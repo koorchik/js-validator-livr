@@ -5,13 +5,16 @@ console.log(LIVR);
 
 var validator = new LIVR.Validator({
     name: { min_length: 2 },
-    email: ['required', { max_length: 2 } ]
+    email: ['required', { max_length: 2 } ],
+    age: 'positive_decimal',
+    password: {'one_of': [['test', 123]] },
+    password2: {'equal_to_field': 'password'}
 });
 
 
 validator.prepare();
 
-var data = validator.validate({name:'a', email: "123"});
+var data = validator.validate({name:'a', email: "123", age:'-20', password: '123', password2: 1234});
 
 if (data) {
     console.log('data', data);
