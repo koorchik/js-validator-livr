@@ -1,5 +1,5 @@
 var fs = require('fs');
-var LIVR = require('../validator-livr');
+var LIVR = require('../lib/LIVR');
 
 console.log(LIVR);
 
