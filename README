@@ -1,0 +1,15 @@
+var LIVR = require('LIVR');
+
+var validator = new LIVR.Validator({
+    name: { min_length: 2 },
+    email: ['required', { max_length: 2 } ]
+});
+
+
+var data = validator.validate({name:'a', email: "123"});
+
+if (data) {
+    console.log('data', data);
+} else {
+    console.log('errors', validator.get_errors());
+}
