@@ -20,7 +20,7 @@ iterateTestData('test_suite/negative', function(data) {
         var output = validator.validate( data.input );
 
         ok(!output, 'Output should be false');
-        deepEqual(validator.get_errors(), data.errors, 'Output should contain correct data');
+        deepEqual(validator.get_errors(), data.errors, 'Validator should contain errors');
     });
 });
 
