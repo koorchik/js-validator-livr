@@ -1,38 +1,45 @@
 var fs = require('fs');
 var LIVR = require('../lib/LIVR');
 
-console.log(LIVR);
+QUnit.module('LIVR: positive tests');
+iterateTestData('test_suite/positive', function(data) {
+    test(data.name, function() {
+        var validator = new LIVR.Validator( data.rules );
+        var output = validator.validate( data.input );
 
-var validator = new LIVR.Validator({
-    name: { min_length: 2 },
-    email: ['required', { max_length: 2 } ],
-    age: 'positive_decimal',
-    password: {'one_of': [['test', 123]] },
-    password2: {'equal_to_field': 'password'}
+        ok(! validator.get_errors(), 'Validator should contain no errors' );
+        deepEqual(output, data.output, 'Output should contain correct data');
+    });
 });
 
 
-validator.prepare();
+QUnit.module('LIVR: negative tests');
+iterateTestData('test_suite/negative', function(data) {
+    test(data.name, function() {
+        var validator = new LIVR.Validator( data.rules );
+        var output = validator.validate( data.input );
 
-var data = validator.validate({name:'a', email: "123", age:'-20', password: '123', password2: 1234});
-
-if (data) {
-    console.log('data', data);
-} else {
-    console.log('errors', validator.get_errors());
-}
-
-function load_json_file(file, cb) {
-    if (!file) throw 'FILE FOR LOAD REQUIRED';
-
-    fs.readFile(file, function (err, json) {
-        if (err) throw err;
-        console.log('READ RAW JSON');
-
-        var data = JSON.parse(json);
-        json = null;
-        console.log('PARSED RAW JSON');
-        
-        cb(data);
+        ok(!output, 'Output should be false');
+        deepEqual(validator.get_errors(), data.errors, 'Output should contain correct data');
     });
+});
+
+
+function iterateTestData(rootPath, cb) {
+    var casesDirs = fs.readdirSync(rootPath);
+
+    for (var i = 0; i < casesDirs.length; i++) {
+        var caseDir = casesDirs[i];
+        var caseFiles = fs.readdirSync(rootPath + '/' + caseDir);        
+        var caseData = {name: caseDir};
+
+        for (var j = 0; j < caseFiles.length; j++) {
+            var file = caseFiles[j];
+            var json = fs.readFileSync(rootPath + '/' + caseDir + '/' + file);
+
+            caseData[ file.replace(/\.json$/, '') ] = JSON.parse(json);
+        }
+
+        cb(caseData);
+    }
 }

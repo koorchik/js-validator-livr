@@ -1,6 +1,6 @@
 var testrunner = require("qunit");
 
 testrunner.run([{
-    code: "../validator-livr.js",
+    code: "../lib/LIVR.js",
     tests: "test_suite.js"
 }]);
