@@ -5,11 +5,10 @@ var validator = new LIVR.Validator({
     email: ['required', { max_length: 2 } ]
 });
 
+var clean_data = validator.validate({name:'a', email: "123"});
 
-var data = validator.validate({name:'a', email: "123"});
-
-if (data) {
-    console.log('data', data);
+if (clean_data) {
+    console.log('clean_data', clean_data);
 } else {
-    console.log('errors', validator.get_errors());
+    console.log('errors', validator.getErrors());
 }
