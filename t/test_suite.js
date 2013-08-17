@@ -7,7 +7,7 @@ iterateTestData('test_suite/positive', function(data) {
         var validator = new LIVR.Validator( data.rules );
         var output = validator.validate( data.input );
 
-        ok(! validator.get_errors(), 'Validator should contain no errors' );
+        ok(! validator.getErrors(), 'Validator should contain no errors' );
         deepEqual(output, data.output, 'Output should contain correct data');
     });
 });
@@ -20,7 +20,7 @@ iterateTestData('test_suite/negative', function(data) {
         var output = validator.validate( data.input );
 
         ok(!output, 'Output should be false');
-        deepEqual(validator.get_errors(), data.errors, 'Validator should contain errors');
+        deepEqual(validator.getErrors(), data.errors, 'Validator should contain errors');
     });
 });
 
