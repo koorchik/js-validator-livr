@@ -6,7 +6,15 @@
       "name": "koorchik",
       "url": "http://koorchik.blogspot.com"
     },
-    "dependencies": {
+    "main": "./lib/LIVR.js",
+    "scripts": {
+        "test": "cd t; node testrunner.js"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+ssh://git@github.com:koorchik/js-validator-livr.git"
+    },
+    "devDependencies": {
         "qunit": "*"
     }
 }
