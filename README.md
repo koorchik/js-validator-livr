@@ -67,10 +67,13 @@ Features:
  * Rules are be able to change results output ("trim", "nested_object", for example)
  * Multipurpose (user input validation, configs validation, contracts programming etc)
 
+# INSTALL
+
+Use npm for nodejs. For browser you can find browserified versions in "dist" folder.
 
 # CLASS METHODS
 
-## LIVR.Validator.registerDefaultRules({"rule_name": ruleBuilder });
+## LIVR.Validator.registerDefaultRules({"rule_name": ruleBuilder })
 ruleBuilder - is a function reference which will be called for building single rule validator.
 
     LIVR.Validator.registerDefaultRules( "my_rule": function(arg1, arg2, arg3, ruleBuilders) {

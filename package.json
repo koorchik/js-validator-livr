@@ -2,20 +2,23 @@
     "name": "LIVR",
     "version": "0.0.1",
     "description": "Lightweight validator supporting Language Independent Validation Rules Specification",
-    "homepage": "",
+    "homepage": "http://",
     "author": {
       "name": "koorchik",
       "url": "http://koorchik.blogspot.com"
     },
     "main": "./lib/LIVR",
     "scripts": {
-        "test": "cd t; node testrunner.js"
+        "test": "cd t; node testrunner.js",
+        "browserify": "browserify -e scripts/browserify_entry.js -o dist/livr.js; browserify -e scripts/browserify_entry.js | uglifyjs -o dist/livr-min.js;"
     },
     "repository": {
         "type": "git",
         "url": "git+ssh://git@github.com:koorchik/js-validator-livr.git"
     },
     "devDependencies": {
-        "qunit": "*"
+        "qunit": "*",
+        "browserify": "*",
+        "uglify-js": "*"
     }
 }
