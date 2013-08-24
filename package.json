@@ -1,12 +1,12 @@
 {
-    "name": "LIVR-Validator",
+    "name": "LIVRValidator",
     "version": "0.0.1",
     "description": "Lightweight validator supporting Language Independent Validation Rules Specification",
     "author": {
       "name": "koorchik",
       "url": "http://koorchik.blogspot.com"
     },
-    "main": "./lib/LIVR.js",
+    "main": "./lib/LIVR",
     "scripts": {
         "test": "cd t; node testrunner.js"
     },
