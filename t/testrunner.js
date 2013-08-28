@@ -6,6 +6,10 @@ testrunner.run([{
 },
 {
     code: "../lib/LIVR.js",
+    tests: "03-auto_trim.js"
+},
+{
+    code: "../lib/LIVR.js",
     tests: "04-custom_filters.js"
 }
 ]);

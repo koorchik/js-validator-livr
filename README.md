@@ -5,7 +5,8 @@ LIVR.Validator - Lightweight validator supporting Language Independent Validatio
 Common usage:
 
     var LIVR = require('LIVR');
-    
+    LIVR.Validator.defaultAutoTrim(true);
+
     var validator = new LIVR.Validator({
         name:      'required',
         email:     [ 'required', 'email' ],
@@ -73,6 +74,13 @@ Use npm for nodejs. For browser you can find browserified versions in "dist" fol
 
 # CLASS METHODS
 
+## new LIVR.Validator(livr, isAutoTrim);
+Contructor creates validator objects.
+livr - validations rules. Rules description is available here - https://github.com/koorchik/LIVR
+
+isAutoTrim - asks validator to trim all values before validation. Output will be also trimmed.
+if isAutoTrim is undefined(or null) than defaultAutoTrim value will be used.
+
 ## LIVR.Validator.registerDefaultRules({"rule_name": ruleBuilder })
 ruleBuilder - is a function reference which will be called for building single rule validator.
 
@@ -117,6 +125,10 @@ All rules for the validator are equal. It does not distinguish "required", "list
 
 ## LIVR.Validator.getDefaultRules({"rule_name": ruleBuilder });
 returns object containing all default ruleBuilders for the validator. You can register new rule or update existing one with "registerRules" method.
+
+## LIVR.Validator.defaultAutoTrim(isAutoTrim)
+Enables or disables automatic trim for input data. If is on then every new validator instance will have auto trim option enabled
+
 
 # OBJECT METHODS
 
