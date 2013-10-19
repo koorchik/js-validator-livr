@@ -65,12 +65,12 @@ Features:
  * Easy to describe and undersand rules
  * Returns understandable error codes(not error messages)
  * Easy to add own rules
- * Rules are be able to change results output ("trim", "nested_object", for example)
+ * Rules are be able to change results output ("trim", "nested\_object", for example)
  * Multipurpose (user input validation, configs validation, contracts programming etc)
 
 # INSTALL
 
-Use npm for nodejs. For browser you can find browserified versions in "dist" folder.
+Use npm for nodejs. For browser you can find browserified versions in "dist" folder (livr-debug.js - not minified development version with source maps, livr-min.js - minified production version)
 
 # CLASS METHODS
 
@@ -81,7 +81,7 @@ livr - validations rules. Rules description is available here - https://github.c
 isAutoTrim - asks validator to trim all values before validation. Output will be also trimmed.
 if isAutoTrim is undefined(or null) than defaultAutoTrim value will be used.
 
-## LIVR.Validator.registerDefaultRules({"rule_name": ruleBuilder })
+## LIVR.Validator.registerDefaultRules({"rule\_name": ruleBuilder })
 ruleBuilder - is a function reference which will be called for building single rule validator.
 
     LIVR.Validator.registerDefaultRules( "my_rule": function(arg1, arg2, arg3, ruleBuilders) {
@@ -99,7 +99,7 @@ ruleBuilder - is a function reference which will be called for building single r
         }
     });
 
-Then you can use "my_rule" for validation:
+Then you can use "my\_rule" for validation:
     
     {
         name1: 'my_rule' // Call without parameters
@@ -108,7 +108,7 @@ Then you can use "my_rule" for validation:
         name4: { 'my_rule': [ arg1, arg2, arg3 ] } // Call with many parameters.
     }
 
-Here is "max_number" implemenation:
+Here is "max\_number" implemenation:
 
     function maxNumber(maxNumber) {
         return function(value) {
@@ -121,9 +121,9 @@ Here is "max_number" implemenation:
     };
     LIVR.Validator.registerDefaultRules({ "max_number": maxNumber });
 
-All rules for the validator are equal. It does not distinguish "required", "list_of_different_objects" and "trim" rules. So, you can extend validator with any rules you like.
+All rules for the validator are equal. It does not distinguish "required", "list\_of\_different\_objects" and "trim" rules. So, you can extend validator with any rules you like.
 
-## LIVR.Validator.getDefaultRules({"rule_name": ruleBuilder });
+## LIVR.Validator.getDefaultRules({"rule\_name": ruleBuilder });
 returns object containing all default ruleBuilders for the validator. You can register new rule or update existing one with "registerRules" method.
 
 ## LIVR.Validator.defaultAutoTrim(isAutoTrim)

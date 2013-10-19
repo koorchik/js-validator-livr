@@ -10,7 +10,7 @@
     "main": "./lib/LIVR",
     "scripts": {
         "test": "cd t; node testrunner.js",
-        "browserify": "browserify -e scripts/browserify_entry.js -o dist/livr.js; browserify -e scripts/browserify_entry.js | uglifyjs -o dist/livr-min.js;"
+        "browserify": "browserify -e scripts/browserify_entry.js -d -o dist/livr-debug.js; browserify -e scripts/browserify_entry.js | uglifyjs -o dist/livr-min.js;"
     },
     "repository": {
         "type": "git",
