@@ -1,5 +1,5 @@
 {
-    "name": "LIVR",
+    "name": "livr",
     "version": "0.0.1",
     "description": "Lightweight validator supporting Language Independent Validation Rules Specification",
     "homepage": "http://livr-spec.org",
