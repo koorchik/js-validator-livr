@@ -2,7 +2,7 @@
     "name": "LIVR",
     "version": "0.0.1",
     "description": "Lightweight validator supporting Language Independent Validation Rules Specification",
-    "homepage": "http://",
+    "homepage": "http://livr-spec.org",
     "author": {
       "name": "koorchik",
       "url": "http://koorchik.blogspot.com"
