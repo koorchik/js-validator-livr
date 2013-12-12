@@ -4,7 +4,7 @@ LIVR.Validator - Lightweight validator supporting Language Independent Validatio
 # SYNOPSIS
 Common usage:
 
-    var LIVR = require('LIVR');
+    var LIVR = require('livr');
     LIVR.Validator.defaultAutoTrim(true);
 
     var validator = new LIVR.Validator({
