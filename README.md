@@ -87,7 +87,7 @@ ruleBuilder - is a function reference which will be called for building single r
     LIVR.Validator.registerDefaultRules( "my_rule": function(arg1, arg2, arg3, ruleBuilders) {
         // ruleBuilders - are rules from original validator 
         // to allow you create new validator with all supported rules
-        // var validator = new LIVR.Validator->new(livr).register_rules(ruleBuilders).prepare();
+        // var validator = new LIVR.Validator(livr).register_rules(ruleBuilders).prepare();
     
         return function(value, allValues, outputArr) {            
             if (notValid) {
@@ -123,7 +123,7 @@ Here is "max\_number" implemenation:
 
 All rules for the validator are equal. It does not distinguish "required", "list\_of\_different\_objects" and "trim" rules. So, you can extend validator with any rules you like.
 
-## LIVR.Validator.getDefaultRules({"rule\_name": ruleBuilder });
+## LIVR.Validator.getDefaultRules();
 returns object containing all default ruleBuilders for the validator. You can register new rule or update existing one with "registerRules" method.
 
 ## LIVR.Validator.defaultAutoTrim(isAutoTrim)
