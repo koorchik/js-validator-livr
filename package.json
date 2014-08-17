@@ -1,6 +1,6 @@
 {
     "name": "livr",
-    "version": "0.0.2",
+    "version": "0.0.3",
     "description": "Lightweight validator supporting Language Independent Validation Rules Specification",
     "homepage": "http://livr-spec.org",
     "author": {
@@ -10,7 +10,7 @@
     "main": "./lib/LIVR",
     "scripts": {
         "test": "cd t; node testrunner.js",
-        "browserify": "browserify -e scripts/browserify_entry.js -d -o dist/livr-debug.js; browserify -e scripts/browserify_entry.js | uglifyjs -o dist/livr-min.js;"
+        "build": "browserify -e scripts/browserify_entry.js -d -o dist/livr-debug.js; browserify -e scripts/browserify_entry.js | uglifyjs -o dist/livr-min.js;"
     },
     "repository": {
         "type": "git",
