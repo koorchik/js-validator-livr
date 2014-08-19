@@ -40,7 +40,7 @@ Feel free to register your own rules:
         password: ['required', 'strong_password']
     });
     
-    validator.registerRules( 'strong_password', function() {
+    validator.registerRules({ strong_password: function() {
         return function(value) {
             // We already have "required" rule to check that the value is present
             if ( value === undefined || value === null || value === '' ) return;
@@ -49,7 +49,7 @@ Feel free to register your own rules:
                 return 'WEAK_PASSWORD'
             }
         }
-    } );
+    }});
 
 
 # DESCRIPTION
@@ -87,7 +87,7 @@ ruleBuilder - is a function reference which will be called for building single r
     LIVR.Validator.registerDefaultRules( "my_rule": function(arg1, arg2, arg3, ruleBuilders) {
         // ruleBuilders - are rules from original validator 
         // to allow you create new validator with all supported rules
-        // var validator = new LIVR.Validator(livr).register_rules(ruleBuilders).prepare();
+        // var validator = new LIVR.Validator(livr).registerRules(ruleBuilders).prepare();
     
         return function(value, allValues, outputArr) {            
             if (notValid) {
