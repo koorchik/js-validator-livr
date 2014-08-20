@@ -1,3 +1,5 @@
+'use strict';
+
 var fs = require('fs');
 var LIVR = require('../lib/LIVR');
 
@@ -24,6 +26,38 @@ iterateTestData('test_suite/negative', function(data) {
     });
 });
 
+
+QUnit.module('LIVR: aliases positive tests');
+iterateTestData('test_suite/aliases_positive', function(data) {
+    test(data.name, function() {
+        var validator = new LIVR.Validator( data.rules );
+
+        data.aliases.forEach(function(alias) {
+            validator.registerAliasedRule(alias);
+        });
+
+        var output = validator.validate( data.input );
+
+        ok(! validator.getErrors(), 'Validator should contain no errors' );
+        deepEqual(output, data.output, 'Output should contain correct data');
+    });
+});
+
+QUnit.module('LIVR: aliases negative tests');
+iterateTestData('test_suite/aliases_negative', function(data) {
+    test(data.name, function() {
+        var validator = new LIVR.Validator( data.rules );
+
+        data.aliases.forEach(function(alias) {
+            validator.registerAliasedRule(alias);
+        });
+
+        var output = validator.validate( data.input );
+
+        ok(!output, 'Output should be false');
+        deepEqual(validator.getErrors(), data.errors, 'Validator should contain errors');
+    });
+});
 
 function iterateTestData(rootPath, cb) {
     var casesDirs = fs.readdirSync(rootPath);
