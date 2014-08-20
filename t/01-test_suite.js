@@ -30,7 +30,7 @@ function iterateTestData(rootPath, cb) {
 
     for (var i = 0; i < casesDirs.length; i++) {
         var caseDir = casesDirs[i];
-        var caseFiles = fs.readdirSync(rootPath + '/' + caseDir);        
+        var caseFiles = fs.readdirSync(rootPath + '/' + caseDir);
         var caseData = {name: caseDir};
 
         for (var j = 0; j < caseFiles.length; j++) {
