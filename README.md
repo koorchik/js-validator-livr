@@ -55,7 +55,7 @@ Feel free to register your own rules:
 
 
 # DESCRIPTION
-See https://github.com/koorchik/LIVR for details.
+See http://livr-spec.org for detailed documentation and list of supported rules.
 
 Features:
 
