@@ -35,8 +35,21 @@ You can use filters separately or can combine them with validation:
     });
     
 
-
 Feel free to register your own rules:
+
+You can use aliases(prefferable, syntax covered by the specification) for a lot of cases:
+    
+    var validator = new LIVR.Validator({
+        password: ['required', 'strong_password']
+    });
+    
+    validator.registerAliasedRule({ 
+        name: 'strong_password',
+        rules: {min_length: 6},
+        error: 'WEAK_PASSWORD'
+    });
+
+Or you can write more sophisticated rules directly:
 
     var validator = new LIVR.Validator({
         password: ['required', 'strong_password']
@@ -52,7 +65,6 @@ Feel free to register your own rules:
             }
         }
     }});
-
 
 # DESCRIPTION
 See http://livr-spec.org for detailed documentation and list of supported rules.
@@ -82,6 +94,35 @@ livr - validations rules. Rules description is available here - https://github.c
 
 isAutoTrim - asks validator to trim all values before validation. Output will be also trimmed.
 if isAutoTrim is undefined(or null) than defaultAutoTrim value will be used.
+
+## LIVR.Validator.registerDefaultAliasedRule(alias)
+alias - is a plain javascript object that contains: name, rules, error (optional).
+
+    LIVR.Validator.registerDefaultAliasedRule({
+        name: 'valid_address',
+        rules: { nested_object: {
+            country: 'required',
+            city: 'required',
+            zip: 'positive_integer'
+        }}
+    });
+
+Then you can use "valid\_address" for validation:
+    
+    {
+        address: 'valid_address'
+    }
+
+
+You can register aliases with own errors: 
+
+    LIVR.Validator.registerDefaultAliasedRule({
+        name: 'adult_age'
+        rules: [ 'positive_integer', { min_number: 18 } ],
+        error: 'WRONG_AGE'
+    });
+
+All rules/aliases for the validator are equal. The validator does not distinguish "required", "list\_of\_different\_objects" and "trim" rules. So, you can extend validator with any rules/alias you like.
 
 ## LIVR.Validator.registerDefaultRules({"rule\_name": ruleBuilder })
 ruleBuilder - is a function reference which will be called for building single rule validator.
@@ -123,7 +164,7 @@ Here is "max\_number" implemenation:
     };
     LIVR.Validator.registerDefaultRules({ "max_number": maxNumber });
 
-All rules for the validator are equal. It does not distinguish "required", "list\_of\_different\_objects" and "trim" rules. So, you can extend validator with any rules you like.
+All rules for the validator are equal. The validator does not distinguish "required", "list\_of\_different\_objects" and "trim" rules. So, you can extend validator with any rules you like.
 
 ## LIVR.Validator.getDefaultRules();
 returns object containing all default ruleBuilders for the validator. You can register new rule or update existing one with "registerRules" method.
@@ -168,6 +209,12 @@ For example:
 ruleBuilder - is a function reference which will be called for building single rule validator.
 
 See "LIVR.Validator.registerDefaultRules" for rules examples.
+
+## validator.registerAliasedRule(alias)
+
+alias - is a composite validation rule. 
+
+See "LIVR.Validator.registerAliasedDefaultRule" for rules examples.
 
 ## validator.getRules()
 returns object containing all ruleBuilders for the validator. You can register new rule or update existing one with "registerRules" method.
