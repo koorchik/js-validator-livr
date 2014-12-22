@@ -12,7 +12,7 @@ Common usage:
     var validator = new LIVR.Validator({
         name:      'required',
         email:     [ 'required', 'email' ],
-        gender:    { one_of : [['male', 'female']] },
+        gender:    { one_of : ['male', 'female'] },
         phone:     { max_length : 10 },
         password:  [ 'required', {min_length : 10} ],
         password2: { equal_to_field : 'password' }
@@ -95,10 +95,10 @@ livr - validations rules. Rules description is available here - https://github.c
 isAutoTrim - asks validator to trim all values before validation. Output will be also trimmed.
 if isAutoTrim is undefined(or null) than defaultAutoTrim value will be used.
 
-## LIVR.Validator.registerDefaultAliasedRule(alias)
+## LIVR.Validator.registerAliasedDefaultRule(alias)
 alias - is a plain javascript object that contains: name, rules, error (optional).
 
-    LIVR.Validator.registerDefaultAliasedRule({
+    LIVR.Validator.registerAliasedDefaultRule({
         name: 'valid_address',
         rules: { nested_object: {
             country: 'required',
@@ -116,7 +116,7 @@ Then you can use "valid\_address" for validation:
 
 You can register aliases with own errors: 
 
-    LIVR.Validator.registerDefaultAliasedRule({
+    LIVR.Validator.registerAliasedDefaultRule({
         name: 'adult_age'
         rules: [ 'positive_integer', { min_number: 18 } ],
         error: 'WRONG_AGE'
