@@ -1,5 +1,0 @@
-{
-    "number1": { "min_number" : 10 },
-    "number2": [{ "min_number" : 20 }],
-    "empty_field":  { "min_number" : 10 }
-}
