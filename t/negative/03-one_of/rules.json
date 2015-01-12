@@ -1,5 +1,0 @@
-{
-    "city1": { "one_of": [["Moscow", "Kiev" ]] },
-    "city2": [{ "one_of": [["Moscow", "Kiev" ]] }],
-    "city3": { "one_of": ["Moscow", "Kiev"] }
-}
