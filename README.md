@@ -127,7 +127,7 @@ All rules/aliases for the validator are equal. The validator does not distinguis
 ## LIVR.Validator.registerDefaultRules({"rule\_name": ruleBuilder })
 ruleBuilder - is a function reference which will be called for building single rule validator.
 
-    LIVR.Validator.registerDefaultRules( "my_rule": function(arg1, arg2, arg3, ruleBuilders) {
+    LIVR.Validator.registerDefaultRules({ my_rule: function(arg1, arg2, arg3, ruleBuilders) {
         // ruleBuilders - are rules from original validator 
         // to allow you create new validator with all supported rules
         // var validator = new LIVR.Validator(livr).registerRules(ruleBuilders).prepare();
