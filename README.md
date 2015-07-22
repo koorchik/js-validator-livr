@@ -67,7 +67,7 @@ Or you can write more sophisticated rules directly:
     }});
 
 # DESCRIPTION
-See http://livr-spec.org for detailed documentation and list of supported rules.
+See ['LIVR Specification'](http://livr-spec.org) for detailed documentation and list of supported rules.
 
 Features:
 
