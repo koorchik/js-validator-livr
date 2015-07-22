@@ -1,6 +1,6 @@
 {
     "name": "livr",
-    "version": "0.0.11",
+    "version": "0.0.12",
     "description": "Lightweight validator supporting Language Independent Validation Rules Specification",
     "homepage": "http://livr-spec.org",
     "author": {
