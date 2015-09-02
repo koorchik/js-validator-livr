@@ -1,4 +1,5 @@
 var LIVR = require('../lib/LIVR');
+var assert = require('chai').assert;
 
 var validator = new LIVR.Validator({
     code:     'required',
@@ -9,7 +10,6 @@ var validator = new LIVR.Validator({
 }, true);
 
 test('NEGATIVE: Validate data with automatic trim', function() {
-
     var output = validator.validate({
         code: '  ',
         password: ' 12  ',
@@ -18,9 +18,9 @@ test('NEGATIVE: Validate data with automatic trim', function() {
         }
     });
 
-    ok(!output, 'should return false due to validation errors fot trimmed values');
+    assert.ok(!output, 'should return false due to validation errors fot trimmed values');
 
-    deepEqual( validator.getErrors() , {
+    assert.deepEqual( validator.getErrors() , {
         code: 'REQUIRED',
         password: 'TOO_SHORT',
         address: {
@@ -39,9 +39,9 @@ test('POSITIVE: Validate data with automatic trim', function() {
         }
     });
 
-    ok( cleanData, 'should return clean data' );
+    assert.ok( cleanData, 'should return clean data' );
 
-    deepEqual( cleanData, {
+    assert.deepEqual( cleanData, {
         code: 'A',
         password: '123',
         address: {

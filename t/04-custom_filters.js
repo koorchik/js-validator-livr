@@ -1,4 +1,5 @@
 var LIVR = require('../lib/LIVR');
+var assert = require('chai').assert;
 
 LIVR.Validator.registerDefaultRules({
     my_trim: function() {
@@ -40,7 +41,7 @@ test('Validate data with registered rules', function() {
         word3: 'wordThree '
     });
 
-    deepEqual( output, {
+    assert.deepEqual( output, {
         word1: 'Wordone',
         word2: 'wordtwo',
         word3: 'WordThree '

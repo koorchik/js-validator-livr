@@ -2,32 +2,34 @@
 
 var fs = require('fs');
 var LIVR = require('../lib/LIVR');
+var assert = require('chai').assert;
 
-QUnit.module('LIVR: positive tests');
+suite('LIVR: positive tests');
+
 iterateTestData('test_suite/positive', function(data) {
     test(data.name, function() {
         var validator = new LIVR.Validator( data.rules );
         var output = validator.validate( data.input );
 
-        ok(! validator.getErrors(), 'Validator should contain no errors' );
-        deepEqual(output, data.output, 'Output should contain correct data');
+        assert.ok(! validator.getErrors(), 'Validator should contain no errors' );
+        assert.deepEqual(output, data.output, 'Output should contain correct data');
     });
 });
 
 
-QUnit.module('LIVR: negative tests');
+suite('LIVR: negative tests');
 iterateTestData('test_suite/negative', function(data) {
     test(data.name, function() {
         var validator = new LIVR.Validator( data.rules );
         var output = validator.validate( data.input );
 
-        ok(!output, 'Output should be false');
-        deepEqual(validator.getErrors(), data.errors, 'Validator should contain errors');
+        assert.ok(!output, 'Output should be false');
+        assert.deepEqual(validator.getErrors(), data.errors, 'Validator should contain errors');
     });
 });
 
 
-QUnit.module('LIVR: aliases positive tests');
+suite('LIVR: aliases positive tests');
 iterateTestData('test_suite/aliases_positive', function(data) {
     test(data.name, function() {
         var validator = new LIVR.Validator( data.rules );
@@ -38,12 +40,12 @@ iterateTestData('test_suite/aliases_positive', function(data) {
 
         var output = validator.validate( data.input );
 
-        ok(! validator.getErrors(), 'Validator should contain no errors' );
-        deepEqual(output, data.output, 'Output should contain correct data');
+        assert.ok(! validator.getErrors(), 'Validator should contain no errors' );
+        assert.deepEqual(output, data.output, 'Output should contain correct data');
     });
 });
 
-QUnit.module('LIVR: aliases negative tests');
+suite('LIVR: aliases negative tests');
 iterateTestData('test_suite/aliases_negative', function(data) {
     test(data.name, function() {
         var validator = new LIVR.Validator( data.rules );
@@ -54,12 +56,14 @@ iterateTestData('test_suite/aliases_negative', function(data) {
 
         var output = validator.validate( data.input );
 
-        ok(!output, 'Output should be false');
-        deepEqual(validator.getErrors(), data.errors, 'Validator should contain errors');
+        assert.ok(!output, 'Output should be false');
+        assert.deepEqual(validator.getErrors(), data.errors, 'Validator should contain errors');
     });
 });
 
-function iterateTestData(rootPath, cb) {
+function iterateTestData(path, cb) {
+    var rootPath = __dirname + '/' + path;
+    console.log(rootPath);
     var casesDirs = fs.readdirSync(rootPath);
 
     for (var i = 0; i < casesDirs.length; i++) {

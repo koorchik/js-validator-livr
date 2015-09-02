@@ -1,5 +1,6 @@
 'use strict';
 var LIVR = require('../lib/LIVR');
+var assert = require('chai').assert;
 
 function patchRule(ruleName, ruleBuilder) {
     return function() {
@@ -22,34 +23,36 @@ function patchRule(ruleName, ruleBuilder) {
     }
 }
 
-var defaultRules = LIVR.Validator.getDefaultRules();
-var newRules = {};
-
-for (var ruleName in defaultRules) {
-    var ruleBuilder = defaultRules[ruleName];
-    newRules[ruleName] = patchRule(ruleName, ruleBuilder);
-}
-
-LIVR.Validator.registerDefaultRules(newRules);
-
-var validData = validator.validate({
-    phone: '123456789123456'
-});
+suite('Rules replacement');
 
 test('Validate data with registered rules', function() {
+    // Patch rules
+    var defaultRules = LIVR.Validator.getDefaultRules();
+
+    var originalRules = {};
+    var newRules      = {};
+
+    for (var ruleName in defaultRules) {
+        var ruleBuilder = defaultRules[ruleName];
+        originalRules[ruleName] = ruleBuilder;
+        newRules[ruleName] = patchRule(ruleName, ruleBuilder);
+    }
+
+    LIVR.Validator.registerDefaultRules(newRules);
+
+    // Test
     var validator = new LIVR.Validator({
         name:  ['required'],
         phone: { max_length: 10 }
     });
 
-
     var output = validator.validate({
         phone: '123456789123456'
     });
 
-    ok(!output, 'Validation should fail');
+    assert.ok(!output, 'Validation should fail');
 
-    deepEqual( validator.getErrors(),
+    assert.deepEqual( validator.getErrors(),
         {
             name: {
                 code: 'REQUIRED',
@@ -61,4 +64,7 @@ test('Validate data with registered rules', function() {
                 rule: { max_length: [10] }
             }
         }, 'Should return detailed errors' );
+
+    // Restore
+    LIVR.Validator.registerDefaultRules(originalRules);
 });
