@@ -2,6 +2,7 @@
     "url1": "url",
     "url2": { "url": [] },
     "url3": [ { "url": [] } ],
+    "url4": [ { "url": [] } ],
     "empty_field": "url",
 
     "value_is_hash":        "url",
