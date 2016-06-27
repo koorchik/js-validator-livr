@@ -1,8 +1,9 @@
 'use strict';
 
-var fs = require('fs');
-var LIVR = require('../lib/LIVR');
+var fs     = require('fs');
+var LIVR   = require('../lib/LIVR');
 var assert = require('chai').assert;
+var util   = require('util');
 
 suite('LIVR: positive tests');
 
@@ -11,7 +12,8 @@ iterateTestData('test_suite/positive', function(data) {
         var validator = new LIVR.Validator( data.rules );
         var output = validator.validate( data.input );
 
-        assert.ok(! validator.getErrors(), 'Validator should contain no errors' );
+        var errors = validator.getErrors();
+        assert.ok(!errors, 'Validator should contain no errors. The error was ' + util.inspect(errors) );
         assert.deepEqual(output, data.output, 'Output should contain correct data');
     });
 });

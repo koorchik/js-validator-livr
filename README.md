@@ -17,15 +17,15 @@ Common usage:
         password:  [ 'required', {min_length : 10} ],
         password2: { equal_to_field : 'password' }
     });
-    
+
     var validData = validator.validate(userData);
-    
+
     if (validData) {
         saveUser(validData);
     } else {
         console.log('errors', validator.getErrors());
     }
-    
+
 
 
 You can use filters separately or can combine them with validation:
@@ -33,17 +33,17 @@ You can use filters separately or can combine them with validation:
     var validator = new LIVR.Validator({
         email: [ 'required', 'trim', 'email', 'to_lc' ]
     });
-    
+
 
 Feel free to register your own rules:
 
 You can use aliases(prefferable, syntax covered by the specification) for a lot of cases:
-    
+
     var validator = new LIVR.Validator({
         password: ['required', 'strong_password']
     });
-    
-    validator.registerAliasedRule({ 
+
+    validator.registerAliasedRule({
         name: 'strong_password',
         rules: {min_length: 6},
         error: 'WEAK_PASSWORD'
@@ -54,12 +54,12 @@ Or you can write more sophisticated rules directly:
     var validator = new LIVR.Validator({
         password: ['required', 'strong_password']
     });
-    
+
     validator.registerRules({ strong_password: function() {
         return function(value) {
             // We already have "required" rule to check that the value is present
             if ( value === undefined || value === null || value === '' ) return;
-    
+
             if ( value.length < 6 ) {
                 return 'WEAK_PASSWORD'
             }
@@ -108,13 +108,13 @@ alias - is a plain javascript object that contains: name, rules, error (optional
     });
 
 Then you can use "valid\_address" for validation:
-    
+
     {
         address: 'valid_address'
     }
 
 
-You can register aliases with own errors: 
+You can register aliases with own errors:
 
     LIVR.Validator.registerAliasedDefaultRule({
         name: 'adult_age'
@@ -128,22 +128,22 @@ All rules/aliases for the validator are equal. The validator does not distinguis
 ruleBuilder - is a function reference which will be called for building single rule validator.
 
     LIVR.Validator.registerDefaultRules({ my_rule: function(arg1, arg2, arg3, ruleBuilders) {
-        // ruleBuilders - are rules from original validator 
+        // ruleBuilders - are rules from original validator
         // to allow you create new validator with all supported rules
         // var validator = new LIVR.Validator(livr).registerRules(ruleBuilders).prepare();
-    
-        return function(value, allValues, outputArr) {            
+
+        return function(value, allValues, outputArr) {
             if (notValid) {
                 return "SOME_ERROR_CODE";
             }
             else {
-                
+
             }
         }
     });
 
 Then you can use "my\_rule" for validation:
-    
+
     {
         name1: 'my_rule' // Call without parameters
         name2: { 'my_rule': arg1 } // Call with one parameter.
@@ -157,7 +157,7 @@ Here is "max\_number" implemenation:
         return function(value) {
             // We do not validate empty fields. We have "required" rule for this purpose
             if (value === undefined || value === null || value === '' ) return;
-    
+
             // return error message
             if ( value > maxNumber ) return 'TOO_HIGH';
         };
@@ -172,6 +172,9 @@ returns object containing all default ruleBuilders for the validator. You can re
 ## LIVR.Validator.defaultAutoTrim(isAutoTrim)
 Enables or disables automatic trim for input data. If is on then every new validator instance will have auto trim option enabled
 
+## LIVR.util
+
+List of usefull utils for writing your rules (see source code)
 
 # OBJECT METHODS
 
@@ -212,7 +215,7 @@ See "LIVR.Validator.registerDefaultRules" for rules examples.
 
 ## validator.registerAliasedRule(alias)
 
-alias - is a composite validation rule. 
+alias - is a composite validation rule.
 
 See "LIVR.Validator.registerAliasedDefaultRule" for rules examples.
 
@@ -242,6 +245,3 @@ This license does not grant you the right to use any trademark, service mark, tr
 This license includes the non-exclusive, worldwide, free-of-charge patent license to make, have made, use, offer to sell, sell, import and otherwise transfer the Package with respect to any patent claims licensable by the Copyright Holder that are necessarily infringed by the Package. If you institute patent litigation (including a cross-claim or counterclaim) against any party alleging that the Package constitutes direct or contributory patent infringement, then this Artistic License to you shall terminate on the date that such litigation is filed.
 
 Disclaimer of Warranty: THE PACKAGE IS PROVIDED BY THE COPYRIGHT HOLDER AND CONTRIBUTORS "AS IS' AND WITHOUT ANY EXPRESS OR IMPLIED WARRANTIES. THE IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, OR NON-INFRINGEMENT ARE DISCLAIMED TO THE EXTENT PERMITTED BY YOUR LOCAL LAW. UNLESS REQUIRED BY LAW, NO COPYRIGHT HOLDER OR CONTRIBUTOR WILL BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, OR CONSEQUENTIAL DAMAGES ARISING IN ANY WAY OUT OF THE USE OF THE PACKAGE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-
-
-
