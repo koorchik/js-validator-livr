@@ -84,7 +84,15 @@ Features:
 
 # INSTALL
 
-Use npm for nodejs. For browser you can find browserified versions in "dist" folder (livr-debug.js - not minified development version with source maps, livr-min.js - minified production version)
+#### nodejs/npm
+
+```bash
+npm install livr
+```
+
+#### Browser
+
+You can find browserified versions in "dist" folder (livr-debug.js - not minified development version with source maps, livr-min.js - minified production version)
 
 # CLASS METHODS
 
