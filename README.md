@@ -124,7 +124,6 @@ LIVR.Validator.registerAliasedDefaultRule({
 });
 ```
 
-
 Then you can use "valid\_address" for validation:
 
 ```javascript
