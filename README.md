@@ -29,7 +29,7 @@ if (validData) {
 ```
 
 
-You can use filters separately or can combine them with validation:
+You can use modifiers separately or can combine them with validation:
 
 ```javascript
 var validator = new LIVR.Validator({
