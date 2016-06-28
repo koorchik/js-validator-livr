@@ -231,12 +231,12 @@ Returns errors object.
 For example:
 
 ```javascript
-    {
-        "country":  "NOT_ALLOWED_VALUE",
-        "zip":      "NOT_POSITIVE_INTEGER",
-        "street":   "REQUIRED",
-        "building": "NOT_POSITIVE_INTEGER"
-    }
+{
+    "country":  "NOT_ALLOWED_VALUE",
+    "zip":      "NOT_POSITIVE_INTEGER",
+    "street":   "REQUIRED",
+    "building": "NOT_POSITIVE_INTEGER"
+}
 ```
 
 ## validator.registerRules({"rule_name": ruleBuilder})
