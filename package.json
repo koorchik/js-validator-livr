@@ -1,16 +1,16 @@
 {
   "name": "livr",
-  "version": "0.0.14",
+  "version": "2.0.0",
   "description": "Lightweight validator supporting Language Independent Validation Rules Specification",
   "homepage": "https://github.com/koorchik/js-validator-livr",
   "author": {
     "name": "koorchik",
-    "url": "http://koorchik.blogspot.com"
+    "url": "http://blog.koorchik.com"
   },
   "license": "Artistic License 2.0",
   "main": "./lib/LIVR",
   "scripts": {
-    "test": "mocha  --timeout 6000 --ui qunit t/*.js",
+    "test": "mocha --timeout 6000 --ui qunit t/*.js",
     "build": "browserify -e scripts/browserify_entry.js -d -o dist/livr-debug.js; browserify -e scripts/browserify_entry.js | uglifyjs -o dist/livr-min.js;"
   },
   "repository": {

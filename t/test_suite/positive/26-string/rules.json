@@ -3,5 +3,5 @@
     "city2": [{ "string": [] }],
     "number1": "string",
     "number2": "string",
-    "empty_city": { "eq": "Kiev" }
+    "empty_city": "string"
 }
