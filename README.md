@@ -6,65 +6,72 @@ LIVR.Validator - Lightweight validator supporting Language Independent Validatio
 # SYNOPSIS
 Common usage:
 
-    var LIVR = require('livr');
-    LIVR.Validator.defaultAutoTrim(true);
+```javascript
+var LIVR = require('livr');
+LIVR.Validator.defaultAutoTrim(true);
 
-    var validator = new LIVR.Validator({
-        name:      'required',
-        email:     [ 'required', 'email' ],
-        gender:    { one_of : ['male', 'female'] },
-        phone:     { max_length : 10 },
-        password:  [ 'required', {min_length : 10} ],
-        password2: { equal_to_field : 'password' }
-    });
+var validator = new LIVR.Validator({
+    name:      'required',
+    email:     [ 'required', 'email' ],
+    gender:    { one_of : ['male', 'female'] },
+    phone:     { max_length : 10 },
+    password:  [ 'required', {min_length : 10} ],
+    password2: { equal_to_field : 'password' }
+});
 
-    var validData = validator.validate(userData);
+var validData = validator.validate(userData);
 
-    if (validData) {
-        saveUser(validData);
-    } else {
-        console.log('errors', validator.getErrors());
-    }
-
+if (validData) {
+    saveUser(validData);
+} else {
+    console.log('errors', validator.getErrors());
+}
+```
 
 
 You can use filters separately or can combine them with validation:
 
-    var validator = new LIVR.Validator({
-        email: [ 'required', 'trim', 'email', 'to_lc' ]
-    });
+```javascript
+var validator = new LIVR.Validator({
+    email: [ 'required', 'trim', 'email', 'to_lc' ]
+});
+```
 
 
 Feel free to register your own rules:
 
 You can use aliases(prefferable, syntax covered by the specification) for a lot of cases:
 
-    var validator = new LIVR.Validator({
-        password: ['required', 'strong_password']
-    });
+```javascript
+var validator = new LIVR.Validator({
+    password: ['required', 'strong_password']
+});
 
-    validator.registerAliasedRule({
-        name: 'strong_password',
-        rules: {min_length: 6},
-        error: 'WEAK_PASSWORD'
-    });
+validator.registerAliasedRule({
+    name: 'strong_password',
+    rules: {min_length: 6},
+    error: 'WEAK_PASSWORD'
+});
+```
 
 Or you can write more sophisticated rules directly:
 
-    var validator = new LIVR.Validator({
-        password: ['required', 'strong_password']
-    });
+```javascript
+var validator = new LIVR.Validator({
+    password: ['required', 'strong_password']
+});
 
-    validator.registerRules({ strong_password: function() {
-        return function(value) {
-            // We already have "required" rule to check that the value is present
-            if ( value === undefined || value === null || value === '' ) return;
+validator.registerRules({ strong_password: function() {
+    return function(value) {
+        // We already have "required" rule to check that the value is present
+        if ( value === undefined || value === null || value === '' ) return;
 
-            if ( value.length < 6 ) {
-                return 'WEAK_PASSWORD'
-            }
+        if ( value.length < 6 ) {
+            return 'WEAK_PASSWORD'
         }
-    }});
+    }
+}});
+```
 
 # DESCRIPTION
 See ['LIVR Specification'](http://livr-spec.org) for detailed documentation and list of supported rules.
@@ -106,71 +113,83 @@ if isAutoTrim is undefined(or null) than defaultAutoTrim value will be used.
 ## LIVR.Validator.registerAliasedDefaultRule(alias)
 alias - is a plain javascript object that contains: name, rules, error (optional).
 
-    LIVR.Validator.registerAliasedDefaultRule({
-        name: 'valid_address',
-        rules: { nested_object: {
-            country: 'required',
-            city: 'required',
-            zip: 'positive_integer'
-        }}
-    });
+```javascript
+LIVR.Validator.registerAliasedDefaultRule({
+    name: 'valid_address',
+    rules: { nested_object: {
+        country: 'required',
+        city: 'required',
+        zip: 'positive_integer'
+    }}
+});
+```
+
 
 Then you can use "valid\_address" for validation:
 
-    {
-        address: 'valid_address'
-    }
-
+```javascript
+{
+    address: 'valid_address'
+}
+```
 
 You can register aliases with own errors:
 
-    LIVR.Validator.registerAliasedDefaultRule({
-        name: 'adult_age'
-        rules: [ 'positive_integer', { min_number: 18 } ],
-        error: 'WRONG_AGE'
-    });
+```javascript
+LIVR.Validator.registerAliasedDefaultRule({
+    name: 'adult_age'
+    rules: [ 'positive_integer', { min_number: 18 } ],
+    error: 'WRONG_AGE'
+});
+```
 
 All rules/aliases for the validator are equal. The validator does not distinguish "required", "list\_of\_different\_objects" and "trim" rules. So, you can extend validator with any rules/alias you like.
 
 ## LIVR.Validator.registerDefaultRules({"rule\_name": ruleBuilder })
 ruleBuilder - is a function reference which will be called for building single rule validator.
 
-    LIVR.Validator.registerDefaultRules({ my_rule: function(arg1, arg2, arg3, ruleBuilders) {
-        // ruleBuilders - are rules from original validator
-        // to allow you create new validator with all supported rules
-        // var validator = new LIVR.Validator(livr).registerRules(ruleBuilders).prepare();
+```javascript
+LIVR.Validator.registerDefaultRules({ my_rule: function(arg1, arg2, arg3, ruleBuilders) {
+    // ruleBuilders - are rules from original validator
+    // to allow you create new validator with all supported rules
+    // var validator = new LIVR.Validator(livr).registerRules(ruleBuilders).prepare();
 
-        return function(value, allValues, outputArr) {
-            if (notValid) {
-                return "SOME_ERROR_CODE";
-            }
-            else {
-
-            }
+    return function(value, allValues, outputArr) {
+        if (notValid) {
+            return "SOME_ERROR_CODE";
         }
-    });
+        else {
+
+        }
+    }
+});
+```
 
 Then you can use "my\_rule" for validation:
 
-    {
-        name1: 'my_rule' // Call without parameters
-        name2: { 'my_rule': arg1 } // Call with one parameter.
-        name3: { 'my_rule': [arg1] } // Call with one parameter.
-        name4: { 'my_rule': [ arg1, arg2, arg3 ] } // Call with many parameters.
-    }
+```javascript
+{
+    name1: 'my_rule' // Call without parameters
+    name2: { 'my_rule': arg1 } // Call with one parameter.
+    name3: { 'my_rule': [arg1] } // Call with one parameter.
+    name4: { 'my_rule': [ arg1, arg2, arg3 ] } // Call with many parameters.
+}
+```
 
 Here is "max\_number" implemenation:
 
-    function maxNumber(maxNumber) {
-        return function(value) {
-            // We do not validate empty fields. We have "required" rule for this purpose
-            if (value === undefined || value === null || value === '' ) return;
+```javascript
+function maxNumber(maxNumber) {
+    return function(value) {
+        // We do not validate empty fields. We have "required" rule for this purpose
+        if (value === undefined || value === null || value === '' ) return;
 
-            // return error message
-            if ( value > maxNumber ) return 'TOO_HIGH';
-        };
+        // return error message
+        if ( value > maxNumber ) return 'TOO_HIGH';
     };
-    LIVR.Validator.registerDefaultRules({ "max_number": maxNumber });
+};
+LIVR.Validator.registerDefaultRules({ "max_number": maxNumber });
+```
 
 All rules for the validator are equal. The validator does not distinguish "required", "list\_of\_different\_objects" and "trim" rules. So, you can extend validator with any rules you like.
 
@@ -189,31 +208,37 @@ List of usefull utils for writing your rules (see source code)
 ## validator.validate(input)
 Validates user input. On success returns validData (contains only data that has described validation rules). On error return false.
 
-    my validaData = validator.validate(input)
+```javascript
+my validaData = validator.validate(input)
 
-    if (validData) {
-        // use validData
-    } else {
-        var errors = validator.getErrors();
-    }
+if (validData) {
+    // use validData
+} else {
+    var errors = validator.getErrors();
+}
+```
 
 ## validator.getErrors()
 Returns errors object.
 
-   {
-        "field1": "ERROR_CODE",
-        "field2": "ERROR_CODE",
-        ...
-    }
+```javascript
+{
+    "field1": "ERROR_CODE",
+    "field2": "ERROR_CODE",
+    ...
+}
+```
 
 For example:
 
+```javascript
     {
         "country":  "NOT_ALLOWED_VALUE",
         "zip":      "NOT_POSITIVE_INTEGER",
         "street":   "REQUIRED",
         "building": "NOT_POSITIVE_INTEGER"
     }
+```
 
 ## validator.registerRules({"rule_name": ruleBuilder})
 
