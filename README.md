@@ -161,7 +161,7 @@ LIVR.Validator.registerDefaultRules({ my_rule: function(arg1, arg2, arg3, ruleBu
 
         }
     }
-});
+}});
 ```
 
 Then you can use "my\_rule" for validation:
