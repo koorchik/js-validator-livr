@@ -1,0 +1,9 @@
+{
+    "city1": { "not_one_of": [["Moscow", "Kiev" ]] },
+    "city2": [{ "not_one_of": [["Moscow", "Kiev" ]] }],
+    "city3": { "not_one_of": ["Moscow", "Kiev"] },
+    "number1": { "not_one_of": [3, 4] },
+    "number2": { "not_one_of": ["3", "4"] },
+    "boolean": { "not_one_of": [false] },
+    "empty_city": { "not_one_of": [["Moscow", "Kiev" ]] }
+}
