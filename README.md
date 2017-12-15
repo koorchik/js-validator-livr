@@ -1,6 +1,6 @@
 [![Build Status](https://travis-ci.org/koorchik/js-validator-livr.svg?branch=master)](https://travis-ci.org/koorchik/js-validator-livr)
 
-# NAME
+# LIVR Validator
 LIVR.Validator - Lightweight validator supporting Language Independent Validation Rules Specification (LIVR)
 
 # SYNOPSIS
