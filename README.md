@@ -208,7 +208,7 @@ List of usefull utils for writing your rules (see source code)
 Validates user input. On success returns validData (contains only data that has described validation rules). On error return false.
 
 ```javascript
-my validaData = validator.validate(input)
+var validaData = validator.validate(input)
 
 if (validData) {
     // use validData
