@@ -1,0 +1,9 @@
+{
+    "city1": "New York",
+    "city2": "New York",
+    "city3": "New York",
+    "number1": 2,
+    "number2": 2,
+    "boolean": true,
+    "empty_city": ""
+}

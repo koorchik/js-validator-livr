@@ -1,0 +1,11 @@
+{
+    "city1": { "not_one_of": [["Moscow", "Kiev", "New York" ]] },
+    "city2": [{ "not_one_of": [["Moscow", "Kiev", "New York" ]] }],
+    "city3": { "not_one_of": ["Moscow", "Kiev", "New York"] },
+    "number1": { "not_one_of": [1, "1.00", "1"] },
+
+    "value_is_hash":        { "not_one_of": [["Moscow", "Kiev", "New York" ]] },
+    "value_is_empty_hash":  { "not_one_of": [["Moscow", "Kiev", "New York" ]] },
+    "value_is_array":       { "not_one_of": [["Moscow", "Kiev", "New York" ]] },
+    "value_is_empty_array": { "not_one_of": [["Moscow", "Kiev", "New York" ]] }
+}
