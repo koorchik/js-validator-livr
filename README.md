@@ -40,7 +40,7 @@ var validator = new LIVR.Validator({
 
 Feel free to register your own rules:
 
-You can use aliases(prefferable, syntax covered by the specification) for a lot of cases:
+You can use aliases(preferable, syntax covered by the specification) for a lot of cases:
 
 ```javascript
 var validator = new LIVR.Validator({
@@ -82,12 +82,14 @@ Features:
  * Any number of rules for each field
  * Return together errors for all fields
  * Excludes all fields that do not have validation rules described
- * Has possibility to validatate complex hierarchical structures
- * Easy to describe and undersand rules
+ * Has possibility to validate complex hierarchical structures
+ * Easy to describe and understand rules
  * Returns understandable error codes(not error messages)
  * Easy to add own rules
  * Rules are be able to change results output ("trim", "nested\_object", for example)
  * Multipurpose (user input validation, configs validation, contracts programming etc)
+
+__You can find more rules in [livr-extra-rules](https://www.npmjs.com/package/livr-extra-rules)__
 
 # INSTALL
 
@@ -99,12 +101,12 @@ npm install livr
 
 #### Browser
 
-You can find browserified versions in "dist" folder (livr-debug.js - not minified development version with source maps, livr-min.js - minified production version)
+You can find browserified versions in "dist" folder (livr-debug.js - not minified development version with source maps, livr-min.js - minified production version). Possible you will need some polyfills ("isInteger" etc) for older browsers.  
 
 # CLASS METHODS
 
 ## new LIVR.Validator(livr, isAutoTrim);
-Contructor creates validator objects.
+Constructor creates validator objects.
 livr - validations rules. Rules description is available here - https://github.com/koorchik/LIVR
 
 isAutoTrim - asks validator to trim all values before validation. Output will be also trimmed.
@@ -200,7 +202,7 @@ Enables or disables automatic trim for input data. If is on then every new valid
 
 ## LIVR.util
 
-List of usefull utils for writing your rules (see source code)
+List of useful utils for writing your rules (see source code)
 
 # OBJECT METHODS
 
@@ -208,7 +210,7 @@ List of usefull utils for writing your rules (see source code)
 Validates user input. On success returns validData (contains only data that has described validation rules). On error return false.
 
 ```javascript
-var validaData = validator.validate(input)
+var validData = validator.validate(input)
 
 if (validData) {
     // use validData
