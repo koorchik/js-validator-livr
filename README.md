@@ -95,7 +95,7 @@ __Features:__
 
 __JavaScript version extra features:__
 
- * Zero dependecies
+ * Zero dependencies
  * Works in NodeJs and in a browser
  * 3.6kb (min+gzip), 13kb (minified)
  * __You can find more rules in [livr-extra-rules](https://www.npmjs.com/package/livr-extra-rules)__
