@@ -80,7 +80,7 @@ validator.registerRules({ strong_password: function() {
 # DESCRIPTION
 See [LIVR Specification](http://livr-spec.org) for detailed documentation and list of supported rules.
 
-Features:
+__Features:__
 
  * Rules are declarative and language independent
  * Any number of rules for each field
@@ -93,7 +93,12 @@ Features:
  * Rules are be able to change results output ("trim", "nested\_object", for example)
  * Multipurpose (user input validation, configs validation, contracts programming etc)
 
-__You can find more rules in [livr-extra-rules](https://www.npmjs.com/package/livr-extra-rules)__
+__JavaScript version extra features:__
+
+ * Zero dependecies
+ * Works in NodeJs and in a browser
+ * 3.6kb (min+gzip), 13kb (minified)
+ * __You can find more rules in [livr-extra-rules](https://www.npmjs.com/package/livr-extra-rules)__
 
 # INSTALL
 
@@ -103,9 +108,9 @@ __You can find more rules in [livr-extra-rules](https://www.npmjs.com/package/li
 npm install livr
 ```
 
-#### Browser
+#### Browser (if you do not use npm)
 
-You can find browserified versions in "dist" folder (livr-debug.js - not minified development version with source maps, livr-min.js - minified production version). Possible you will need some polyfills ("isInteger" etc) for older browsers.  
+You can find prebuilt browser versions in "dist" folder (livr-debug.js - not minified development version with source maps, livr-min.js - minified production version). Possible you will need some polyfills ("isInteger" etc) for older browsers.  
 
 # CLASS METHODS
 

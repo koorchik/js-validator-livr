@@ -11,7 +11,9 @@
   "main": "./lib/LIVR",
   "scripts": {
     "test": "mocha --timeout 6000 --ui qunit t/*.js",
-    "build": "browserify -e scripts/browserify_entry.js -d -o dist/livr-debug.js; browserify -e scripts/browserify_entry.js | uglifyjs -o dist/livr-min.js;"
+    "build:min": "webpack scripts/browser_build_entry.js -p -o dist/livr-min.js",
+    "build:debug": "webpack scripts/browser_build_entry.js -d -o dist/livr-debug.js",
+    "build": "npm run build:min && npm run build:debug"
   },
   "repository": {
     "type": "git",
@@ -31,6 +33,7 @@
     "browserify": "*",
     "chai": "^3.2.0",
     "mocha": "^2.3.0",
-    "uglify-js": "*"
+    "webpack": "^4.1.1",
+    "webpack-cli": "^2.0.12"
   }
 }
