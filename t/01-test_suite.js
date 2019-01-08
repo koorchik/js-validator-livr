@@ -63,13 +63,11 @@ function iterateTestData(path, cb) {
     console.log(`ITERATE: ${rootPath}`);
     const casesDirs = fs.readdirSync(rootPath);
 
-    for (let i = 0; i < casesDirs.length; i++) {
-        const caseDir = casesDirs[i];
+    for (const caseDir of casesDirs) {
         const caseFiles = fs.readdirSync(rootPath + '/' + caseDir);
         const caseData = { name: caseDir };
 
-        for (let j = 0; j < caseFiles.length; j++) {
-            const file = caseFiles[j];
+        for (const file of caseFiles) {
             const json = fs.readFileSync(rootPath + '/' + caseDir + '/' + file);
 
             caseData[file.replace(/\.json$/, '')] = JSON.parse(json);
