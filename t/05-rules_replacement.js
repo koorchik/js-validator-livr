@@ -4,7 +4,7 @@ import LIVR from '../lib/LIVR';
 function patchRule(ruleName, ruleBuilder) {
     return function(...params) {
         const ruleValidator = ruleBuilder(...params);
-        const ruleArgs = Array.prototype.splice.call(arguments, 0, arguments.length - 1);
+        const ruleArgs = params.splice(0, params.length - 1);
 
         return (...params) => {
             const errorCode = ruleValidator(...params);
