@@ -11,7 +11,8 @@ LIVR.Validator.registerDefaultRules({
             outputArr.push(value.replace(/^\s*/, '').replace(/\s*$/, ''));
         };
     },
-    my_lc(field) {
+
+    my_lc() {
         return (value, undefined, outputArr) => {
             if (value === undefined || value === null || typeof value === 'object' || value === '')
                 return;
@@ -20,7 +21,8 @@ LIVR.Validator.registerDefaultRules({
             outputArr.push(value.toLowerCase());
         };
     },
-    my_ucfirst(field) {
+
+    my_ucfirst() {
         return (value, undefined, outputArr) => {
             if (value === undefined || value === null || typeof value === 'object' || value === '')
                 return;
@@ -51,6 +53,6 @@ test('Validate data with registered rules', t => {
             word2: 'wordtwo',
             word3: 'WordThree '
         },
-        'Should appluy changes to values'
+        'Should apply changes to values'
     );
 });

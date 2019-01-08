@@ -1,6 +1,6 @@
 {
     "name": "livr",
-    "version": "2.1.0",
+    "version": "2.2.0",
     "description": "Lightweight validator supporting Language Independent Validation Rules Specification",
     "homepage": "https://github.com/koorchik/js-validator-livr",
     "author": {
@@ -43,10 +43,10 @@
     "nyc": {
         "check-coverage": true,
         "per-file": true,
-        "lines": 80,
-        "statements": 80,
-        "functions": 80,
-        "branches": 80,
+        "lines": 85,
+        "statements": 85,
+        "functions": 85,
+        "branches": 85,
         "exclude": [
             "t/*.js"
         ]

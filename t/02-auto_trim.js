@@ -23,7 +23,7 @@ test('NEGATIVE: Validate data with automatic trim', t => {
         }
     });
 
-    t.true(!output, 'should return false due to validation errors fot trimmed values');
+    t.true(!output, 'should return false due to validation errors for trimmed values');
 
     t.deepEqual(
         validator.getErrors(),
