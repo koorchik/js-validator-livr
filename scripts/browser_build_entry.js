@@ -1,1 +1,1 @@
-window.LIVR = require("../lib/LIVR");
+window.LIVR = require('../lib/LIVR');

@@ -4,26 +4,29 @@ import LIVR from '../lib/LIVR';
 LIVR.Validator.registerDefaultRules({
     my_trim() {
         return (value, undefined, outputArr) => {
-            if (value === undefined || value === null || typeof value === 'object' || value === '' ) return;
+            if (value === undefined || value === null || typeof value === 'object' || value === '')
+                return;
 
             value += '';
-            outputArr.push( value.replace(/^\s*/, '').replace(/\s*$/, '') );
+            outputArr.push(value.replace(/^\s*/, '').replace(/\s*$/, ''));
         };
     },
     my_lc(field) {
         return (value, undefined, outputArr) => {
-            if (value === undefined || value === null || typeof value === 'object' || value === '' ) return;
+            if (value === undefined || value === null || typeof value === 'object' || value === '')
+                return;
 
             value += '';
-            outputArr.push( value.toLowerCase() );
+            outputArr.push(value.toLowerCase());
         };
     },
     my_ucfirst(field) {
         return (value, undefined, outputArr) => {
-            if (value === undefined || value === null || typeof value === 'object' || value === '' ) return;
+            if (value === undefined || value === null || typeof value === 'object' || value === '')
+                return;
 
             value += '';
-            outputArr.push( value.charAt(0).toUpperCase() + value.slice(1) );
+            outputArr.push(value.charAt(0).toUpperCase() + value.slice(1));
         };
     }
 });
@@ -41,9 +44,13 @@ test('Validate data with registered rules', t => {
         word3: 'wordThree '
     });
 
-    t.deepEqual( output, {
-        word1: 'Wordone',
-        word2: 'wordtwo',
-        word3: 'WordThree '
-    }, 'Should appluy changes to values' );
+    t.deepEqual(
+        output,
+        {
+            word1: 'Wordone',
+            word2: 'wordtwo',
+            word3: 'WordThree '
+        },
+        'Should appluy changes to values'
+    );
 });

@@ -4,7 +4,7 @@ import LIVR from '../lib/LIVR';
 function patchRule(ruleName, ruleBuilder) {
     return function(...params) {
         const ruleValidator = ruleBuilder(...params);
-        const ruleArgs = Array.prototype.splice.call(arguments, 0, arguments.length - 1 );
+        const ruleArgs = Array.prototype.splice.call(arguments, 0, arguments.length - 1);
 
         return (...params) => {
             const errorCode = ruleValidator(...params);
@@ -17,10 +17,10 @@ function patchRule(ruleName, ruleBuilder) {
                 return {
                     code: errorCode,
                     rule
-                }
+                };
             }
         };
-    }
+    };
 }
 
 test('Rules replacement: Validate data with registered rules', t => {
@@ -28,7 +28,7 @@ test('Rules replacement: Validate data with registered rules', t => {
     const defaultRules = LIVR.Validator.getDefaultRules();
 
     const originalRules = {};
-    const newRules      = {};
+    const newRules = {};
 
     for (const ruleName in defaultRules) {
         const ruleBuilder = defaultRules[ruleName];
@@ -40,7 +40,7 @@ test('Rules replacement: Validate data with registered rules', t => {
 
     // Test
     const validator = new LIVR.Validator({
-        name:  ['required'],
+        name: ['required'],
         phone: { max_length: 10 }
     });
 
@@ -50,7 +50,8 @@ test('Rules replacement: Validate data with registered rules', t => {
 
     t.true(!output, 'Validation should fail');
 
-    t.deepEqual( validator.getErrors(),
+    t.deepEqual(
+        validator.getErrors(),
         {
             name: {
                 code: 'REQUIRED',
@@ -61,7 +62,9 @@ test('Rules replacement: Validate data with registered rules', t => {
                 code: 'TOO_LONG',
                 rule: { max_length: [10] }
             }
-        }, 'Should return detailed errors' );
+        },
+        'Should return detailed errors'
+    );
 
     // Restore
     LIVR.Validator.registerDefaultRules(originalRules);
