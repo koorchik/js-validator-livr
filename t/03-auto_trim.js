@@ -1,7 +1,7 @@
-var LIVR = require('../lib/LIVR');
-var assert = require('chai').assert;
+import test from 'ava';
+import LIVR from '../lib/LIVR';
 
-var validator = new LIVR.Validator({
+const validator = new LIVR.Validator({
     code:     'required',
     password: ['required', { min_length: 3 }],
     address:  { nested_object: {
@@ -9,8 +9,8 @@ var validator = new LIVR.Validator({
     }}
 }, true);
 
-test('NEGATIVE: Validate data with automatic trim', function() {
-    var output = validator.validate({
+test('NEGATIVE: Validate data with automatic trim', t => {
+    const output = validator.validate({
         code: '  ',
         password: ' 12  ',
         address: {
@@ -18,9 +18,9 @@ test('NEGATIVE: Validate data with automatic trim', function() {
         }
     });
 
-    assert.ok(!output, 'should return false due to validation errors fot trimmed values');
+    t.true(!output, 'should return false due to validation errors fot trimmed values');
 
-    assert.deepEqual( validator.getErrors() , {
+    t.deepEqual( validator.getErrors() , {
         code: 'REQUIRED',
         password: 'TOO_SHORT',
         address: {
@@ -29,9 +29,8 @@ test('NEGATIVE: Validate data with automatic trim', function() {
     }, 'Should contain error codes' );
 });
 
-test('POSITIVE: Validate data with automatic trim', function() {
-
-    var cleanData = validator.validate({
+test('POSITIVE: Validate data with automatic trim', t => {
+    const cleanData = validator.validate({
         code: ' A ',
         password: ' 123  ',
         address: {
@@ -39,9 +38,9 @@ test('POSITIVE: Validate data with automatic trim', function() {
         }
     });
 
-    assert.ok( cleanData, 'should return clean data' );
+    t.truthy( cleanData, 'should return clean data' );
 
-    assert.deepEqual( cleanData, {
+    t.deepEqual( cleanData, {
         code: 'A',
         password: '123',
         address: {

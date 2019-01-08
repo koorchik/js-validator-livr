@@ -11,10 +11,10 @@ LIVR.Validator - Lightweight JavaScript validator supporting Language Independen
 Common usage:
 
 ```javascript
-var LIVR = require('livr');
+const LIVR = require('livr');
 LIVR.Validator.defaultAutoTrim(true);
 
-var validator = new LIVR.Validator({
+const validator = new LIVR.Validator({
     name:      'required',
     email:     [ 'required', 'email' ],
     gender:    { one_of : ['male', 'female'] },
@@ -23,7 +23,7 @@ var validator = new LIVR.Validator({
     password2: { equal_to_field : 'password' }
 });
 
-var validData = validator.validate(userData);
+const validData = validator.validate(userData);
 
 if (validData) {
     saveUser(validData);
@@ -36,7 +36,7 @@ if (validData) {
 You can use modifiers separately or can combine them with validation:
 
 ```javascript
-var validator = new LIVR.Validator({
+const validator = new LIVR.Validator({
     email: [ 'required', 'trim', 'email', 'to_lc' ]
 });
 ```
@@ -47,7 +47,7 @@ Feel free to register your own rules:
 You can use aliases(preferable, syntax covered by the specification) for a lot of cases:
 
 ```javascript
-var validator = new LIVR.Validator({
+const validator = new LIVR.Validator({
     password: ['required', 'strong_password']
 });
 
@@ -61,7 +61,7 @@ validator.registerAliasedRule({
 Or you can write more sophisticated rules directly:
 
 ```javascript
-var validator = new LIVR.Validator({
+const validator = new LIVR.Validator({
     password: ['required', 'strong_password']
 });
 
@@ -162,7 +162,7 @@ ruleBuilder - is a function reference which will be called for building single r
 LIVR.Validator.registerDefaultRules({ my_rule: function(arg1, arg2, arg3, ruleBuilders) {
     // ruleBuilders - are rules from original validator
     // to allow you create new validator with all supported rules
-    // var validator = new LIVR.Validator(livr).registerRules(ruleBuilders).prepare();
+    // const validator = new LIVR.Validator(livr).registerRules(ruleBuilders).prepare();
 
     return function(value, allValues, outputArr) {
         if (notValid) {
@@ -219,12 +219,12 @@ List of useful utils for writing your rules (see source code)
 Validates user input. On success returns validData (contains only data that has described validation rules). On error return false.
 
 ```javascript
-var validData = validator.validate(input)
+const validData = validator.validate(input)
 
 if (validData) {
     // use validData
 } else {
-    var errors = validator.getErrors();
+    const errors = validator.getErrors();
 }
 ```
 

@@ -10,7 +10,7 @@
   "license": "MIT",
   "main": "./lib/LIVR",
   "scripts": {
-    "test": "mocha --timeout 6000 --ui qunit t/*.js",
+    "test": "nyc ava",
     "build:min": "webpack scripts/browser_build_entry.js -p -o dist/livr-min.js",
     "build:debug": "webpack scripts/browser_build_entry.js -d -o dist/livr-debug.js",
     "build": "npm run build:min && npm run build:debug"
@@ -30,9 +30,25 @@
     "sanitize"
   ],
   "devDependencies": {
-    "chai": "^4.1.2",
-    "mocha": "^5.2.0",
+    "ava": "^1.0.1",
+    "nyc": "^13.1.0",
     "webpack": "^4.12.0",
     "webpack-cli": "^3.0.4"
+  },
+  "ava": {
+    "files": [
+      "t/*.js"
+    ]
+  },
+  "nyc": {
+    "check-coverage": true,
+    "per-file": true,
+    "lines": 80,
+    "statements": 80,
+    "functions": 80,
+    "branches": 80,
+    "exclude": [
+      "t/*.js"
+    ]
   }
 }

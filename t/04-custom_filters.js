@@ -1,25 +1,25 @@
-var LIVR = require('../lib/LIVR');
-var assert = require('chai').assert;
+import test from 'ava';
+import LIVR from '../lib/LIVR';
 
 LIVR.Validator.registerDefaultRules({
-    my_trim: function() {
-        return function(value, undefined, outputArr) {
+    my_trim() {
+        return (value, undefined, outputArr) => {
             if (value === undefined || value === null || typeof value === 'object' || value === '' ) return;
 
             value += '';
             outputArr.push( value.replace(/^\s*/, '').replace(/\s*$/, '') );
         };
     },
-    my_lc: function(field) {
-        return function(value, undefined, outputArr) {
+    my_lc(field) {
+        return (value, undefined, outputArr) => {
             if (value === undefined || value === null || typeof value === 'object' || value === '' ) return;
 
             value += '';
             outputArr.push( value.toLowerCase() );
         };
     },
-    my_ucfirst: function(field) {
-        return function(value, undefined, outputArr) {
+    my_ucfirst(field) {
+        return (value, undefined, outputArr) => {
             if (value === undefined || value === null || typeof value === 'object' || value === '' ) return;
 
             value += '';
@@ -28,20 +28,20 @@ LIVR.Validator.registerDefaultRules({
     }
 });
 
-test('Validate data with registered rules', function() {
-    var validator = new LIVR.Validator({
+test('Validate data with registered rules', t => {
+    const validator = new LIVR.Validator({
         word1: ['my_trim', 'my_lc', 'my_ucfirst'],
         word2: ['my_trim', 'my_lc'],
         word3: ['my_ucfirst']
     });
 
-    var output = validator.validate({
+    const output = validator.validate({
         word1: ' wordOne ',
         word2: ' wordTwo ',
         word3: 'wordThree '
     });
 
-    assert.deepEqual( output, {
+    t.deepEqual( output, {
         word1: 'Wordone',
         word2: 'wordtwo',
         word3: 'WordThree '
