@@ -29,7 +29,7 @@ iterateTestData('test_suite/aliases_positive', data => {
     test(`Aliases positive: ${data.name}`, t => {
         const validator = new LIVR.Validator( data.rules );
 
-        data.aliases.forEach(function(alias) {
+        data.aliases.forEach(alias => {
             validator.registerAliasedRule(alias);
         });
 
@@ -44,7 +44,7 @@ iterateTestData('test_suite/aliases_negative', data => {
     test(`Aliases negative: ${data.name}`, t => {
         const validator = new LIVR.Validator( data.rules );
 
-        data.aliases.forEach(function(alias) {
+        data.aliases.forEach( alias => {
             validator.registerAliasedRule(alias);
         });
 

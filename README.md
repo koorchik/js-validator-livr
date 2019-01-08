@@ -64,8 +64,8 @@ const validator = new LIVR.Validator({
     password: ['required', 'strong_password']
 });
 
-validator.registerRules({ strong_password: function() {
-    return function(value) {
+validator.registerRules({ strong_password() {
+    return value => {
         // We already have "required" rule to check that the value is present
         if ( value === undefined || value === null || value === '' ) return;
 
@@ -158,12 +158,12 @@ All rules/aliases for the validator are equal. The validator does not distinguis
 ruleBuilder - is a function reference which will be called for building single rule validator.
 
 ```javascript
-LIVR.Validator.registerDefaultRules({ my_rule: function(arg1, arg2, arg3, ruleBuilders) {
+LIVR.Validator.registerDefaultRules({ my_rule(arg1, arg2, arg3, ruleBuilders) {
     // ruleBuilders - are rules from original validator
     // to allow you create new validator with all supported rules
     // const validator = new LIVR.Validator(livr).registerRules(ruleBuilders).prepare();
 
-    return function(value, allValues, outputArr) {
+    return (value, allValues, outputArr) => {
         if (notValid) {
             return "SOME_ERROR_CODE";
         }
@@ -189,7 +189,7 @@ Here is "max\_number" implemenation:
 
 ```javascript
 function maxNumber(maxNumber) {
-    return function(value) {
+    return value => {
         // We do not validate empty fields. We have "required" rule for this purpose
         if (value === undefined || value === null || value === '' ) return;
 

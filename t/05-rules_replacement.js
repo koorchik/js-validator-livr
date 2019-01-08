@@ -2,12 +2,12 @@ import test from 'ava';
 import LIVR from '../lib/LIVR';
 
 function patchRule(ruleName, ruleBuilder) {
-    return function() {
-        const ruleValidator = ruleBuilder.apply(null, arguments);
+    return function(...params) {
+        const ruleValidator = ruleBuilder(...params);
         const ruleArgs = Array.prototype.splice.call(arguments, 0, arguments.length - 1 );
 
-        return function() {
-            const errorCode = ruleValidator.apply(null, arguments);
+        return (...params) => {
+            const errorCode = ruleValidator(...params);
 
             if (errorCode) {
                 const rule = {
