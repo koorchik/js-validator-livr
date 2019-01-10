@@ -5,6 +5,7 @@ const validator = new LIVR.Validator(
     {
         code: 'required',
         password: ['required', { min_length: 3 }],
+        list: { list_of: ['string'] },
         address: {
             nested_object: {
                 street: { min_length: 5 }
@@ -42,6 +43,7 @@ test('POSITIVE: Validate data with automatic trim', t => {
     const cleanData = validator.validate({
         code: ' A ',
         password: ' 123  ',
+        list: [' aaa ', ' bbb '],
         address: {
             street: '  hello '
         }
@@ -54,6 +56,7 @@ test('POSITIVE: Validate data with automatic trim', t => {
         {
             code: 'A',
             password: '123',
+            list: ['aaa', 'bbb'],
             address: {
                 street: 'hello'
             }
