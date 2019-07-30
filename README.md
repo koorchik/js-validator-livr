@@ -77,6 +77,44 @@ validator.registerRules({
 });
 ```
 
+If you use LIVR in browser, you can import only the rules you use (it can reduce budle size a little bit):
+
+```javascript
+const Validator = require('livr/Validator');
+
+Validator.registerDefaultRules({
+    required:       require('livr/LIVR/rules/common/required'),
+    email:          require('livr/LIVR/rules/special/email'),
+    one_of:         require('livr/LIVR/rules/string/one_of'),
+    min_length:     require('livr/LIVR/rules/string/min_length'),
+    max_length:     require('livr/LIVR/rules/string/max_length'),
+    equal_to_field: require('livr/LIVR/rules/special/equal_to_field')
+});
+
+Validator.defaultAutoTrim(true);
+
+// Anywhere in your app
+const Validator = require('livr/Validator');
+const validator = new Validator({
+    name: 'required',
+    email: ['required', 'email'],
+    gender: { one_of: ['male', 'female'] },
+    phone: { max_length: 10 },
+    password: ['required', { min_length: 10 }],
+    password2: { equal_to_field: 'password' }
+});
+
+const validData = validator.validate(userData);
+
+if (validData) {
+    saveUser(validData);
+} else {
+    console.log('errors', validator.getErrors());
+}
+
+```
+
+
 # DESCRIPTION
 
 See **[LIVR Specification and rules documentation](http://livr-spec.org)** for detailed documentation and list of supported rules.
@@ -98,7 +136,8 @@ See **[LIVR Specification and rules documentation](http://livr-spec.org)** for d
 
 -   Zero dependencies
 -   Works in NodeJs and in a browser
--   3.6kb (min+gzip), 13kb (minified)
+-   Validator (without rules) less than 1KB (min+gzip)
+-   Validator with all rules 2.84KB (min+gzip)
 -   **You can find more rules in [livr-extra-rules](https://www.npmjs.com/package/livr-extra-rules)**
 
 # INSTALL
