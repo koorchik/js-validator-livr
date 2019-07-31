@@ -29,7 +29,6 @@
             "path": "lib/LIVR.js",
             "limit": "3 KB"
         }
-
     ],
     "bugs": {
         "url": "https://github.com/koorchik/js-validator-livr/issues"
