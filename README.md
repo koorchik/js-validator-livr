@@ -80,21 +80,21 @@ validator.registerRules({
 If you use LIVR in browser, you can import only the rules you use (it can reduce budle size a little bit):
 
 ```javascript
-const Validator = require('livr/Validator');
+const Validator = require('livr/lib/Validator');
 
 Validator.registerDefaultRules({
-    required:       require('livr/LIVR/rules/common/required'),
-    email:          require('livr/LIVR/rules/special/email'),
-    one_of:         require('livr/LIVR/rules/string/one_of'),
-    min_length:     require('livr/LIVR/rules/string/min_length'),
-    max_length:     require('livr/LIVR/rules/string/max_length'),
-    equal_to_field: require('livr/LIVR/rules/special/equal_to_field')
+    required:       require('livr/lib/rules/common/required'),
+    email:          require('livr/lib/rules/special/email'),
+    one_of:         require('livr/lib/rules/string/one_of'),
+    min_length:     require('livr/lib/rules/string/min_length'),
+    max_length:     require('livr/lib/rules/string/max_length'),
+    equal_to_field: require('livr/lib/rules/special/equal_to_field')
 });
 
 Validator.defaultAutoTrim(true);
 
 // Anywhere in your app
-const Validator = require('livr/Validator');
+const Validator = require('livr/lib/Validator');
 const validator = new Validator({
     name: 'required',
     email: ['required', 'email'],

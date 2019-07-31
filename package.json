@@ -8,7 +8,7 @@
         "url": "http://blog.koorchik.com"
     },
     "license": "MIT",
-    "main": "./LIVR",
+    "main": "./lib/LIVR.js",
     "scripts": {
         "test": "nyc ava",
         "size": "size-limit",
@@ -22,7 +22,7 @@
     },
     "size-limit": [
         {
-            "path": "lib/LIVR/*.js"
+            "path": "lib/Validator.js"
         },
         {
             "path": "lib/LIVR.js"
