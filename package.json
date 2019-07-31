@@ -1,6 +1,6 @@
 {
     "name": "livr",
-    "version": "2.2.6",
+    "version": "2.3.0",
     "description": "Lightweight validator supporting Language Independent Validation Rules Specification",
     "homepage": "https://github.com/koorchik/js-validator-livr",
     "author": {
@@ -10,7 +10,7 @@
     "license": "MIT",
     "main": "./lib/LIVR.js",
     "scripts": {
-        "test": "nyc ava",
+        "test": "nyc ava && npm run size",
         "size": "size-limit",
         "build:min": "webpack scripts/browser_build_entry.js -p -o dist/livr-min.js",
         "build:debug": "webpack scripts/browser_build_entry.js -d -o dist/livr-debug.js",
@@ -22,10 +22,12 @@
     },
     "size-limit": [
         {
-            "path": "lib/Validator.js"
+            "path": "lib/Validator.js",
+            "limit": "1 KB"
         },
         {
-            "path": "lib/LIVR.js"
+            "path": "lib/LIVR.js",
+            "limit": "3 KB"
         }
 
     ],
@@ -54,10 +56,10 @@
     "nyc": {
         "check-coverage": true,
         "per-file": true,
-        "lines": 85,
-        "statements": 85,
-        "functions": 85,
-        "branches": 85,
+        "lines": 80,
+        "statements": 80,
+        "functions": 80,
+        "branches": 80,
         "exclude": [
             "t/*.js"
         ]
