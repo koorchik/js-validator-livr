@@ -1,5 +1,5 @@
-import test from 'ava';
-import LIVR from '../lib/LIVR';
+const test = require('ava');
+const LIVR = require('../lib/LIVR');
 
 const validator = new LIVR.Validator(
     {

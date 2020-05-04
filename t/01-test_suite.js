@@ -1,8 +1,8 @@
-import test from 'ava';
+const test = require('ava');
 
-import fs from 'fs';
-import LIVR from '../lib/LIVR';
-import util from 'util';
+const fs   = require('fs');
+const LIVR = require('../lib/LIVR');
+const util = require('util');
 
 iterateTestData('test_suite/positive', data => {
     test(`Positive: ${data.name}`, t => {
