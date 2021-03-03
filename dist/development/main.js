@@ -246,7 +246,7 @@ eval("const util = __webpack_require__(/*! ../../util */ \"./lib/util.js\");\n\n
   \***********************************************/
 /***/ ((module, __unused_webpack_exports, __webpack_require__) => {
 
-eval("const util = __webpack_require__(/*! ../../util */ \"./lib/util.js\");\n\nfunction positive_decimal() {\n    return (value, params, outputArr) => {\n        if (util.isNoValue(value)) return;\n        if (!util.isPrimitiveValue(value)) return 'FORMAT_ERROR';\n        if (!util.looksLikeNumber(value)) return 'NOT_POSITIVE_DECIMAL';\n\n        value += '';\n        if (!/^(?:(?:[0-9]*\\.[0-9]+)|(?:[1-9][0-9]*))$/.test(value))\n            return 'NOT_POSITIVE_DECIMAL';\n        outputArr.push(+value);\n    };\n}\n\nmodule.exports = positive_decimal;\n\n\n//# sourceURL=webpack://livr/./lib/rules/numeric/positive_decimal.js?");
+eval("const util = __webpack_require__(/*! ../../util */ \"./lib/util.js\");\n\nfunction positive_decimal() {\n    return (value, params, outputArr) => {\n        if (util.isNoValue(value)) return;\n        if (!util.isPrimitiveValue(value)) return 'FORMAT_ERROR';\n        if (!util.looksLikeNumber(value)) return 'NOT_POSITIVE_DECIMAL';\n\n        if (Number.isNaN(+value) || +value <= 0) return 'NOT_POSITIVE_DECIMAL';\n        outputArr.push(+value);\n    };\n}\n\nmodule.exports = positive_decimal;\n\n\n//# sourceURL=webpack://livr/./lib/rules/numeric/positive_decimal.js?");
 
 /***/ }),
 
