@@ -319,6 +319,10 @@ returns object containing all ruleBuilders for the validator. You can register n
 
 koorchik (Viktor Turskyi)
 
+# Contributors
+
+eNdiD
+
 # BUGS
 
 Please report any bugs or feature requests to Github https://github.com/koorchik/js-validator-livr
