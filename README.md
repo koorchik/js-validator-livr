@@ -150,7 +150,7 @@ npm install livr
 
 #### Browser (if you do not use npm)
 
-You can find prebuilt browser versions in "dist" folder (livr-debug.js - not minified development version with source maps, livr-min.js - minified production version). Possible you will need some polyfills ("isInteger" etc) for older browsers.
+You can find prebuilt browser versions in "dist" folder (development/main.js - not minified development version with source maps, production/main.js - minified production version). Possible you will need some polyfills ("isInteger" etc) for older browsers.
 
 # CLASS METHODS
 
