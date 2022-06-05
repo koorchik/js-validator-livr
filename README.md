@@ -11,7 +11,7 @@ LIVR.Validator - Lightweight JavaScript validator supporting Language Independen
 Common usage:
 
 ```javascript
-const LIVR = require('livr');
+import LIVR from 'livr';
 LIVR.Validator.defaultAutoTrim(true);
 
 const validator = new LIVR.Validator({
@@ -80,7 +80,7 @@ validator.registerRules({
 If you use LIVR in browser, you can import only the rules you use (it can reduce budle size a little bit):
 
 ```javascript
-const Validator = require('livr/lib/Validator');
+import Validator from 'livr/lib/Validator';
 
 Validator.registerDefaultRules({
     required:       require('livr/lib/rules/common/required'),
@@ -94,7 +94,8 @@ Validator.registerDefaultRules({
 Validator.defaultAutoTrim(true);
 
 // Anywhere in your app
-const Validator = require('livr/lib/Validator');
+import Validator from 'livr/lib/Validator';
+
 const validator = new Validator({
     name: 'required',
     email: ['required', 'email'],
