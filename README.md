@@ -194,7 +194,7 @@ See **[LIVR Specification and rules documentation](http://livr-spec.org)** for d
 
 # ASYNC VALIDATION (NEW)
 
-LIVR supports async validation but it was added only in v3. So, it uses a little bit different API.
+LIVR supports async validation but it was added only in v2.5. So, it uses a little bit different API.
 
 What you need to know about implementation:
 
