@@ -1,7 +1,7 @@
 const test = require('ava');
 
 const fs   = require('fs');
-const LIVR = require('../lib/LIVR');
+const LIVR = require('../../lib/LIVR');
 const util = require('util');
 
 iterateTestData('test_suite/positive', data => {
@@ -59,7 +59,7 @@ iterateTestData('test_suite/aliases_negative', data => {
 });
 
 function iterateTestData(path, cb) {
-    const rootPath = __dirname + '/' + path;
+    const rootPath = __dirname + '/../' + path;
     console.log(`ITERATE: ${rootPath}`);
     const casesDirs = fs.readdirSync(rootPath);
 

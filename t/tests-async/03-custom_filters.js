@@ -1,7 +1,7 @@
 const test = require('ava');
-const LIVR = require('../lib/LIVR');
+const LIVR = require('../../async');
 
-LIVR.Validator.registerDefaultRules({
+LIVR.AsyncValidator.registerDefaultRules({
     my_trim() {
         return (value, undefined, outputArr) => {
             if (value === undefined || value === null || typeof value === 'object' || value === '')
@@ -33,14 +33,14 @@ LIVR.Validator.registerDefaultRules({
     }
 });
 
-test('Validate data with registered rules', t => {
-    const validator = new LIVR.Validator({
+test('Validate data with registered rules', async (t) => {
+    const validator = new LIVR.AsyncValidator({
         word1: ['my_trim', 'my_lc', 'my_ucfirst'],
         word2: ['my_trim', 'my_lc'],
         word3: ['my_ucfirst']
     });
 
-    const output = validator.validate({
+    const output = await validator.validate({
         word1: ' wordOne ',
         word2: ' wordTwo ',
         word3: 'wordThree '

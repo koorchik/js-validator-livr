@@ -1,0 +1,1 @@
+window.LIVR = require('../async');

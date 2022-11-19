@@ -12,9 +12,11 @@
     "scripts": {
         "test": "nyc ava && npm run size",
         "size": "size-limit",
-        "build:min": "webpack --entry ./scripts/browser_build_entry.js --mode production -o ./dist/production/",
-        "build:debug": "webpack --entry ./scripts/browser_build_entry.js --mode development -o ./dist/development/",
-        "build": "npm run build:min && npm run build:debug"
+        "build-sync:min": "webpack --entry ./scripts/browser_build_entry-sync.js --mode production -o ./dist/production/",
+        "build-sync:debug": "webpack --entry ./scripts/browser_build_entry-sync.js --mode development -o ./dist/development/",
+        "build-async:min": "webpack --entry ./scripts/browser_build_entry-async.js --mode production -o ./dist/production-async/",
+        "build-async:debug": "webpack --entry ./scripts/browser_build_entry-async.js --mode development -o ./dist/development-async/",
+        "build": "npm run build-sync:min && npm run build-sync:debug && npm run build-async:min && npm run build-async:debug"
     },
     "repository": {
         "type": "git",
@@ -50,7 +52,8 @@
     },
     "ava": {
         "files": [
-            "t/*.js"
+            "t/tests-sync/*.js",
+            "t/tests-async/*.js"
         ]
     },
     "nyc": {

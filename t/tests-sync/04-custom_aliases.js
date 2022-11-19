@@ -1,5 +1,5 @@
 const test = require('ava');
-const LIVR = require('../lib/LIVR');
+const LIVR = require('../../lib/LIVR');
 
 LIVR.Validator.registerAliasedDefaultRule({
     name: 'strong_password1',
