@@ -64,7 +64,7 @@
         "functions": 80,
         "branches": 80,
         "exclude": [
-            "t/*.js"
+            "t/**/*.js"
         ]
     }
 }
