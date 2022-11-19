@@ -8,6 +8,11 @@ LIVR.Validator - Lightweight JavaScript validator supporting Language Independen
 
 # SYNOPSIS
 
+There are 2 implemnations:
+
+1. "Validator" supports only synchronous rules. All built-in rules are synchronous.
+2. "AsyncValidator" (_experimental_) supports both synchronous and asynchronous rules.
+
 Common usage:
 
 ```javascript
@@ -29,6 +34,29 @@ if (validData) {
     saveUser(validData);
 } else {
     console.log('errors', validator.getErrors());
+}
+```
+
+Common usage of async version:
+
+```javascript
+import LIVR from 'livr/async';
+LIVR.AsyncValidator.defaultAutoTrim(true);
+
+const validator = new LIVR.AsyncValidator({
+    name: 'required',
+    email: ['required', 'email'],
+    gender: { one_of: ['male', 'female'] },
+    phone: { max_length: 10 },
+    password: ['required', { min_length: 10 }],
+    password2: { equal_to_field: 'password' }
+});
+
+try {
+    const validData = await validator.validate(userData);
+    saveUser(validData);
+} catch(errors) {
+    console.log('errors', errors);
 }
 ```
 
@@ -77,6 +105,29 @@ validator.registerRules({
 });
 ```
 
+Or you can write more sophisticated **async** rules as well:
+
+```javascript
+const validator = new LIVR.AsyncValidator({
+    userId: ['required', 'valid_user_id']
+});
+
+validator.registerRules({
+    valid_user_id() {
+        return async value => {
+            // We already have "required" rule to check that the value is present
+            if (value === undefined || value === null || value === '') return;
+
+            const user = await Users.findUserById(value);
+            
+            if (!user) {
+                return 'WRONG_USER_ID';
+            }
+        };
+    }
+});
+```
+
 If you use LIVR in browser, you can import only the rules you use (it can reduce budle size a little bit):
 
 ```javascript
@@ -115,7 +166,6 @@ if (validData) {
 
 ```
 
-
 # DESCRIPTION
 
 See **[LIVR Specification and rules documentation](http://livr-spec.org)** for detailed documentation and list of supported rules.
@@ -132,6 +182,7 @@ See **[LIVR Specification and rules documentation](http://livr-spec.org)** for d
 -   Easy to add own rules
 -   Rules are be able to change results output ("trim", "nested_object", for example)
 -   Multipurpose (user input validation, configs validation, contracts programming etc)
+-   Supports sync and async validation
 
 **JavaScript version extra features:**
 
@@ -141,17 +192,52 @@ See **[LIVR Specification and rules documentation](http://livr-spec.org)** for d
 -   Validator with all rules 2.84KB (min+gzip)
 -   **You can find more rules in [livr-extra-rules](https://www.npmjs.com/package/livr-extra-rules)**
 
+# ASYNC VALIDATION (NEW)
+
+LIVR supports async validation but it was added only in v3. So, it uses a little bit different API.
+
+What you need to know about implementation:
+
+1. All simple sync rules are supported out of the box.
+2. Meta rules (rules that construct a new validator instance inside them) were rewritten to use AsyncValidator. 
+If you import "livr/async" they will be automatically used
+3. Fields validation is done in parallel but rules for one field are processed one after another.
+
+Usage example:
+
+```javascript
+import LIVR from 'livr/async';
+LIVR.AsyncValidator.defaultAutoTrim(true);
+
+const validator = new LIVR.AsyncValidator({
+    name: 'required',
+    email: ['required', 'email'],
+});
+
+try {
+    const validData = await validator.validate(userData);
+    saveUser(validData);
+} catch(errors) {
+    console.log('errors', errors);
+}
+```
+
 # INSTALL
 
-#### nodejs/npm
+### nodejs/npm
 
 ```bash
 npm install livr
 ```
 
-#### Browser (if you do not use npm)
+### Browser (if you do not use npm)
 
-You can find prebuilt browser versions in "dist" folder (development/main.js - not minified development version with source maps, production/main.js - minified production version). Possible you will need some polyfills ("isInteger" etc) for older browsers.
+You can find prebuilt browser versions in "dist" folder 
+
+* development/main.js - not minified development version with source maps
+* production/main.js - minified production version. Possible you will need some polyfills ("isInteger" etc) for older browsers.
+* development-async/main.js - not minified development version with source maps of "AsyncValidator"
+* production-async/main.js - minified production version of "AsyncValidator"
 
 # CLASS METHODS
 
@@ -259,7 +345,7 @@ Enables or disables automatic trim for input data. If is on then every new valid
 
 ## LIVR.util
 
-List of useful utils for writing your rules (see source code)
+List of useful utils for writing your rules (see [source code](./lib/util.js))
 
 # OBJECT METHODS
 
@@ -277,9 +363,20 @@ if (validData) {
 }
 ```
 
-## validator.getErrors()
+for AsyncValidator
 
-Returns errors object.
+```javascript
+try {
+    const validData = await validator.validate(input);
+    // use validData
+} catch(errors) {
+    // handle errors
+}
+```
+
+## validator.getErrors() (only for sync version of validator)
+
+Returns errors object. 
 
 ```javascript
 {
