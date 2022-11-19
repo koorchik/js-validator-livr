@@ -8,7 +8,7 @@ LIVR.Validator - Lightweight JavaScript validator supporting Language Independen
 
 # SYNOPSIS
 
-There are 2 implemnations:
+There are 2 implementations:
 
 1. "Validator" supports only synchronous rules. All built-in rules are synchronous.
 2. "AsyncValidator" (_experimental_) supports both synchronous and asynchronous rules.
