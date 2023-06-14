@@ -3,7 +3,6 @@
 LIVR.Validator - Lightweight JavaScript validator supporting Language Independent Validation Rules Specification (LIVR).
 
 [![npm version](https://badge.fury.io/js/livr.svg)](https://badge.fury.io/js/livr)
-[![Build Status](https://travis-ci.org/koorchik/js-validator-livr.svg?branch=master)](https://travis-ci.org/koorchik/js-validator-livr)
 [![Known Vulnerabilities](https://snyk.io/test/github/koorchik/js-validator-livr/badge.svg?targetFile=package.json)](https://snyk.io/test/github/koorchik/js-validator-livr?targetFile=package.json)
 
 # SYNOPSIS
