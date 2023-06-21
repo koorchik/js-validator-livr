@@ -37,6 +37,35 @@ if (validData) {
 }
 ```
 
+Common usage with camel case names ("camelizeRules" option automatically camelizes rule names):
+
+_"camelizeRules" option registers each rule addionally with camel case name._
+
+_Camel case names are closer to JS naming conventions but underscore rule names are more compatible with LIVR spec._ 
+
+```javascript
+import LIVR from 'livr';
+LIVR.Validator.defaultAutoTrim(true);
+
+const validator = new LIVR.Validator({
+    name: 'required',
+    email: ['required', 'email'],
+    gender: { oneOf: ['male', 'female'] },
+    phone: { maxLength: 10 },
+    password: ['required', { minLength: 10 }],
+    password2: { equalToField: 'password' }
+});
+
+
+const validData = validator.validate(userData);
+
+if (validData) {
+    saveUser(validData);
+} else {
+    console.log('errors', validator.getErrors());
+}
+```
+
 Common usage of async version:
 
 ```javascript
@@ -241,13 +270,18 @@ You can find prebuilt browser versions in "dist" folder
 
 # CLASS METHODS
 
-## new LIVR.Validator(livr, isAutoTrim);
+## new LIVR.Validator(rules, options);
 
 Constructor creates validator objects.
-livr - validations rules. Rules description is available here - https://github.com/koorchik/LIVR
+rules - validations rules. Rules description is available here - https://livr-spec.org/
 
-isAutoTrim - asks validator to trim all values before validation. Output will be also trimmed.
-if isAutoTrim is undefined(or null) than defaultAutoTrim value will be used.
+**Supported options:**
+
+* "autoTrim" (default false) - asks validator to trim all values before validation. Output will be also trimmed. If key is not passed then defaultAutoTrim value will be used.
+* "camelizeRules" (default true) - each registered rule which contains uderscore will be registered using camel case name as well
+
+_Instead of "options" object "isAutoTrim" boolean value can be passed for compatibility with previous API.
+if isAutoTrim is undefined(or null) then defaultAutoTrim value will be used._
 
 ## LIVR.Validator.registerAliasedDefaultRule(alias)
 

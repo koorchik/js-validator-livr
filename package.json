@@ -1,6 +1,6 @@
 {
     "name": "livr",
-    "version": "2.6.0",
+    "version": "2.7.0",
     "description": "Lightweight validator supporting Language Independent Validation Rules Specification",
     "homepage": "https://github.com/koorchik/js-validator-livr",
     "author": {
@@ -28,8 +28,16 @@
             "limit": "1.5 KB"
         },
         {
+            "path": "lib/AsyncValidator.js",
+            "limit": "1.5 KB"
+        },
+        {
             "path": "lib/LIVR.js",
-            "limit": "4 KB"
+            "limit": "4.5 KB"
+        },
+        {
+            "path": "async.js",
+            "limit": "4.5 KB"
         }
     ],
     "bugs": {
@@ -44,7 +52,7 @@
     ],
     "devDependencies": {
         "@size-limit/preset-small-lib": "^8.1.0",
-        "ava": "^5.0.1",
+        "ava": "^5.3.1",
         "nyc": "^15.1.0",
         "size-limit": "^8.1.0",
         "webpack": "^5.75.0",
