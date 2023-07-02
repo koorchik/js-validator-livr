@@ -24,7 +24,7 @@ const validator = new LIVR.Validator({
     gender: { one_of: ['male', 'female'] },
     phone: { max_length: 10 },
     password: ['required', { min_length: 10 }],
-    password2: { equal_to_field: 'password' }
+    password2: { equal_to_field: 'password' },
 });
 
 const validData = validator.validate(userData);
@@ -36,11 +36,9 @@ if (validData) {
 }
 ```
 
-Common usage with camel case names ("camelizeRules" option automatically camelizes rule names):
+All standard rules are supported in camel case as well (Validator.registerDefaultRules always does autocamelization):
 
-_"camelizeRules" option registers each rule addionally with camel case name._
-
-_Camel case names are closer to JS naming conventions but underscore rule names are more compatible with LIVR spec._ 
+_Camel case names are closer to JS naming conventions but underscore rule names are more compatible with LIVR spec._
 
 ```javascript
 import LIVR from 'livr';
@@ -52,9 +50,8 @@ const validator = new LIVR.Validator({
     gender: { oneOf: ['male', 'female'] },
     phone: { maxLength: 10 },
     password: ['required', { minLength: 10 }],
-    password2: { equalToField: 'password' }
+    password2: { equalToField: 'password' },
 });
-
 
 const validData = validator.validate(userData);
 
@@ -77,13 +74,13 @@ const validator = new LIVR.AsyncValidator({
     gender: { one_of: ['male', 'female'] },
     phone: { max_length: 10 },
     password: ['required', { min_length: 10 }],
-    password2: { equal_to_field: 'password' }
+    password2: { equal_to_field: 'password' },
 });
 
 try {
     const validData = await validator.validate(userData);
     saveUser(validData);
-} catch(errors) {
+} catch (errors) {
     console.log('errors', errors);
 }
 ```
@@ -92,7 +89,7 @@ You can use modifiers separately or can combine them with validation:
 
 ```javascript
 const validator = new LIVR.Validator({
-    email: ['required', 'trim', 'email', 'to_lc']
+    email: ['required', 'trim', 'email', 'to_lc'],
 });
 ```
 
@@ -102,13 +99,13 @@ You can use aliases(preferable, syntax covered by the specification) for a lot o
 
 ```javascript
 const validator = new LIVR.Validator({
-    password: ['required', 'strong_password']
+    password: ['required', 'strong_password'],
 });
 
 validator.registerAliasedRule({
     name: 'strong_password',
     rules: { min_length: 6 },
-    error: 'WEAK_PASSWORD'
+    error: 'WEAK_PASSWORD',
 });
 ```
 
@@ -116,12 +113,12 @@ Or you can write more sophisticated rules directly:
 
 ```javascript
 const validator = new LIVR.Validator({
-    password: ['required', 'strong_password']
+    password: ['required', 'strong_password'],
 });
 
 validator.registerRules({
     strong_password() {
-        return value => {
+        return (value) => {
             // We already have "required" rule to check that the value is present
             if (value === undefined || value === null || value === '') return;
 
@@ -129,7 +126,7 @@ validator.registerRules({
                 return 'WEAK_PASSWORD';
             }
         };
-    }
+    },
 });
 ```
 
@@ -137,22 +134,22 @@ Or you can write more sophisticated **async** rules as well:
 
 ```javascript
 const validator = new LIVR.AsyncValidator({
-    userId: ['required', 'valid_user_id']
+    userId: ['required', 'valid_user_id'],
 });
 
 validator.registerRules({
     valid_user_id() {
-        return async value => {
+        return async (value) => {
             // We already have "required" rule to check that the value is present
             if (value === undefined || value === null || value === '') return;
 
             const user = await Users.findUserById(value);
-            
+
             if (!user) {
                 return 'WRONG_USER_ID';
             }
         };
-    }
+    },
 });
 ```
 
@@ -162,12 +159,12 @@ If you use LIVR in browser, you can import only the rules you use (it can reduce
 import Validator from 'livr/lib/Validator';
 
 Validator.registerDefaultRules({
-    required:       require('livr/lib/rules/common/required'),
-    email:          require('livr/lib/rules/special/email'),
-    one_of:         require('livr/lib/rules/string/one_of'),
-    min_length:     require('livr/lib/rules/string/min_length'),
-    max_length:     require('livr/lib/rules/string/max_length'),
-    equal_to_field: require('livr/lib/rules/special/equal_to_field')
+    required: require('livr/lib/rules/common/required'),
+    email: require('livr/lib/rules/special/email'),
+    one_of: require('livr/lib/rules/string/one_of'),
+    min_length: require('livr/lib/rules/string/min_length'),
+    max_length: require('livr/lib/rules/string/max_length'),
+    equal_to_field: require('livr/lib/rules/special/equal_to_field'),
 });
 
 Validator.defaultAutoTrim(true);
@@ -181,7 +178,7 @@ const validator = new Validator({
     gender: { one_of: ['male', 'female'] },
     phone: { max_length: 10 },
     password: ['required', { min_length: 10 }],
-    password2: { equal_to_field: 'password' }
+    password2: { equal_to_field: 'password' },
 });
 
 const validData = validator.validate(userData);
@@ -191,7 +188,6 @@ if (validData) {
 } else {
     console.log('errors', validator.getErrors());
 }
-
 ```
 
 # DESCRIPTION
@@ -227,8 +223,8 @@ LIVR supports async validation but it was added only in v2.5. So, it uses a litt
 What you need to know about implementation:
 
 1. All simple sync rules are supported out of the box.
-2. Meta rules (rules that construct a new validator instance inside them) were rewritten to use AsyncValidator. 
-If you import "livr/async" they will be automatically used
+2. Meta rules (rules that construct a new validator instance inside them) were rewritten to use AsyncValidator.
+   If you import "livr/async" they will be automatically used
 3. Fields validation is done in parallel but rules for one field are processed one after another.
 
 Usage example:
@@ -245,7 +241,7 @@ const validator = new LIVR.AsyncValidator({
 try {
     const validData = await validator.validate(userData);
     saveUser(validData);
-} catch(errors) {
+} catch (errors) {
     console.log('errors', errors);
 }
 ```
@@ -260,12 +256,12 @@ npm install livr
 
 ### Browser (if you do not use npm)
 
-You can find prebuilt browser versions in "dist" folder 
+You can find prebuilt browser versions in "dist" folder
 
-* development/main.js - not minified development version with source maps
-* production/main.js - minified production version. Possible you will need some polyfills ("isInteger" etc) for older browsers.
-* development-async/main.js - not minified development version with source maps of "AsyncValidator"
-* production-async/main.js - minified production version of "AsyncValidator"
+-   development/main.js - not minified development version with source maps
+-   production/main.js - minified production version. Possible you will need some polyfills ("isInteger" etc) for older browsers.
+-   development-async/main.js - not minified development version with source maps of "AsyncValidator"
+-   production-async/main.js - minified production version of "AsyncValidator"
 
 # CLASS METHODS
 
@@ -276,8 +272,7 @@ rules - validations rules. Rules description is available here - https://livr-sp
 
 **Supported options:**
 
-* "autoTrim" (default false) - asks validator to trim all values before validation. Output will be also trimmed. If key is not passed then defaultAutoTrim value will be used.
-* "camelizeRules" (default true) - each registered rule which contains uderscore will be registered using camel case name as well
+-   "autoTrim" (default false) - asks validator to trim all values before validation. Output will be also trimmed. If key is not passed then defaultAutoTrim value will be used.
 
 _Instead of "options" object "isAutoTrim" boolean value can be passed for compatibility with previous API.
 if isAutoTrim is undefined(or null) then defaultAutoTrim value will be used._
@@ -293,9 +288,9 @@ LIVR.Validator.registerAliasedDefaultRule({
         nested_object: {
             country: 'required',
             city: 'required',
-            zip: 'positive_integer'
-        }
-    }
+            zip: 'positive_integer',
+        },
+    },
 });
 ```
 
@@ -319,9 +314,13 @@ LIVR.Validator.registerAliasedDefaultRule({
 
 All rules/aliases for the validator are equal. The validator does not distinguish "required", "list_of_different_objects" and "trim" rules. So, you can extend validator with any rules/alias you like.
 
+_Note: Each rule which contains uderscore in name will be additionally registered using camel case name if there is no such rule name already._
+
 ## LIVR.Validator.registerDefaultRules({"rule_name": ruleBuilder })
 
 ruleBuilder - is a function reference which will be called for building single rule validator.
+
+_Note: Each rule which contains uderscore in name will be additionally registered using camel case name if there is no such rule name already._
 
 ```javascript
 LIVR.Validator.registerDefaultRules({
@@ -336,7 +335,7 @@ LIVR.Validator.registerDefaultRules({
             } else {
             }
         };
-    }
+    },
 });
 ```
 
@@ -355,7 +354,7 @@ Here is "max_number" implemenation:
 
 ```javascript
 function maxNumber(maxNumber) {
-    return value => {
+    return (value) => {
         // We do not validate empty fields. We have "required" rule for this purpose
         if (value === undefined || value === null || value === '') return;
 
@@ -382,6 +381,13 @@ List of useful utils for writing your rules (see [source code](./lib/util.js))
 
 # OBJECT METHODS
 
+## validator.prepare()
+
+Parses all validation rules to make subsequent calls faster. This step is always automatically called on first call of validator.validate(input) but you can call it manually if you want to warm up your validator object before validation was called. Usually, it is useful in several cases:
+
+-   Benchmarks. As first validation call will take more time without prepare
+-   Custom meta rules. Just to prepare nested validators when parent validator prepare method is called.
+
 ## validator.validate(input)
 
 Validates user input. On success returns validData (contains only data that has described validation rules). On error return false.
@@ -402,14 +408,14 @@ for AsyncValidator
 try {
     const validData = await validator.validate(input);
     // use validData
-} catch(errors) {
+} catch (errors) {
     // handle errors
 }
 ```
 
 ## validator.getErrors() (only for sync version of validator)
 
-Returns errors object. 
+Returns errors object.
 
 ```javascript
 {
@@ -445,6 +451,14 @@ See "LIVR.Validator.registerAliasedDefaultRule" for rules examples.
 ## validator.getRules()
 
 returns object containing all ruleBuilders for the validator. You can register new rule or update existing one with "registerRules" method.
+
+# Performance
+
+LIVR is fast but you should be aware about following:
+
+Do not construct Validator for each validation call. Construct object once for each schema and reuse validators with different inputs. "validator.validate(input)" is very fast.
+
+In some cases you need to construct object each time, it is slower but still ok. It still will be twice faster than "Joi". LIVR validator preparation (rules compile step) is 100 time faster than "fastest-validator" compile time.
 
 # AUTHOR
 
