@@ -20,7 +20,9 @@
             "product_type": "wrongtype",
             "name": "Wrongtype"
         },
-        "Some Wrong Data"
+        "Some Wrong Data",
+        {}
     ],
+    "comments": ["not an object"],
     "users": "not an array"
 }
