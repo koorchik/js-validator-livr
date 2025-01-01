@@ -1,5 +1,9 @@
 ## CHANGELOG
 
+v2.8.0
+
+-   Add basic types for typescript
+
 v2.7.1
 
 -   300-500% faster validator construction. Useful when you construct new Validator for each validation.
