@@ -5,10 +5,11 @@
     "homepage": "https://github.com/koorchik/js-validator-livr",
     "author": {
         "name": "koorchik",
-        "url": "http://blog.koorchik.com"
+        "url": "https://github.com/koorchik"
     },
     "license": "MIT",
     "main": "./lib/LIVR.js",
+    "types": "types/index.d.ts",
     "scripts": {
         "test": "nyc ava && npm run size",
         "size": "size-limit",
