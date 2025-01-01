@@ -16,7 +16,7 @@ declare module 'livr' {
     /**
      * Main Validator class from LIVR.
      */
-    class Validator {
+    class Validator<T = any> {
         /**
          * Constructs a new validator with a given rules object.
          *
@@ -38,7 +38,7 @@ declare module 'livr' {
          * @param data The object (or primitive) to validate.
          * @returns The validated data if validation passes, or `false` if validation fails.
          */
-        validate<T = any>(data: T): T | false;
+        validate(data: T): T | false;
 
         /**
          * Returns validation errors if validation has failed, or `null` if there were no errors.
