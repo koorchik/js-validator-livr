@@ -10,7 +10,28 @@
 
 ---
 
-## Highlights
+**[LIVR Specification](http://livr-spec.org)** - Full documentation of all validation rules
+
+---
+
+## Built-in Rules
+
+| Category | Rules |
+|----------|-------|
+| **Common** | [required](http://livr-spec.org/validation-rules/common-rules.html#required) &#183; [not_empty](http://livr-spec.org/validation-rules/common-rules.html#not-empty) &#183; [not_empty_list](http://livr-spec.org/validation-rules/common-rules.html#not-empty-list) &#183; [any_object](http://livr-spec.org/validation-rules/common-rules.html#any-object) |
+| **String** | [string](http://livr-spec.org/validation-rules/string-rules.html#string) &#183; [eq](http://livr-spec.org/validation-rules/string-rules.html#eq) &#183; [one_of](http://livr-spec.org/validation-rules/string-rules.html#one-of) &#183; [max_length](http://livr-spec.org/validation-rules/string-rules.html#max-length) &#183; [min_length](http://livr-spec.org/validation-rules/string-rules.html#min-length) &#183; [length_between](http://livr-spec.org/validation-rules/string-rules.html#length-between) &#183; [length_equal](http://livr-spec.org/validation-rules/string-rules.html#length-equal) &#183; [like](http://livr-spec.org/validation-rules/string-rules.html#like) |
+| **Numeric** | [integer](http://livr-spec.org/validation-rules/numeric-rules.html#integer) &#183; [positive_integer](http://livr-spec.org/validation-rules/numeric-rules.html#positive-integer) &#183; [decimal](http://livr-spec.org/validation-rules/numeric-rules.html#decimal) &#183; [positive_decimal](http://livr-spec.org/validation-rules/numeric-rules.html#positive-decimal) &#183; [max_number](http://livr-spec.org/validation-rules/numeric-rules.html#max-number) &#183; [min_number](http://livr-spec.org/validation-rules/numeric-rules.html#min-number) &#183; [number_between](http://livr-spec.org/validation-rules/numeric-rules.html#number-between) |
+| **Special** | [email](http://livr-spec.org/validation-rules/special-rules.html#email) &#183; [url](http://livr-spec.org/validation-rules/special-rules.html#url) &#183; [iso_date](http://livr-spec.org/validation-rules/special-rules.html#iso-date) &#183; [equal_to_field](http://livr-spec.org/validation-rules/special-rules.html#equal-to-field) |
+| **Meta** | [nested_object](http://livr-spec.org/validation-rules/metarules.html#nested-object) &#183; [variable_object](http://livr-spec.org/validation-rules/metarules.html#variable-object) &#183; [list_of](http://livr-spec.org/validation-rules/metarules.html#list-of) &#183; [list_of_objects](http://livr-spec.org/validation-rules/metarules.html#list-of-objects) &#183; [list_of_different_objects](http://livr-spec.org/validation-rules/metarules.html#list-of-different-objects) &#183; [or](http://livr-spec.org/validation-rules/metarules.html#or) |
+| **Modifiers** | [trim](http://livr-spec.org/validation-rules/modifiers.html#trim) &#183; [to_lc](http://livr-spec.org/validation-rules/modifiers.html#to-lc) &#183; [to_uc](http://livr-spec.org/validation-rules/modifiers.html#to-uc) &#183; [remove](http://livr-spec.org/validation-rules/modifiers.html#remove) &#183; [leave_only](http://livr-spec.org/validation-rules/modifiers.html#leave-only) &#183; [default](http://livr-spec.org/validation-rules/modifiers.html#default) |
+
+> **Need more rules?** Check out [livr-extra-rules](https://www.npmjs.com/package/livr-extra-rules) for additional validators.
+
+---
+
+## Features
+
+### Why LIVR?
 
 - **Zero dependencies** - No external runtime dependencies
 - **Tiny footprint** - Validator core < 1KB, with all rules ~3KB (min+gzip)
@@ -18,7 +39,16 @@
 - **Isomorphic** - Works in Node.js and browsers
 - **Sync & async** - Both synchronous and asynchronous validation
 - **Extensible** - Easy to add custom rules and aliases
-- **Language independent** - Based on [LIVR Specification](http://livr-spec.org)
+
+### Validation Capabilities
+
+- **Declarative schemas** - Rules are language-independent JSON structures
+- **Multiple rules per field** - Chain any number of validators
+- **Aggregated errors** - Returns all errors at once, not just the first
+- **Data sanitization** - Output contains only validated fields
+- **Hierarchical validation** - Validate nested objects and arrays
+- **Readable error codes** - Returns codes like `REQUIRED`, `TOO_SHORT` (not messages)
+- **Output transformation** - Rules can modify output (`trim`, `default`, etc.)
 
 ---
 
@@ -51,6 +81,8 @@ if (validData) {
 
 ## Table of Contents
 
+- [Built-in Rules](#built-in-rules)
+- [Features](#features)
 - [Installation](#installation)
 - [Usage Guide](#usage-guide)
   - [Basic Validation](#basic-validation)
@@ -58,7 +90,6 @@ if (validData) {
   - [Async Validation](#async-validation)
   - [Using Modifiers](#using-modifiers)
   - [Custom Rules](#custom-rules)
-- [Features](#features)
 - [API Reference](#api-reference)
   - [Static Methods](#static-methods)
   - [Instance Methods](#instance-methods)
@@ -297,28 +328,6 @@ Validator.registerDefaultRules({
 
 const validator = new Validator({ /* schema */ });
 ```
-
----
-
-## Features
-
-### Core Features
-
-- **Declarative schemas** - Rules are language-independent JSON structures
-- **Multiple rules per field** - Chain any number of validators
-- **Aggregated errors** - Returns all errors at once, not just the first
-- **Data sanitization** - Output contains only validated fields
-- **Hierarchical validation** - Validate nested objects and arrays
-- **Readable error codes** - Returns codes like `REQUIRED`, `TOO_SHORT` (not messages)
-- **Output transformation** - Rules can modify output (`trim`, `default`, etc.)
-
-### JavaScript-Specific Features
-
-- **Zero dependencies** - No external runtime dependencies
-- **Tiny bundle** - Core validator < 1KB (min+gzip)
-- **TypeScript inference** - Derive types from schemas automatically
-- **Isomorphic** - Same code works in Node.js and browsers
-- **Additional rules** - See [livr-extra-rules](https://www.npmjs.com/package/livr-extra-rules)
 
 ---
 
