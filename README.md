@@ -10,7 +10,7 @@
 
 ---
 
-**[LIVR Specification](http://livr-spec.org)** - Full documentation of all validation rules
+**<a href="http://livr-spec.org" target="_blank">LIVR Specification</a>** - Full documentation of all validation rules
 
 ---
 
@@ -18,14 +18,14 @@
 
 | Category | Rules |
 |----------|-------|
-| **Common** | [required](http://livr-spec.org/validation-rules/common-rules.html#required) &#183; [not_empty](http://livr-spec.org/validation-rules/common-rules.html#not-empty) &#183; [not_empty_list](http://livr-spec.org/validation-rules/common-rules.html#not-empty-list) &#183; [any_object](http://livr-spec.org/validation-rules/common-rules.html#any-object) |
-| **String** | [string](http://livr-spec.org/validation-rules/string-rules.html#string) &#183; [eq](http://livr-spec.org/validation-rules/string-rules.html#eq) &#183; [one_of](http://livr-spec.org/validation-rules/string-rules.html#one-of) &#183; [max_length](http://livr-spec.org/validation-rules/string-rules.html#max-length) &#183; [min_length](http://livr-spec.org/validation-rules/string-rules.html#min-length) &#183; [length_between](http://livr-spec.org/validation-rules/string-rules.html#length-between) &#183; [length_equal](http://livr-spec.org/validation-rules/string-rules.html#length-equal) &#183; [like](http://livr-spec.org/validation-rules/string-rules.html#like) |
-| **Numeric** | [integer](http://livr-spec.org/validation-rules/numeric-rules.html#integer) &#183; [positive_integer](http://livr-spec.org/validation-rules/numeric-rules.html#positive-integer) &#183; [decimal](http://livr-spec.org/validation-rules/numeric-rules.html#decimal) &#183; [positive_decimal](http://livr-spec.org/validation-rules/numeric-rules.html#positive-decimal) &#183; [max_number](http://livr-spec.org/validation-rules/numeric-rules.html#max-number) &#183; [min_number](http://livr-spec.org/validation-rules/numeric-rules.html#min-number) &#183; [number_between](http://livr-spec.org/validation-rules/numeric-rules.html#number-between) |
-| **Special** | [email](http://livr-spec.org/validation-rules/special-rules.html#email) &#183; [url](http://livr-spec.org/validation-rules/special-rules.html#url) &#183; [iso_date](http://livr-spec.org/validation-rules/special-rules.html#iso-date) &#183; [equal_to_field](http://livr-spec.org/validation-rules/special-rules.html#equal-to-field) |
-| **Meta** | [nested_object](http://livr-spec.org/validation-rules/metarules.html#nested-object) &#183; [variable_object](http://livr-spec.org/validation-rules/metarules.html#variable-object) &#183; [list_of](http://livr-spec.org/validation-rules/metarules.html#list-of) &#183; [list_of_objects](http://livr-spec.org/validation-rules/metarules.html#list-of-objects) &#183; [list_of_different_objects](http://livr-spec.org/validation-rules/metarules.html#list-of-different-objects) &#183; [or](http://livr-spec.org/validation-rules/metarules.html#or) |
-| **Modifiers** | [trim](http://livr-spec.org/validation-rules/modifiers.html#trim) &#183; [to_lc](http://livr-spec.org/validation-rules/modifiers.html#to-lc) &#183; [to_uc](http://livr-spec.org/validation-rules/modifiers.html#to-uc) &#183; [remove](http://livr-spec.org/validation-rules/modifiers.html#remove) &#183; [leave_only](http://livr-spec.org/validation-rules/modifiers.html#leave-only) &#183; [default](http://livr-spec.org/validation-rules/modifiers.html#default) |
+| **Common** | <a href="http://livr-spec.org/validation-rules/common-rules.html#required" target="_blank">required</a> &#183; <a href="http://livr-spec.org/validation-rules/common-rules.html#not-empty" target="_blank">not_empty</a> &#183; <a href="http://livr-spec.org/validation-rules/common-rules.html#not-empty-list" target="_blank">not_empty_list</a> &#183; <a href="http://livr-spec.org/validation-rules/common-rules.html#any-object" target="_blank">any_object</a> |
+| **String** | <a href="http://livr-spec.org/validation-rules/string-rules.html#string" target="_blank">string</a> &#183; <a href="http://livr-spec.org/validation-rules/string-rules.html#eq" target="_blank">eq</a> &#183; <a href="http://livr-spec.org/validation-rules/string-rules.html#one-of" target="_blank">one_of</a> &#183; <a href="http://livr-spec.org/validation-rules/string-rules.html#max-length" target="_blank">max_length</a> &#183; <a href="http://livr-spec.org/validation-rules/string-rules.html#min-length" target="_blank">min_length</a> &#183; <a href="http://livr-spec.org/validation-rules/string-rules.html#length-between" target="_blank">length_between</a> &#183; <a href="http://livr-spec.org/validation-rules/string-rules.html#length-equal" target="_blank">length_equal</a> &#183; <a href="http://livr-spec.org/validation-rules/string-rules.html#like" target="_blank">like</a> |
+| **Numeric** | <a href="http://livr-spec.org/validation-rules/numeric-rules.html#integer" target="_blank">integer</a> &#183; <a href="http://livr-spec.org/validation-rules/numeric-rules.html#positive-integer" target="_blank">positive_integer</a> &#183; <a href="http://livr-spec.org/validation-rules/numeric-rules.html#decimal" target="_blank">decimal</a> &#183; <a href="http://livr-spec.org/validation-rules/numeric-rules.html#positive-decimal" target="_blank">positive_decimal</a> &#183; <a href="http://livr-spec.org/validation-rules/numeric-rules.html#max-number" target="_blank">max_number</a> &#183; <a href="http://livr-spec.org/validation-rules/numeric-rules.html#min-number" target="_blank">min_number</a> &#183; <a href="http://livr-spec.org/validation-rules/numeric-rules.html#number-between" target="_blank">number_between</a> |
+| **Special** | <a href="http://livr-spec.org/validation-rules/special-rules.html#email" target="_blank">email</a> &#183; <a href="http://livr-spec.org/validation-rules/special-rules.html#url" target="_blank">url</a> &#183; <a href="http://livr-spec.org/validation-rules/special-rules.html#iso-date" target="_blank">iso_date</a> &#183; <a href="http://livr-spec.org/validation-rules/special-rules.html#equal-to-field" target="_blank">equal_to_field</a> |
+| **Meta** | <a href="http://livr-spec.org/validation-rules/metarules.html#nested-object" target="_blank">nested_object</a> &#183; <a href="http://livr-spec.org/validation-rules/metarules.html#variable-object" target="_blank">variable_object</a> &#183; <a href="http://livr-spec.org/validation-rules/metarules.html#list-of" target="_blank">list_of</a> &#183; <a href="http://livr-spec.org/validation-rules/metarules.html#list-of-objects" target="_blank">list_of_objects</a> &#183; <a href="http://livr-spec.org/validation-rules/metarules.html#list-of-different-objects" target="_blank">list_of_different_objects</a> &#183; <a href="http://livr-spec.org/validation-rules/metarules.html#or" target="_blank">or</a> |
+| **Modifiers** | <a href="http://livr-spec.org/validation-rules/modifiers.html#trim" target="_blank">trim</a> &#183; <a href="http://livr-spec.org/validation-rules/modifiers.html#to-lc" target="_blank">to_lc</a> &#183; <a href="http://livr-spec.org/validation-rules/modifiers.html#to-uc" target="_blank">to_uc</a> &#183; <a href="http://livr-spec.org/validation-rules/modifiers.html#remove" target="_blank">remove</a> &#183; <a href="http://livr-spec.org/validation-rules/modifiers.html#leave-only" target="_blank">leave_only</a> &#183; <a href="http://livr-spec.org/validation-rules/modifiers.html#default" target="_blank">default</a> |
 
-> **Need more rules?** Check out [livr-extra-rules](https://www.npmjs.com/package/livr-extra-rules) for additional validators.
+> **Need more rules?** Check out <a href="https://www.npmjs.com/package/livr-extra-rules" target="_blank">livr-extra-rules</a> for additional validators.
 
 ---
 
@@ -512,15 +512,15 @@ for (const item of items) {
 
 ## Additional Resources
 
-- **[LIVR Specification](http://livr-spec.org)** - Full specification and rule documentation
-- **[livr-extra-rules](https://www.npmjs.com/package/livr-extra-rules)** - Additional validation rules
+- **<a href="http://livr-spec.org" target="_blank">LIVR Specification</a>** - Full specification and rule documentation
+- **<a href="https://www.npmjs.com/package/livr-extra-rules" target="_blank">livr-extra-rules</a>** - Additional validation rules
 - **[TypeScript Guide](./docs/TYPESCRIPT.md)** - Comprehensive TypeScript documentation
 
 ---
 
 ## Contributing
 
-Found a bug or have a feature request? Please open an issue on [GitHub](https://github.com/koorchik/js-validator-livr/issues).
+Found a bug or have a feature request? Please open an issue on <a href="https://github.com/koorchik/js-validator-livr/issues" target="_blank">GitHub</a>.
 
 ---
 
@@ -532,7 +532,7 @@ MIT License - see [LICENSE](./LICENSE) for details.
 
 ## Author
 
-**Viktor Turskyi** ([@koorchik](https://github.com/koorchik))
+**Viktor Turskyi** (<a href="https://github.com/koorchik" target="_blank">@koorchik</a>)
 
 ### Contributors
 
