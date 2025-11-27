@@ -1,5 +1,9 @@
 ## CHANGELOG
 
+v2.9
+
+-   Add types inference engine
+
 v2.8.1
 
 -   Add basic types for typescript
