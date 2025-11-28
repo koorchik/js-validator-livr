@@ -9,24 +9,21 @@ LIVR (Language Independent Validation Rules) is a JavaScript validator implement
 ## Commands
 
 ```bash
-# Run all tests with coverage and size check
+# Run all tests (runtime tests with coverage + TypeScript type checks)
 npm test
 
-# Run tests only (using AVA test runner)
+# Run runtime tests only (using AVA test runner)
 npx ava
 
 # Run a specific test file
 npx ava t/tests-sync/01-test_suite.js
 npx ava t/tests-async/01-test_suite.js
 
-# Type check (verify TypeScript definitions)
+# Type check only (verify TypeScript definitions and type inference)
 npx tsc --noEmit
 
 # Build browser bundles (sync and async, dev and production)
 npm run build
-
-# Check bundle size limits
-npm run size
 ```
 
 ## Architecture
@@ -70,6 +67,7 @@ function ruleName(arg1, arg2, ruleBuilders) {
 - `t/test_suite/` - JSON-based test cases (positive, negative, aliases_positive, aliases_negative)
   - Each test case is a directory containing `rules.json`, `input.json`, and `output.json` (positive) or `errors.json` (negative)
   - Alias tests also include `aliases.json`
+- `t/types-test.ts` - Compile-time type inference tests (verified via `tsc --noEmit`)
 
 ### TypeScript Types (types/)
 
