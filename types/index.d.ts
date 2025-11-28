@@ -37,22 +37,21 @@
 /// <reference path="../lib/rules/meta/variable_object.d.ts" />
 /// <reference path="../lib/rules/meta/or.d.ts" />
 
-// Re-export inference types
-export type {
-    InferFromSchema,
-    InferRuleType,
-    LIVRSchema,
-    LIVRRuleDefinition,
-    LIVRPrimitive,
-    RuleTypeDef,
-    RuleTypeRegistry,
-    ParameterizedRuleDef,
-    ParameterizedRuleRegistry,
-    Simplify,
-    SimpleRule,
-    RequiredRule,
-    ParameterizedRule,
-    DefaultRule,
+import {
+    InferFromSchema as _InferFromSchema,
+    InferRuleType as _InferRuleType,
+    LIVRSchema as _LIVRSchema,
+    LIVRRuleDefinition as _LIVRRuleDefinition,
+    LIVRPrimitive as _LIVRPrimitive,
+    RuleTypeDef as _RuleTypeDef,
+    RuleTypeRegistry as _RuleTypeRegistry,
+    ParameterizedRuleDef as _ParameterizedRuleDef,
+    ParameterizedRuleRegistry as _ParameterizedRuleRegistry,
+    Simplify as _Simplify,
+    SimpleRule as _SimpleRule,
+    RequiredRule as _RequiredRule,
+    ParameterizedRule as _ParameterizedRule,
+    DefaultRule as _DefaultRule,
 } from './inference';
 
 type Schema = Record<string, any>;
@@ -67,7 +66,7 @@ type RuleFactory = (
     ...args: Array<any>
 ) => (value: any, params: any, outputArr: Array<any>) => string | undefined;
 
-declare module 'livr' {
+declare namespace LIVR {
     /**
      * Main Validator class from LIVR.
      */
@@ -148,14 +147,23 @@ declare module 'livr' {
         getErrors(): Record<string, any>;
     }
 
-    /**
-     * LIVR module exports as a CommonJS object with named exports.
-     */
-    const LIVR: {
-        Validator: typeof Validator;
-        ValidatorError: typeof ValidatorError;
-        rules: Record<string, RuleFactory>;
-    };
+    // Type inference exports
+    export type InferFromSchema<S> = _InferFromSchema<S>;
+    export type InferRuleType<R> = _InferRuleType<R>;
+    export type LIVRSchema = _LIVRSchema;
+    export type LIVRRuleDefinition = _LIVRRuleDefinition;
+    export type LIVRPrimitive = _LIVRPrimitive;
+    export type RuleTypeDef<TOutput = unknown, TRequiredEffect extends boolean = false, TDefaultEffect extends boolean = false> = _RuleTypeDef<TOutput, TRequiredEffect, TDefaultEffect>;
+    export type RuleTypeRegistry = _RuleTypeRegistry;
+    export type ParameterizedRuleDef<TTemplate extends string = string, TRequiredEffect extends boolean = false, TDefaultEffect extends boolean = false> = _ParameterizedRuleDef<TTemplate, TRequiredEffect, TDefaultEffect>;
+    export type ParameterizedRuleRegistry = _ParameterizedRuleRegistry;
+    export type Simplify<T> = _Simplify<T>;
+    export type SimpleRule<T> = _SimpleRule<T>;
+    export type RequiredRule = _RequiredRule;
+    export type ParameterizedRule<F> = _ParameterizedRule<F>;
+    export type DefaultRule<T> = _DefaultRule<T>;
 
-    export = LIVR;
+    export const rules: Record<string, RuleFactory>;
 }
+
+export = LIVR;

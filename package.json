@@ -1,6 +1,6 @@
 {
     "name": "livr",
-    "version": "2.9.1",
+    "version": "2.9.2",
     "description": "Lightweight validator supporting Language Independent Validation Rules Specification",
     "homepage": "https://github.com/koorchik/js-validator-livr",
     "author": {
@@ -10,6 +10,16 @@
     "license": "MIT",
     "main": "./lib/LIVR.js",
     "types": "types/index.d.ts",
+    "exports": {
+        ".": {
+            "types": "./types/index.d.ts",
+            "require": "./lib/LIVR.js",
+            "import": "./lib/LIVR.js"
+        },
+        "./types/inference": {
+            "types": "./types/inference.d.ts"
+        }
+    },
     "scripts": {
         "test": "nyc ava",
         "build-sync:min": "webpack --entry ./scripts/browser_build_entry-sync.js --mode production -o ./dist/production/",
