@@ -2,6 +2,26 @@
 // Core type inference engine for LIVR schemas
 
 // ============================================================================
+// Type Utilities
+// ============================================================================
+
+/** Check if T is a union type (has more than one member) */
+type IsUnion<T, U = T> = T extends any
+  ? [U] extends [T]
+    ? false
+    : true
+  : never;
+
+/** Widen single literal types to their primitive base types, preserve unions */
+type Widen<T> =
+  IsUnion<T> extends true
+    ? T  // Keep unions as-is (e.g., 'ACTIVE' | 'PENDING')
+    : T extends number ? number
+    : T extends string ? string
+    : T extends boolean ? boolean
+    : T;
+
+// ============================================================================
 // Base Types
 // ============================================================================
 
@@ -209,9 +229,9 @@ type ComputeParameterizedOutput<Name extends string, Args> =
   // eq: output is the literal type of the argument
   : Name extends 'eq'
     ? Args
-  // default: output is the type of the default value
+  // default: output is widened type of the default value (use type assertion to preserve literals)
   : Name extends 'default'
-    ? Args
+    ? Widen<Args>
   // nested_object: output is inferred from nested schema
   : Name extends 'nested_object' | 'nestedObject'
     ? Args extends LIVRSchema ? InferFromSchema<Args> : unknown

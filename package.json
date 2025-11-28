@@ -1,6 +1,6 @@
 {
     "name": "livr",
-    "version": "2.9.3",
+    "version": "2.9.4",
     "description": "Lightweight validator supporting Language Independent Validation Rules Specification",
     "homepage": "https://github.com/koorchik/js-validator-livr",
     "author": {
@@ -21,7 +21,7 @@
         }
     },
     "scripts": {
-        "test": "nyc ava",
+        "test": "nyc ava && tsc --noEmit",
         "build-sync:min": "webpack --entry ./scripts/browser_build_entry-sync.js --mode production -o ./dist/production/",
         "build-sync:debug": "webpack --entry ./scripts/browser_build_entry-sync.js --mode development -o ./dist/development/",
         "build-async:min": "webpack --entry ./scripts/browser_build_entry-async.js --mode production -o ./dist/production-async/",

@@ -1,5 +1,12 @@
 ## CHANGELOG
 
+v2.9.4
+-   Type inference: `default` rule now widens literal types to primitives (e.g., `{default: 10}` infers as `number` instead of `10`)
+-   Use type assertions with unions to preserve specific types (e.g., `{default: 'ACTIVE' as 'ACTIVE' | 'PENDING'}`)
+-   Add TypeScript type inference tests (`t/types-test.ts`)
+-   Add `tsconfig.json` for type checking
+-   `npm test` now includes TypeScript type checks
+
 v2.9.3
 -   Add support for custom templates for complex cases of type inference
 

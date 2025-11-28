@@ -75,11 +75,11 @@ The `default` rule also makes fields non-optional since they always have a value
 ```typescript
 const schema = {
     count: [{ default: 0 }, 'integer'],     // number (has default)
-    enabled: { default: true },              // true (has default)
+    enabled: { default: true },              // boolean (has default, widened)
 } as const;
 
 type Config = InferFromSchema<typeof schema>;
-// { count: number; enabled: true }
+// { count: number; enabled: boolean }
 ```
 
 ### Primitive Type Rules
@@ -111,6 +111,32 @@ const schema = {
 type Data = InferFromSchema<typeof schema>;
 // { role?: 'admin' | 'user' | 'guest'; status?: 'active' }
 ```
+
+### Type Widening with `default`
+
+The `default` rule automatically widens literal types to their primitive base:
+
+```typescript
+const schema = {
+    // Widens to primitive types
+    count: { default: 0 },           // number (not 0)
+    name: { default: 'anonymous' },  // string (not 'anonymous')
+    active: { default: true },       // boolean (not true)
+
+    // Use type assertions with unions to preserve specific types
+    status: { default: 'ACTIVE' as 'ACTIVE' | 'PENDING' },  // 'ACTIVE' | 'PENDING'
+} as const;
+
+type Config = InferFromSchema<typeof schema>;
+// {
+//     count: number;
+//     name: string;
+//     active: boolean;
+//     status: 'ACTIVE' | 'PENDING';
+// }
+```
+
+This is useful because default values typically represent any value of that type, not just the specific default. Use type assertions with union types (`as 'A' | 'B'`) when you need a specific set of allowed values.
 
 ---
 
@@ -300,7 +326,7 @@ LIVR provides several built-in templates for common patterns:
 
 | Template | Description | Example Usage |
 |----------|-------------|---------------|
-| `literal` | Output equals the argument type | `eq`, `default` |
+| `literal` | Output equals the argument type | `eq` |
 | `array_element` | Output is element type of array argument | `one_of` |
 | `infer_schema` | Output is inferred from schema argument | `nested_object` |
 | `infer_schema_array` | Output is array of inferred schema type | `list_of_objects` |
