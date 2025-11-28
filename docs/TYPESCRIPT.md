@@ -16,6 +16,7 @@ LIVR provides powerful TypeScript type inference that automatically derives type
   - [Union Types](#union-types-with-or)
 - [Custom Rules Type Inference](#custom-rules-type-inference)
   - [Creating Type Definitions](#step-1-create-the-rule-implementation)
+  - [Parameterized Output Types](#advanced-rules-with-parameterized-output-types)
   - [RuleTypeDef Parameters](#ruletypedef-parameters)
   - [External Rule Packages](#type-inference-for-external-rule-packages)
 - [Available Type Exports](#available-type-exports)
@@ -291,21 +292,91 @@ const result = validator.validate(input);
 
 ### Advanced: Rules with Parameterized Output Types
 
-For rules where the output type depends on the arguments:
+For rules where the output type depends on the arguments, use `ParameterizedRuleRegistry` with templates.
+
+#### Using Built-in Templates
+
+LIVR provides several built-in templates for common patterns:
+
+| Template | Description | Example Usage |
+|----------|-------------|---------------|
+| `literal` | Output equals the argument type | `eq`, `default` |
+| `array_element` | Output is element type of array argument | `one_of` |
+| `infer_schema` | Output is inferred from schema argument | `nested_object` |
+| `infer_schema_array` | Output is array of inferred schema type | `list_of_objects` |
+| `infer_rule_array` | Output is array of inferred rule type | `list_of` |
 
 ```typescript
-// my-rules/enum_value.js
-module.exports = function enumValue(allowedValues) {
-    return (value) => {
-        if (value === undefined || value === null || value === '') return;
-        if (!allowedValues.includes(value)) {
-            return 'NOT_ALLOWED_VALUE';
-        }
-    };
-};
+// my-rules/allowed_status.d.ts
+import type { ParameterizedRuleDef } from 'livr/types/inference';
+
+declare module 'livr/types/inference' {
+    interface ParameterizedRuleRegistry {
+        // Uses 'array_element' template: output is union of array elements
+        allowed_status: ParameterizedRuleDef<'array_element', false, false>;
+    }
+}
 ```
 
-For parameterized rules, you have two options:
+```typescript
+// Usage
+const schema = {
+    status: { allowed_status: ['pending', 'active', 'closed'] as const },
+} as const;
+
+type Data = InferFromSchema<typeof schema>;
+// { status?: 'pending' | 'active' | 'closed' }
+```
+
+#### Creating Custom Templates
+
+For rules that need custom type transformations, you can extend `TemplateOutputRegistry`:
+
+```typescript
+// my-rules/instance_of.d.ts
+import type { ParameterizedRuleDef } from 'livr/types/inference';
+
+declare module 'livr/types/inference' {
+    // Step 1: Define custom template computation
+    interface TemplateOutputRegistry<Args> {
+        // Extract instance type from constructor argument
+        my_instance: Args extends abstract new (...args: any) => any
+            ? InstanceType<Args>
+            : unknown;
+    }
+
+    // Step 2: Register rule using the template
+    interface ParameterizedRuleRegistry {
+        my_instance_of: ParameterizedRuleDef<'my_instance', false, false>;
+    }
+}
+```
+
+```typescript
+// Usage
+import { Temporal } from '@js-temporal/polyfill';
+
+const schema = {
+    createdAt: { my_instance_of: Temporal.Instant },
+} as const;
+
+type Data = InferFromSchema<typeof schema>;
+// { createdAt?: Temporal.Instant }
+```
+
+#### ParameterizedRuleDef Parameters
+
+```typescript
+ParameterizedRuleDef<TTemplate, TRequiredEffect, TDefaultEffect>
+```
+
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| `TTemplate` | `string` | Template name from `TemplateOutputRegistry` |
+| `TRequiredEffect` | `boolean` | Set to `true` if this rule makes the field required |
+| `TDefaultEffect` | `boolean` | Set to `true` if this rule provides a default value |
+
+#### Alternative Approaches
 
 **Option 1: Use existing rules as building blocks**
 
@@ -365,11 +436,14 @@ RuleTypeDef<{ id: number; name: string }, false, false>
 
 ## Type Inference for External Rule Packages
 
-If you're publishing a package with LIVR rules, include type definitions:
+If you're publishing a package with LIVR rules, include type definitions.
+
+### Simple Rules (Fixed Output Types)
+
+For rules that always output the same type:
 
 ```typescript
 // my-livr-rules/types.d.ts
-import 'livr';
 import type { RuleTypeDef } from 'livr/types/inference';
 
 declare module 'livr/types/inference' {
@@ -385,6 +459,56 @@ declare module 'livr/types/inference' {
     }
 }
 ```
+
+### Parameterized Rules (Output Depends on Arguments)
+
+For rules where output type depends on arguments, use `ParameterizedRuleRegistry`:
+
+```typescript
+// my-livr-rules/types.d.ts
+import type { RuleTypeDef, ParameterizedRuleDef } from 'livr/types/inference';
+
+declare module 'livr/types/inference' {
+    // Simple rules
+    interface RuleTypeRegistry {
+        uuid: RuleTypeDef<string, false, false>;
+    }
+
+    // Parameterized rules using built-in templates
+    interface ParameterizedRuleRegistry {
+        // Uses 'literal' template: output equals the argument
+        is: ParameterizedRuleDef<'literal', true, false>;
+        // Uses 'array_element' template: output is union of array elements
+        allowed_values: ParameterizedRuleDef<'array_element', false, false>;
+    }
+}
+```
+
+### Custom Templates
+
+For rules that need custom type transformations, extend `TemplateOutputRegistry`:
+
+```typescript
+// my-livr-rules/types.d.ts
+import type { ParameterizedRuleDef } from 'livr/types/inference';
+
+declare module 'livr/types/inference' {
+    // Define custom template computation
+    interface TemplateOutputRegistry<Args> {
+        instance_of: Args extends abstract new (...args: any) => any
+            ? InstanceType<Args>
+            : unknown;
+    }
+
+    // Register rules using the custom template
+    interface ParameterizedRuleRegistry {
+        instanceOf: ParameterizedRuleDef<'instance_of', false, false>;
+        instance_of: ParameterizedRuleDef<'instance_of', false, false>;
+    }
+}
+```
+
+### Using External Rule Packages
 
 Users of your package will automatically get type inference when they import it:
 
@@ -419,9 +543,16 @@ import type {
     LIVRRuleDefinition,
     LIVRPrimitive,
 
-    // For defining custom rule types
+    // For defining custom rule types (fixed output)
     RuleTypeDef,
     RuleTypeRegistry,
+
+    // For defining parameterized rules (output depends on arguments)
+    ParameterizedRuleDef,
+    ParameterizedRuleRegistry,
+
+    // For defining custom output templates
+    TemplateOutputRegistry,
 
     // Utility types
     Simplify,

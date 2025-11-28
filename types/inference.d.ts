@@ -57,16 +57,31 @@ export interface RuleTypeRegistry {
 // ============================================================================
 
 /**
- * Computation templates for parameterized rules.
- * These cover the common patterns for how output types are derived from args.
+ * Extensible registry for template output computations.
+ * External packages can augment this interface to add custom templates.
+ *
+ * @example
+ * ```typescript
+ * declare module 'livr/types/inference' {
+ *   interface TemplateOutputRegistry<Args> {
+ *     my_template: Args extends MyType ? TransformedType : unknown;
+ *   }
+ * }
+ * ```
  */
+export interface TemplateOutputRegistry<Args> {
+  literal: Args;
+  array_element: Args extends readonly (infer T)[] ? T : unknown;
+  infer_schema: Args extends LIVRSchema ? InferFromSchema<Args> : unknown;
+  infer_schema_array: Args extends LIVRSchema ? Array<InferFromSchema<Args>> : unknown;
+  infer_rule_array: Args extends LIVRRuleDefinition ? Array<InferRuleType<Args>> : unknown;
+}
+
+/** Compute output type from template name and arguments */
 type ComputeFromTemplate<Template extends string, Args> =
-  Template extends 'literal' ? Args :
-  Template extends 'array_element' ? (Args extends readonly (infer T)[] ? T : unknown) :
-  Template extends 'infer_schema' ? (Args extends LIVRSchema ? InferFromSchema<Args> : unknown) :
-  Template extends 'infer_schema_array' ? (Args extends LIVRSchema ? Array<InferFromSchema<Args>> : unknown) :
-  Template extends 'infer_rule_array' ? (Args extends LIVRRuleDefinition ? Array<InferRuleType<Args>> : unknown) :
-  unknown;
+  Template extends keyof TemplateOutputRegistry<Args>
+    ? TemplateOutputRegistry<Args>[Template]
+    : unknown;
 
 /**
  * Parameterized rule definition structure.
@@ -86,18 +101,25 @@ export interface ParameterizedRuleDef<
  * Extensible registry for parameterized rules.
  * External packages can augment this to add custom parameterized rules.
  *
- * Available templates:
- * - 'literal': Output = Args (for rules like `eq`, `is`)
+ * Built-in templates (see TemplateOutputRegistry):
+ * - 'literal': Output = Args (for rules like `eq`)
  * - 'array_element': Output = element type of Args array (for rules like `one_of`)
  * - 'infer_schema': Output = InferFromSchema<Args> (for rules like `nested_object`)
  * - 'infer_schema_array': Output = Array<InferFromSchema<Args>> (for rules like `list_of_objects`)
  * - 'infer_rule_array': Output = Array<InferRuleType<Args>> (for rules like `list_of`)
  *
+ * External packages can add custom templates via TemplateOutputRegistry augmentation.
+ *
  * @example
  * ```typescript
  * declare module 'livr/types/inference' {
+ *   // Add custom template
+ *   interface TemplateOutputRegistry<Args> {
+ *     my_template: Args extends SomeType ? OutputType : unknown;
+ *   }
+ *   // Register rule using the template
  *   interface ParameterizedRuleRegistry {
- *     is: ParameterizedRuleDef<'literal', true, false>;
+ *     my_rule: ParameterizedRuleDef<'my_template', false, false>;
  *   }
  * }
  * ```

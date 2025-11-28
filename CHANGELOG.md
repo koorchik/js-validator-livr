@@ -1,5 +1,8 @@
 ## CHANGELOG
 
+v2.9.3
+-   Add support for custom templates for complex cases of type inference
+
 v2.9
 
 -   Add types inference engine
