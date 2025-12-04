@@ -172,11 +172,15 @@ type User = InferFromSchema<typeof userSchema>;
 // Result: { name: string; email: string; age?: number; role?: 'admin' | 'user' }
 
 const validator = new LIVR.Validator<User>(userSchema);
+
+// Validate data from external source (API request, form submission, etc.)
+const input = getUserInput();
 const validData = validator.validate(input);
 
 if (validData) {
     // validData is typed as User
-    saveUser(validData);
+    console.log(validData.name);  // string
+    console.log(validData.age);   // number | undefined
 }
 ```
 

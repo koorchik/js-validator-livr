@@ -5,11 +5,13 @@
     "strict": true,
     "noEmit": true,
     "skipLibCheck": true,
-    "esModuleInterop": true
+    "esModuleInterop": true,
+    "baseUrl": "."
   },
   "include": [
     "types/**/*.d.ts",
     "lib/**/*.d.ts",
-    "t/types-test.ts"
+    "t/types-test.ts",
+    "examples/**/*.ts"
   ]
 }

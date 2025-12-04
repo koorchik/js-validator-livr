@@ -9,12 +9,13 @@ This document examines LIVR's design decisions, compares them to alternatives in
 ## Quick Start
 
 ```typescript
-import LIVR, { InferFromSchema } from 'livr';
+import LIVR from 'livr';
+import type { InferFromSchema } from 'livr/types';
 
 const schema = {
     email: ['required', 'email'],
     age: ['required', 'positiveInteger'],
-    role: { oneOf: ['admin', 'user'] },
+    role: { oneOf: ['admin', 'user'] as const },
 } as const;
 
 type User = InferFromSchema<typeof schema>;
@@ -1231,15 +1232,16 @@ The same schema works identically across all implementations:
 LIVR fully supports TypeScript type inference using the `InferFromSchema<>` utility:
 
 ```typescript
-import LIVR, { InferFromSchema } from 'livr';
+import LIVR from 'livr';
+import type { InferFromSchema } from 'livr/types';
 
 const userSchema = {
     id: ['required', 'positiveInteger'],
     username: ['required', { minLength: 3 }, { maxLength: 50 }],
-    role: { oneOf: ['admin', 'user', 'guest'] },
+    role: { oneOf: ['admin', 'user', 'guest'] as const },
     settings: {
         nestedObject: {
-            theme: { oneOf: ['light', 'dark'] },
+            theme: { oneOf: ['light', 'dark'] as const },
             notifications: 'boolean',
         },
     },
@@ -1250,19 +1252,20 @@ type User = InferFromSchema<typeof userSchema>;
 // {
 //   id: number;
 //   username: string;
-//   role: 'admin' | 'user' | 'guest';
-//   settings: {
-//     theme: 'light' | 'dark';
-//     notifications: boolean;
+//   role?: 'admin' | 'user' | 'guest';
+//   settings?: {
+//     theme?: 'light' | 'dark';
+//     notifications?: boolean;
 //   }
 // }
 
 const validator = new LIVR.Validator<User>(userSchema);
+const input = getUserInput(); // data from API, form, etc.
 const result = validator.validate(input);
 
 if (result) {
     // result is typed as User
-    console.log(result.role); // TypeScript knows: 'admin' | 'user' | 'guest'
+    console.log(result.role); // TypeScript knows: 'admin' | 'user' | 'guest' | undefined
 }
 ```
 
@@ -1272,7 +1275,7 @@ Register custom rule types via module augmentation:
 
 ```typescript
 import LIVR from 'livr';
-import type { InferFromSchema } from 'livr';
+import type { InferFromSchema } from 'livr/types';
 import type { RuleTypeDef } from 'livr/types/inference';
 
 // Declare custom rule types via module augmentation

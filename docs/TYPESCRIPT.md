@@ -41,6 +41,9 @@ type User = InferFromSchema<typeof userSchema>;
 
 // Pass the inferred type as a generic parameter
 const validator = new LIVR.Validator<User>(userSchema);
+
+// Validate data from external source (API request, form submission, etc.)
+const input = getUserInput();
 const result = validator.validate(input);
 
 if (result) {
@@ -312,6 +315,9 @@ type Contact = InferFromSchema<typeof schema>;
 
 // Pass the inferred type as a generic parameter
 const validator = new LIVR.Validator<Contact>(schema);
+
+// Validate data from external source
+const input = getContactInput();
 const result = validator.validate(input);
 // result is typed as Contact | false
 ```

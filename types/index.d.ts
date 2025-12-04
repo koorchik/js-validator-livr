@@ -92,7 +92,7 @@ declare namespace LIVR {
          * @param data The object (or primitive) to validate.
          * @returns The validated data if validation passes, or `false` if validation fails.
          */
-        validate(data: T): T | false;
+        validate(data: unknown): T | false;
 
         /**
          * Returns validation errors if validation has failed, or `null` if there were no errors.
