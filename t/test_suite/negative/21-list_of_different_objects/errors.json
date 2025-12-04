@@ -11,7 +11,13 @@
         {
             "name": "TOO_LONG"
         },
+        {
+            "product_type": "NOT_ALLOWED_VALUE"
+        },
         "FORMAT_ERROR",
-        "FORMAT_ERROR"
-    ]
+        {
+            "product_type": "REQUIRED"
+        }
+    ],
+    "comments": ["FORMAT_ERROR"]
 }
