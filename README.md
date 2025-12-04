@@ -12,6 +12,8 @@
 
 **[LIVR Specification](http://livr-spec.org)** - Full documentation of all validation rules
 
+**[Design Decisions](./docs/DESIGN.md)** - Why LIVR works the way it does: schemas as data, security, error codes, and more
+
 ---
 
 ## Built-in Rules
