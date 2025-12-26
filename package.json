@@ -1,6 +1,6 @@
 {
     "name": "livr",
-    "version": "2.10.1",
+    "version": "2.10.2",
     "description": "Lightweight validator supporting Language Independent Validation Rules Specification",
     "homepage": "https://github.com/koorchik/js-validator-livr",
     "author": {
