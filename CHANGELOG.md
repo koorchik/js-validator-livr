@@ -10,6 +10,7 @@ Unreleased
 -   Fix: objects with own `constructor` key failed with `FORMAT_ERROR` (on any level) and were not auto trimmed
 -   Objects without prototype (`Object.create(null)`, `querystring.parse()` output) are validated as objects, `util.isObject()` returns `true` for them
 -   `util.isThenable()` and `util.getFieldValue()` (value of a data field; inherited methods like `constructor` are not taken as values)
+-   `validator.getFieldRule(fieldName)` (sync and async): all rules of a schema field as one rule function, for custom meta rules that validate many values with the same rules. Built-in `list_of`, `or` and aliases use it
 -   Test suite: sync with the LIVR spec repository, which got cases for the fixes above
 -   Performance (no API changes):
     -   Sync validator: 1.1-1.4x faster for flat and nested forms, `list_of` 2.2x, `or` and aliases 1.6-1.7x, `iso_date` 2.4x, invalid emails 1.8x, `one_of` with long lists up to 4.7x

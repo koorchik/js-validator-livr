@@ -165,6 +165,21 @@ test('Meta rules return exceptions of nested rules as errors', async () => {
     assert.deepEqual(errors, { items: [boom], values: ['ASYNC_BOOM'], object: boom });
 });
 
+test('Aliases return exceptions of their rules as errors', async () => {
+    const validator = new LIVR.AsyncValidator({ a: 'my_alias_with_error', b: 'my_alias' });
+
+    validator.registerRules({
+        my_throw: () => () => {
+            throw { value: 'THROWN' };
+        },
+    });
+    validator.registerAliasedRule({ name: 'my_alias_with_error', rules: 'my_throw', error: 'MY_ERROR' });
+    validator.registerAliasedRule({ name: 'my_alias', rules: 'my_throw' });
+
+    const errors = await validator.validate({ a: 1, b: 2 }).catch(e => e);
+    assert.deepEqual(errors, { a: 'MY_ERROR', b: 'THROWN' });
+});
+
 test('Subclass can override validateField()', async () => {
     class LoggingValidator extends LIVR.AsyncValidator {
         validateField(fieldName, ...args) {

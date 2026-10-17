@@ -87,6 +87,16 @@ declare namespace LIVR {
         prepare(): this;
 
         /**
+         * Returns all rules of a schema field as one rule function, prepared once.
+         * The rules run like in validate(): in order, each gets the output of the previous one.
+         * The function returns an error code, or undefined and pushes the output value to
+         * outputArr. For custom meta rules that validate many values with the same rules.
+         *
+         * @param fieldName A field of the schema.
+         */
+        getFieldRule(fieldName: string): (value: any, allValues: any, outputArr: Array<any>) => any;
+
+        /**
          * Validates the provided data against the prepared rules.
          *
          * @param data The object (or primitive) to validate.

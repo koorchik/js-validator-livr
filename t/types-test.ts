@@ -2,6 +2,7 @@
 // Type inference tests - verified at compile time via `npx tsc --noEmit`
 
 import type { InferFromSchema } from '../types';
+import LIVR = require('../lib/LIVR');
 
 // ============================================================================
 // Test Utilities
@@ -157,3 +158,11 @@ type _test11 = Expect<Equal<NestedDefaults, {
     mode: 'auto' | 'manual';
   };
 }>>;
+
+// ============================================================================
+// Validator methods
+// ============================================================================
+
+const validateName = new LIVR.Validator({ name: 'required' }).getFieldRule('name');
+const nameOutput: unknown[] = [];
+const nameError: unknown = validateName('john', {}, nameOutput);

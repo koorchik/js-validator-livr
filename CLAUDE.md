@@ -31,8 +31,8 @@ npm run build
 ### Core Classes (lib/)
 
 - **BaseValidator.js** - Abstract base class containing shared validation logic: rule parsing, validator building, auto-trim functionality, and static methods for registering default rules. Default rules are stored per validator family (`Validator`, `AsyncValidator`), with fallback to the other family for custom rules, so both entry points can be loaded in one process
-- **Validator.js** - Synchronous validator extending BaseValidator. Returns `false` on validation failure, validated data on success. `_validateSingleField()` is the fast path used by `list_of`, `or` and aliases
-- **AsyncValidator.js** - Asynchronous validator extending BaseValidator. Validates fields in parallel but processes rules sequentially per field. Rules run synchronously (rule #0 of all fields, then #1...) until one returns a promise, only then the field is awaited. `_validateOutcome()` (returns `{ result }` or `{ errors }`, or a promise of it) is used by async meta rules and aliases. Rejects with errors on failure
+- **Validator.js** - Synchronous validator extending BaseValidator. Returns `false` on validation failure, validated data on success. `getFieldRule(fieldName)` returns all rules of a field as one rule function; `list_of`, `or` and aliases use it instead of `validate()`
+- **AsyncValidator.js** - Asynchronous validator extending BaseValidator. Validates fields in parallel but processes rules sequentially per field. Rules run synchronously (rule #0 of all fields, then #1...) until one returns a promise, only then the field is awaited. Its `getFieldRule()` returns the error code, or a promise only when a rule returns one. Rejects with errors on failure
 - **LIVR.js** - Main entry point for sync validator; registers all default rules and exports `{ Validator, rules, util }`
 - **async.js** (root) - Entry point for async validator with async-specific meta rules
 
@@ -47,7 +47,7 @@ Rules are organized by category:
 - `meta/` - nested_object, variable_object, list_of, list_of_objects, list_of_different_objects, or
 - `meta-async/` - Async versions of meta rules for AsyncValidator
 
-Every rule file is self-contained: it may use the generic helpers of `lib/util.js` and validator methods, but no shared rule-specific modules. Repeat code between rules (for example, sync and async versions of a meta rule) instead of extracting it into a separate file.
+Every rule file is self-contained: it may use the generic helpers of `lib/util.js` and public validator methods (`validate()`, `getErrors()`, `getFieldRule()`...), but no private methods (`_name`) and no shared rule-specific modules. Repeat code between rules (for example, sync and async versions of a meta rule) instead of extracting it into a separate file.
 
 ### Rule Builder Pattern
 
