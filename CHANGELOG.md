@@ -14,8 +14,8 @@ Unreleased
     -   Sync validator: 1.1-1.4x faster for flat and nested forms, `list_of` 2.2x, `or` and aliases 1.6-1.7x, `iso_date` 2.4x, invalid emails 1.8x, `one_of` with long lists up to 4.7x
     -   Validator construction (new validator per validation): 1.2-1.3x faster
     -   Async validator: 1.7-2.9x faster. Rules that return plain values no longer cost an `await`. With synchronous rules the key order of results and errors is the same as before; with rules returning promises (async meta rules, aliases, custom async rules) it may differ, as it depended on microtask timing
--   Benchmarks: add nested, list, alias, dynamic and async scenarios
--   Docs: re-measure the comparison with Zod, Valibot, Joi, fastest-validator and Ajv in `docs/DESIGN.md` and README; the benchmark is in the separate `validators-benchmarks` repository
+-   Benchmarks moved to the separate `validators-benchmarks` repository: `benchmarks/bench.js`, the `bench` script and the `benchmark` dev dependency are removed
+-   Docs: re-measure the comparison with Zod, Valibot, Joi, fastest-validator and Ajv in `docs/DESIGN.md` and README
 
 v2.10.2
 -   Security hardening: Skip `__proto__` key in `_autoTrim` and `prepare()` to prevent local prototype manipulation
