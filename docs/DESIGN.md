@@ -730,12 +730,12 @@ Dynamic validation measures schema creation + validation—critical for runtime-
 
 | Validator         | Simple (ops/sec) | Nested (ops/sec) | vs LIVR                     |
 | ----------------- | ---------------- | ---------------- | --------------------------- |
-| **LIVR**          | **883,461**      | **435,189**      | baseline                    |
-| Valibot           | 908,099          | 514,250          | on par (1.2x faster nested) |
-| Joi               | 42,967           | 22,166           | 20-21x slower               |
-| Zod               | 15,594           | 8,423            | 52-57x slower               |
-| fastest-validator | 10,511           | 5,669            | 77-84x slower               |
-| Ajv               | 1,418            | 791              | **550-620x slower**         |
+| **LIVR**          | **938,107**      | **451,946**      | baseline                    |
+| Valibot           | 902,565          | 537,939          | on par (1.2x faster nested) |
+| Joi               | 41,098           | 22,461           | 20-23x slower               |
+| Zod               | 15,509           | 8,496            | 53-60x slower               |
+| fastest-validator | 10,811           | 5,866            | 77-87x slower               |
+| Ajv               | 1,413            | 800              | **565-664x slower**         |
 
 LIVR and Valibot lead dynamic validation. LIVR schemas are plain JSON data, so creating a validator only builds a closure per rule. fastest-validator and Ajv generate and compile JavaScript code for every schema, which is the slowest option here.
 
@@ -745,14 +745,14 @@ Static validation measures pre-compiled validator speed—typical production usa
 
 | Validator         | Simple (ops/sec) | Nested (ops/sec) | Note                |
 | ----------------- | ---------------- | ---------------- | ------------------- |
-| **LIVR**          | **2,836,661**    | **1,530,878**    | Data interpretation |
-| fastest-validator | 2,818,350        | 1,170,113        | Code generation     |
-| Valibot           | 2,791,233        | 1,496,312        |                     |
-| Zod               | 2,719,388        | 1,251,318        |                     |
-| Ajv               | 2,423,703        | 1,279,194        | Code generation     |
-| Joi               | 300,356          | 171,145          |                     |
+| fastest-validator | 2,903,525        | 1,149,791        | Code generation     |
+| Valibot           | 2,874,540        | 1,556,438        |                     |
+| Zod               | 2,793,436        | 1,298,476        |                     |
+| **LIVR**          | **2,793,296**    | **1,506,131**    | Data interpretation |
+| Ajv               | 2,573,169        | 1,268,813        | Code generation     |
+| Joi               | 313,530          | 173,519          |                     |
 
-LIVR, fastest-validator, Valibot and Zod are within 1.05x of each other on the simple form, Ajv is 1.2x slower. On nested data LIVR and Valibot lead, 1.2-1.3x ahead of Zod, Ajv and fastest-validator. Joi is about 9x slower.
+LIVR, fastest-validator, Valibot and Zod are within 1.05x of each other on the simple form, Ajv is 1.1x slower. On nested data Valibot and LIVR lead, 1.15-1.3x ahead of Zod, Ajv and fastest-validator. Joi is about 9x slower.
 
 #### The Key Insight
 
@@ -768,7 +768,7 @@ LIVR gives you best-in-class dynamic performance AND static performance on par w
 
 #### How These Numbers Were Measured
 
-Measured with the separate `validators-benchmarks` repository (`npm run bench -- --runs 2`, with `LIVR_DIR` pointing to this repository). Node.js 26, AMD Ryzen 9 5950X; Zod 4.6, Valibot 1.5, Joi 18.3, fastest-validator 1.19, Ajv 8.20. Average of two runs, the runs differ by up to 7%.
+Measured with the separate `validators-benchmarks` repository (`npm run bench -- --runs 2`, with `LIVR_DIR` pointing to this repository). Node.js 26, AMD Ryzen 9 5950X; Zod 4.6, Valibot 1.5, Joi 18.3, fastest-validator 1.19, Ajv 8.20. Average of two runs, the runs differ by up to 9%.
 
 -   **Simple**: a 5-field form (required strings, email, positive integer, enum, min length)
 -   **Nested**: an object with two levels of nested objects and a list of strings
@@ -1335,12 +1335,12 @@ Best for: Runtime-generated schemas, form builders, multi-tenant validation
 
 | Validator         | Simple  | Nested  | Relative                    |
 | ----------------- | ------- | ------- | --------------------------- |
-| **LIVR**          | 883,461 | 435,189 | **1x**                      |
-| Valibot           | 908,099 | 514,250 | on par (1.2x faster nested) |
-| Joi               | 42,967  | 22,166  | 20-21x slower               |
-| Zod               | 15,594  | 8,423   | 52-57x slower               |
-| fastest-validator | 10,511  | 5,669   | 77-84x slower               |
-| Ajv               | 1,418   | 791     | 550-620x slower             |
+| **LIVR**          | 938,107 | 451,946 | **1x**                      |
+| Valibot           | 902,565 | 537,939 | on par (1.2x faster nested) |
+| Joi               | 41,098  | 22,461  | 20-23x slower               |
+| Zod               | 15,509  | 8,496   | 53-60x slower               |
+| fastest-validator | 10,811  | 5,866   | 77-87x slower               |
+| Ajv               | 1,413   | 800     | 565-664x slower             |
 
 ### Static Validation (Pre-compiled)
 
@@ -1348,19 +1348,19 @@ Best for: Fixed schemas, API endpoints, production validation
 
 | Validator         | Simple    | Nested    | Note            |
 | ----------------- | --------- | --------- | --------------- |
-| **LIVR**          | 2,836,661 | 1,530,878 |                 |
-| fastest-validator | 2,818,350 | 1,170,113 | Code generation |
-| Valibot           | 2,791,233 | 1,496,312 |                 |
-| Zod               | 2,719,388 | 1,251,318 |                 |
-| Ajv               | 2,423,703 | 1,279,194 | Code generation |
-| Joi               | 300,356   | 171,145   |                 |
+| fastest-validator | 2,903,525 | 1,149,791 | Code generation |
+| Valibot           | 2,874,540 | 1,556,438 |                 |
+| Zod               | 2,793,436 | 1,298,476 |                 |
+| **LIVR**          | 2,793,296 | 1,506,131 |                 |
+| Ajv               | 2,573,169 | 1,268,813 | Code generation |
+| Joi               | 313,530   | 173,519   |                 |
 
 See [How These Numbers Were Measured](#how-these-numbers-were-measured).
 
 ### The Bottom Line
 
--   **Dynamic validation**: LIVR is on par with Valibot, 50-60x faster than Zod, 77-84x faster than fastest-validator, 550-620x faster than Ajv
--   **Static validation**: on par with fastest-validator, Valibot and Zod (with Valibot, the fastest on nested data), 1.2x faster than Ajv, 9x faster than Joi
+-   **Dynamic validation**: LIVR is on par with Valibot, 53-60x faster than Zod, 77-87x faster than fastest-validator, 565-664x faster than Ajv
+-   **Static validation**: on par with fastest-validator, Valibot and Zod (with Valibot, the fastest on nested data), 1.1-1.2x faster than Ajv, 9x faster than Joi
 -   **Balance**: Best-in-class dynamic + top-tier static performance, without code generation
 
 ---
