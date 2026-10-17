@@ -87,3 +87,29 @@ test('list_of, or and aliases pass the same arguments to rules as validate()', t
         ['c', { value: 'c' }],
     ]);
 });
+
+test('Rules edge cases keep their results', t => {
+    const validator = new LIVR.Validator({
+        emails: { list_of: 'email' },
+        dates: { list_of: 'iso_date' },
+        choice: { one_of: ['1', 1, 'b'] },
+        other: { one_of: [1, '1'] },
+    });
+
+    validator.validate({
+        emails: ['a@b.com', 'a_b@c.com', 'a@b_c.com', 'a@b@c.com', 'ab.com', 'a@b\n_c.com', '"q"@b.com'],
+        dates: ['2024-02-29', '2023-02-29', '2024-13-01', '2024-00-10', '0000-01-31', '2024-1-01', '2024-01-01\n'],
+        choice: 1,
+        other: '1',
+    });
+
+    t.deepEqual(validator.getErrors(), {
+        emails: [null, null, 'WRONG_EMAIL', 'WRONG_EMAIL', 'WRONG_EMAIL', 'WRONG_EMAIL', null],
+        dates: [null, 'WRONG_DATE', 'WRONG_DATE', 'WRONG_DATE', null, 'WRONG_DATE', 'WRONG_DATE'],
+    });
+
+    const output = new LIVR.Validator({ choice: { one_of: ['1', 1, 'b'] }, other: { one_of: [1, '1'] } })
+        .validate({ choice: 1, other: '1' });
+
+    t.deepEqual(output, { choice: '1', other: 1 }, 'one_of returns the first matching allowed value');
+});
