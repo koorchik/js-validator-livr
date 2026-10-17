@@ -1,6 +1,6 @@
 ## CHANGELOG
 
-Unreleased
+v2.11.0
 -   Fix: `livr/async`, `livr/lib/*` (tree-shaking) and `livr/types` were not importable since 2.9.2 (`ERR_PACKAGE_PATH_NOT_EXPORTED`), as the `exports` field listed only `.` and `./types/inference`
 -   Fix: `validate()` threw a `TypeError` when the input had its own `hasOwnProperty` key
 -   Fix: when both `livr` and `livr/async` were loaded, the one loaded last replaced meta rules (`nested_object`, `list_of`, etc.) of the other. Built-in rules are now stored per validator family. Rules registered through `registerDefaultRules()` and `registerAliasedDefaultRule()` are still shared by both classes, so custom rules and overrides of built-in rules work in both (async rules only in `AsyncValidator`, as before). `getDefaultRules()` returns a new object with the built-in and registered rules
