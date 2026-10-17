@@ -30,9 +30,9 @@ npm run build
 
 ### Core Classes (lib/)
 
-- **BaseValidator.js** - Abstract base class containing shared validation logic: rule parsing, validator building, auto-trim functionality, and static methods for registering default rules
-- **Validator.js** - Synchronous validator extending BaseValidator. Returns `false` on validation failure, validated data on success
-- **AsyncValidator.js** - Asynchronous validator extending BaseValidator. Validates fields in parallel but processes rules sequentially per field. Rejects with errors on failure
+- **BaseValidator.js** - Abstract base class containing shared validation logic: rule parsing, validator building, auto-trim functionality, and static methods for registering default rules. Default rules are stored per validator family (`Validator`, `AsyncValidator`), with fallback to the other family for custom rules, so both entry points can be loaded in one process
+- **Validator.js** - Synchronous validator extending BaseValidator. Returns `false` on validation failure, validated data on success. `_validateSingleField()` is the fast path used by `list_of`, `or` and aliases
+- **AsyncValidator.js** - Asynchronous validator extending BaseValidator. Validates fields in parallel but processes rules sequentially per field. Rules run synchronously (rule #0 of all fields, then #1...) until one returns a promise, only then the field is awaited. `_validateMaybeSync()` is used by async meta rules. Rejects with errors on failure
 - **LIVR.js** - Main entry point for sync validator; registers all default rules and exports `{ Validator, rules, util }`
 - **async.js** (root) - Entry point for async validator with async-specific meta rules
 
