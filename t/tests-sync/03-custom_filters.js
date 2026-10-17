@@ -56,3 +56,34 @@ test('Validate data with registered rules', t => {
         'Should apply changes to values'
     );
 });
+
+test('list_of, or and aliases pass the same arguments to rules as validate()', t => {
+    const calls = [];
+    const validator = new LIVR.Validator({
+        list: { list_of: ['my_spy', 'my_spy'] },
+        any: { or: [['my_spy', { eq: 'nope' }], ['my_spy']] },
+        aliased: 'my_spied_alias',
+        empty: { list_of: [] },
+    });
+
+    validator.registerRules({
+        my_spy() {
+            return (value, allValues, outputArr) => {
+                calls.push([value, allValues]);
+                outputArr.push(value + '!');
+            };
+        },
+    });
+    validator.registerAliasedRule({ name: 'my_spied_alias', rules: ['my_spy'] });
+
+    const output = validator.validate({ list: ['a'], any: 'b', aliased: 'c', empty: [1, 2] });
+
+    t.deepEqual(output, { list: ['a!!'], any: 'b!', aliased: 'c!', empty: [undefined, undefined] });
+    t.deepEqual(calls, [
+        ['a', { field: 'a' }],
+        ['a!', { field: 'a' }],
+        ['b', { field: 'b' }],
+        ['b', { field: 'b' }],
+        ['c', { value: 'c' }],
+    ]);
+});
