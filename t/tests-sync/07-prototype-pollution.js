@@ -59,3 +59,17 @@ test('SECURITY: Object.prototype should not be polluted', t => {
     t.is(testObj.polluted, undefined, 'Object.prototype should not be polluted after validation');
     t.is(({}).polluted, undefined, 'New empty objects should not have polluted property');
 });
+
+test('SECURITY: input with own "hasOwnProperty" key should not crash validation', t => {
+    const validator = new LIVR.Validator({ name: 'required', age: 'positive_integer' });
+
+    const input = JSON.parse('{"name": "test", "hasOwnProperty": "x"}');
+
+    t.deepEqual(validator.validate(input), { name: 'test' });
+});
+
+test('SECURITY: schema field named "hasOwnProperty" should work', t => {
+    const validator = new LIVR.Validator({ hasOwnProperty: ['required', 'trim'], name: 'required' });
+
+    t.deepEqual(validator.validate({ hasOwnProperty: ' x ', name: 'test' }), { hasOwnProperty: 'x', name: 'test' });
+});
