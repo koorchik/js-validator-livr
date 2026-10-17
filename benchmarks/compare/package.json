@@ -1,0 +1,15 @@
+{
+    "name": "livr-compare-benchmark",
+    "private": true,
+    "description": "Performance comparison of LIVR with other validators (numbers in docs/DESIGN.md)",
+    "scripts": {
+        "bench": "node compare.js"
+    },
+    "dependencies": {
+        "benchmark": "2.1.4",
+        "fastest-validator": "1.19.1",
+        "joi": "18.3.0",
+        "valibot": "1.5.0",
+        "zod": "4.6.7"
+    }
+}

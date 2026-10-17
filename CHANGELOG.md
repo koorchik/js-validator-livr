@@ -9,6 +9,7 @@ Unreleased
     -   Validator construction (new validator per validation): 1.2-1.3x faster
     -   Async validator: 1.7-2.9x faster. Rules that return plain values no longer cost an `await`. With synchronous rules the key order of results and errors is the same as before; with rules returning promises (async meta rules, aliases, custom async rules) it may differ, as it depended on microtask timing
 -   Benchmarks: add nested, list, alias, dynamic and async scenarios
+-   Docs: re-measure the comparison with Zod, Valibot, Joi and fastest-validator in `docs/DESIGN.md` and README; the script is in `benchmarks/compare`
 
 v2.10.2
 -   Security hardening: Skip `__proto__` key in `_autoTrim` and `prepare()` to prevent local prototype manipulation
