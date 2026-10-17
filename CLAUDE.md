@@ -32,7 +32,7 @@ npm run build
 
 - **BaseValidator.js** - Abstract base class containing shared validation logic: rule parsing, validator building, auto-trim functionality, and static methods for registering default rules. Default rules are stored per validator family (`Validator`, `AsyncValidator`), with fallback to the other family for custom rules, so both entry points can be loaded in one process
 - **Validator.js** - Synchronous validator extending BaseValidator. Returns `false` on validation failure, validated data on success. `_validateSingleField()` is the fast path used by `list_of`, `or` and aliases
-- **AsyncValidator.js** - Asynchronous validator extending BaseValidator. Validates fields in parallel but processes rules sequentially per field. Rules run synchronously (rule #0 of all fields, then #1...) until one returns a promise, only then the field is awaited. `_validateMaybeSync()` is used by async meta rules. Rejects with errors on failure
+- **AsyncValidator.js** - Asynchronous validator extending BaseValidator. Validates fields in parallel but processes rules sequentially per field. Rules run synchronously (rule #0 of all fields, then #1...) until one returns a promise, only then the field is awaited. `_validateOutcome()` (returns `{ result }` or `{ errors }`, or a promise of it) is used by async meta rules and aliases. Rejects with errors on failure
 - **LIVR.js** - Main entry point for sync validator; registers all default rules and exports `{ Validator, rules, util }`
 - **async.js** (root) - Entry point for async validator with async-specific meta rules
 
@@ -44,7 +44,7 @@ Rules are organized by category:
 - `numeric/` - integer, positive_integer, decimal, positive_decimal, min_number, max_number, number_between
 - `special/` - email, url, equal_to_field, iso_date
 - `modifiers/` - trim, to_lc, to_uc, default, remove, leave_only
-- `meta/` - nested_object, variable_object, list_of, list_of_objects, list_of_different_objects, or
+- `meta/` - nested_object, variable_object, list_of, list_of_objects, list_of_different_objects, or. `selectorValidators.js` is not a rule: shared helpers of variable_object and list_of_different_objects (sync and async)
 - `meta-async/` - Async versions of meta rules for AsyncValidator
 
 ### Rule Builder Pattern
@@ -77,7 +77,7 @@ function ruleName(arg1, arg2, ruleBuilders) {
 
 ### Utilities (lib/util.js)
 
-Helper functions: `isPrimitiveValue`, `looksLikeNumber`, `isObject`, `isEmptyObject`, `escapeRegExp`, `isNoValue`, `camelize`
+Helper functions: `isPrimitiveValue`, `looksLikeNumber`, `isObject`, `isEmptyObject`, `escapeRegExp`, `isNoValue`, `isThenable`, `getFieldValue`, `camelize`. Exported as `LIVR.util`, so additions become public API
 
 ## Key Patterns
 

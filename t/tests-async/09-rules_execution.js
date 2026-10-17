@@ -52,6 +52,95 @@ test('Rejects with exception thrown by a rule', async t => {
     await t.throwsAsync(validator.validate({ a: 1, b: 2 }), { message: 'Boom' });
 });
 
+test('Exception of a rule leaves no unhandled rejections of fields validated asynchronously', async t => {
+    const validator = new LIVR.AsyncValidator({ a: 'my_reject_later', b: 'my_throw' });
+
+    validator.registerRules({
+        my_reject_later: () => () =>
+            new Promise((resolve, reject) => setTimeout(() => reject(new Error('Later')), 10)),
+        my_throw: () => () => {
+            throw new Error('Boom');
+        },
+    });
+
+    const unhandledRejections = [];
+    const onUnhandledRejection = error => unhandledRejections.push(error.message);
+    process.on('unhandledRejection', onUnhandledRejection);
+
+    try {
+        await t.throwsAsync(validator.validate({ a: 1, b: 2 }), { message: 'Boom' });
+        // The rule of "a" rejects after validate() has rejected
+        await new Promise(resolve => setTimeout(resolve, 50));
+    } finally {
+        process.off('unhandledRejection', onUnhandledRejection);
+    }
+
+    t.deepEqual(unhandledRejections, []);
+});
+
+test('Meta rules and aliases wait for asynchronous rules of nested schemas', async t => {
+    const nestedRules = { type: 'required', value: 'my_async_uc' };
+    const validator = new LIVR.AsyncValidator({
+        nested: { nested_object: { value: 'my_async_uc' } },
+        list: { list_of: 'my_async_uc' },
+        objects: { list_of_objects: { value: 'my_async_uc' } },
+        variable: { variable_object: ['type', { a: nestedRules }] },
+        different: { list_of_different_objects: ['type', { a: nestedRules }] },
+        either: { or: [{ eq: 'never' }, 'my_async_uc'] },
+        aliased: 'my_alias',
+    });
+
+    validator.registerRules({
+        my_async_uc: () => async (value, all, outputArr) => {
+            if (value === 'bad') return 'BAD';
+            outputArr.push(value.toUpperCase());
+        },
+    });
+    validator.registerAliasedRule({ name: 'my_alias', rules: 'my_async_uc' });
+
+    const output = await validator.validate({
+        nested: { value: 'a' },
+        list: ['a', 'b'],
+        objects: [{ value: 'a' }],
+        variable: { type: 'a', value: 'a' },
+        different: [{ type: 'a', value: 'a' }],
+        either: 'a',
+        aliased: 'a',
+    });
+
+    t.deepEqual(output, {
+        nested: { value: 'A' },
+        list: ['A', 'B'],
+        objects: [{ value: 'A' }],
+        variable: { type: 'a', value: 'A' },
+        different: [{ type: 'a', value: 'A' }],
+        either: 'A',
+        aliased: 'A',
+    });
+
+    const errors = await validator
+        .validate({
+            nested: { value: 'bad' },
+            list: ['a', 'bad'],
+            objects: [{ value: 'bad' }],
+            variable: { type: 'a', value: 'bad' },
+            different: [{ type: 'a', value: 'bad' }],
+            either: 'bad',
+            aliased: 'bad',
+        })
+        .catch(e => e);
+
+    t.deepEqual(errors, {
+        nested: { value: 'BAD' },
+        list: [null, 'BAD'],
+        objects: [{ value: 'BAD' }],
+        variable: { value: 'BAD' },
+        different: [{ value: 'BAD' }],
+        either: 'BAD',
+        aliased: 'BAD',
+    });
+});
+
 test('Meta rules return exceptions of nested rules as errors', async t => {
     const validator = new LIVR.AsyncValidator({
         items: { list_of_objects: { a: 'my_throw' } },

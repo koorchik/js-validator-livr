@@ -9,6 +9,7 @@ Unreleased
 -   Fix: missing fields named like `Object.prototype` methods (`constructor`, `toString`, `hasOwnProperty`, ...) got the inherited method as a value: `required` passed and `default` was not applied
 -   Fix: objects with own `constructor` key failed with `FORMAT_ERROR` (on any level) and were not auto trimmed
 -   Objects without prototype (`Object.create(null)`, `querystring.parse()` output) are validated as objects, `util.isObject()` returns `true` for them
+-   `util.isThenable()` and `util.getFieldValue()` (value of a data field; inherited methods like `constructor` are not taken as values)
 -   Test suite: sync with the LIVR spec repository, which got cases for the fixes above
 -   Performance (no API changes):
     -   Sync validator: 1.1-1.4x faster for flat and nested forms, `list_of` 2.2x, `or` and aliases 1.6-1.7x, `iso_date` 2.4x, invalid emails 1.8x, `one_of` with long lists up to 4.7x
