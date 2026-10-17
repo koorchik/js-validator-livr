@@ -44,8 +44,10 @@ Rules are organized by category:
 - `numeric/` - integer, positive_integer, decimal, positive_decimal, min_number, max_number, number_between
 - `special/` - email, url, equal_to_field, iso_date
 - `modifiers/` - trim, to_lc, to_uc, default, remove, leave_only
-- `meta/` - nested_object, variable_object, list_of, list_of_objects, list_of_different_objects, or. `selectorValidators.js` is not a rule: shared helpers of variable_object and list_of_different_objects (sync and async)
+- `meta/` - nested_object, variable_object, list_of, list_of_objects, list_of_different_objects, or
 - `meta-async/` - Async versions of meta rules for AsyncValidator
+
+Every rule file is self-contained: it may use the generic helpers of `lib/util.js` and validator methods, but no shared rule-specific modules. Repeat code between rules (for example, sync and async versions of a meta rule) instead of extracting it into a separate file.
 
 ### Rule Builder Pattern
 
