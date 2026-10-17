@@ -97,3 +97,29 @@ test('Class instances and arrays are not objects', () => {
         assert.deepEqual(validator.getErrors(), { object: 'FORMAT_ERROR', nested: 'FORMAT_ERROR' });
     }
 });
+
+test('Validators filled or changed by a subclass are used', () => {
+    class OwnValidators extends LIVR.Validator {
+        prepare() {
+            this.validators = { a: [() => 'ERR'] };
+            this.isPrepared = true;
+            return this;
+        }
+    }
+
+    class ExtraField extends LIVR.Validator {
+        prepare() {
+            super.prepare();
+            this.validators.extra = [() => 'EXTRA_ERR'];
+            return this;
+        }
+    }
+
+    const own = new OwnValidators({});
+    assert.equal(own.validate({ a: 1 }), false);
+    assert.deepEqual(own.getErrors(), { a: 'ERR' });
+
+    const extra = new ExtraField({ name: 'required' });
+    assert.equal(extra.validate({ name: 'x' }), false);
+    assert.deepEqual(extra.getErrors(), { extra: 'EXTRA_ERR' });
+});

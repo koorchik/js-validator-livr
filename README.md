@@ -387,7 +387,7 @@ LIVR.Validator.registerAliasedDefaultRule({
 
 #### `Validator.getDefaultRules()`
 
-Returns all registered default rules.
+Returns a new object with all default rules: the built-in rules of the validator class and the rules registered with `registerDefaultRules()` and `registerAliasedDefaultRule()`.
 
 ### Instance Methods
 
@@ -437,7 +437,7 @@ const validator = new LIVR.Validator(schema).prepare();
 
 #### `validator.getFieldRule(fieldName)`
 
-Returns all rules of a schema field as one rule function `(value, allValues, outputArr) => errorCode`, prepared once. It runs the rules like `validate()` does for that field: in order, each rule gets the output of the previous one. On success it returns `undefined` and pushes the output value to `outputArr`. With `AsyncValidator` it returns a promise only when some rule returns a promise.
+Returns all rules of a schema field as one rule function `(value, allValues, outputArr) => errorCode`, prepared once. It runs the rules like `validate()` does for that field: in order, each rule gets the output of the previous one. On success it returns `undefined` and pushes the output value to `outputArr`. With `AsyncValidator` it returns a promise only when some rule returns a promise. With `autoTrim` the value is trimmed before the rules run; `allValues` are passed to the rules as given.
 
 Use it in custom meta rules that validate many values with the same rules: it skips the result and errors objects that `validate()` builds for every call. Built-in `list_of` and `or` work this way.
 

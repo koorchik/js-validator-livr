@@ -74,3 +74,10 @@ test('SECURITY: schema field named "hasOwnProperty" should work', () => {
 
     assert.deepEqual(validator.validate({ hasOwnProperty: ' x ', name: 'test' }), { hasOwnProperty: 'x', name: 'test' });
 });
+
+test('SECURITY: rule names like "toString" are not registered rules', () => {
+    for (const name of ['toString', 'constructor', 'hasOwnProperty', '__proto__']) {
+        const validator = new LIVR.Validator({ field: name });
+        assert.throws(() => validator.prepare(), { message: `Rule [${name}] not registered` });
+    }
+});

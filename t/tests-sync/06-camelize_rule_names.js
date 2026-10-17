@@ -59,3 +59,30 @@ test('Camelization should not overide custom rules', () => {
         'Should contain error codes'
     );
 });
+
+test('Default aliases get camelCase names', () => {
+    LIVR.Validator.registerAliasedDefaultRule({ name: 'small_number', rules: { max_number: 10 } });
+
+    const validator = new LIVR.Validator({ a: 'small_number', b: 'smallNumber' });
+    assert.equal(validator.validate({ a: 11, b: 12 }), false);
+    assert.deepEqual(validator.getErrors(), { a: 'TOO_HIGH', b: 'TOO_HIGH' });
+
+    // A new version of the alias replaces the camelCase name too
+    LIVR.Validator.registerAliasedDefaultRule({ name: 'small_number', rules: { max_number: 100 } });
+    assert.deepEqual(new LIVR.Validator({ b: 'smallNumber' }).validate({ b: 12 }), { b: 12 });
+});
+
+test('Overriding a default rule overrides its camelCase name too', () => {
+    const original = LIVR.Validator.getDefaultRules().max_length;
+    LIVR.Validator.registerDefaultRules({ max_length: () => () => 'MY_MAX_LENGTH' });
+
+    try {
+        const validator = new LIVR.Validator({ a: { max_length: 1 }, b: { maxLength: 1 } });
+        assert.equal(validator.validate({ a: 'x', b: 'x' }), false);
+        assert.deepEqual(validator.getErrors(), { a: 'MY_MAX_LENGTH', b: 'MY_MAX_LENGTH' });
+    } finally {
+        LIVR.Validator.registerDefaultRules({ max_length: original });
+    }
+
+    assert.deepEqual(new LIVR.Validator({ b: { maxLength: 1 } }).validate({ b: 'x' }), { b: 'x' });
+});

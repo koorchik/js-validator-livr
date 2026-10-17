@@ -147,37 +147,68 @@ test('Meta rules return exceptions of nested rules as errors', async () => {
         items: { list_of_objects: { a: 'my_throw' } },
         values: { list_of: 'my_async_throw' },
         object: { nested_object: { a: 'my_throw' } },
+        // The exception of the last rule set used to be lost, so the value passed
+        either: { or: ['integer', 'my_throw'] },
+        syncValues: { list_of: 'my_throw' },
+        asyncEither: { or: ['integer', 'my_async_throw'] },
     });
 
     const boom = new Error('Boom');
+    const asyncBoom = new Error('Async boom');
     validator.registerRules({
         my_throw: () => () => {
             throw boom;
         },
         my_async_throw: () => async () => {
-            throw { field: 'ASYNC_BOOM' };
+            throw asyncBoom;
         },
     });
 
-    const errors = await validator.validate({ items: [{ a: 1 }], values: [1], object: { a: 1 } })
+    const errors = await validator
+        .validate({
+            items: [{ a: 1 }],
+            values: [1],
+            object: { a: 1 },
+            either: 'abc',
+            syncValues: [1, 2],
+            asyncEither: 'abc',
+        })
         .catch(e => e);
 
-    assert.deepEqual(errors, { items: [boom], values: ['ASYNC_BOOM'], object: boom });
+    assert.deepEqual(errors, {
+        items: [boom],
+        values: [asyncBoom],
+        object: boom,
+        either: boom,
+        syncValues: [boom, boom],
+        asyncEither: asyncBoom,
+    });
 });
 
 test('Aliases return exceptions of their rules as errors', async () => {
-    const validator = new LIVR.AsyncValidator({ a: 'my_alias_with_error', b: 'my_alias' });
+    const validator = new LIVR.AsyncValidator({
+        a: 'my_alias_with_error',
+        b: 'my_alias',
+        c: 'my_async_alias',
+    });
 
+    const boom = new Error('Boom');
+    const asyncBoom = new Error('Async boom');
     validator.registerRules({
         my_throw: () => () => {
-            throw { value: 'THROWN' };
+            throw boom;
+        },
+        my_async_throw: () => async () => {
+            throw asyncBoom;
         },
     });
+    validator.registerAliasedRule({ name: 'my_async_alias', rules: 'my_async_throw' });
     validator.registerAliasedRule({ name: 'my_alias_with_error', rules: 'my_throw', error: 'MY_ERROR' });
+    // Without its own error the alias used to pass the value
     validator.registerAliasedRule({ name: 'my_alias', rules: 'my_throw' });
 
-    const errors = await validator.validate({ a: 1, b: 2 }).catch(e => e);
-    assert.deepEqual(errors, { a: 'MY_ERROR', b: 'THROWN' });
+    const errors = await validator.validate({ a: 1, b: 2, c: 3 }).catch(e => e);
+    assert.deepEqual(errors, { a: 'MY_ERROR', b: boom, c: asyncBoom });
 });
 
 test('Subclass can override validateField()', async () => {
@@ -193,4 +224,42 @@ test('Subclass can override validateField()', async () => {
 
     assert.deepEqual(await validator.validate({ a: 1, b: ' xy ' }), { a: 1, b: 'xy' });
     assert.deepEqual(validator.fieldNames, ['a', 'b']);
+});
+
+test('or, list_of and aliases return results synchronously while their rules are synchronous', async () => {
+    const validator = new LIVR.AsyncValidator({
+        either: { or: ['integer', 'my_async_uc'] },
+        list: { list_of: ['required', 'to_uc'] },
+        asyncList: { list_of: 'my_async_uc' },
+        aliased: 'my_alias',
+    });
+
+    validator.registerRules({
+        my_async_uc: () => async (value, params, outputArr) => {
+            outputArr.push(String(value).toUpperCase());
+        },
+    });
+    validator.registerAliasedRule({ name: 'my_alias', rules: ['required', 'to_uc'] });
+
+    const run = (fieldName, value) => {
+        const output = [];
+        const errCode = validator.getFieldRule(fieldName)(value, {}, output);
+        return { isAsync: LIVR.util.isThenable(errCode), errCode, output };
+    };
+
+    assert.deepEqual(run('either', 1), { isAsync: false, errCode: undefined, output: [1] });
+    assert.deepEqual(run('list', ['a', 'b']), { isAsync: false, errCode: undefined, output: [['A', 'B']] });
+    assert.deepEqual(run('list', ['a', '']), { isAsync: false, errCode: [null, 'REQUIRED'], output: [] });
+    assert.deepEqual(run('aliased', 'a'), { isAsync: false, errCode: undefined, output: ['A'] });
+
+    // The second rule set of "or" and the items of "asyncList" are asynchronous
+    const either = run('either', 'x');
+    assert.equal(either.isAsync, true);
+    assert.equal(await either.errCode, undefined);
+    assert.deepEqual(either.output, ['X']);
+
+    const asyncList = run('asyncList', ['a', 'b']);
+    assert.equal(asyncList.isAsync, true);
+    assert.equal(await asyncList.errCode, undefined);
+    assert.deepEqual(asyncList.output, [['A', 'B']]);
 });

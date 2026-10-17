@@ -45,6 +45,6 @@ const rules = {
     list_of_different_objects: require('./lib/rules/meta-async/list_of_different_objects')
 };
 
-AsyncValidator.registerDefaultRules(rules);
+AsyncValidator._registerBuiltInRules(rules);
 
 module.exports = { AsyncValidator, rules, util };

@@ -74,3 +74,16 @@ test('Class instances and arrays are not objects', async () => {
         assert.deepEqual(errors, { object: 'FORMAT_ERROR', nested: 'FORMAT_ERROR' });
     }
 });
+
+test('Validators filled or changed by a subclass are used', async () => {
+    class ExtraField extends LIVR.AsyncValidator {
+        prepare() {
+            super.prepare();
+            this.validators.extra = [() => 'EXTRA_ERR'];
+            return this;
+        }
+    }
+
+    const errors = await new ExtraField({ name: 'required' }).validate({ name: 'x' }).catch(e => e);
+    assert.deepEqual(errors, { extra: 'EXTRA_ERR' });
+});

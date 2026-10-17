@@ -57,6 +57,23 @@ test('Custom default rules registered through one class work in the other', asyn
     assert.deepEqual(validator.validate({ q: '?' }), { q: '?' });
 });
 
+test('Default rule overridden through one class is overridden in the other', async () => {
+    const strictEmail = () => value => (value.endsWith('.ua') ? undefined : 'NOT_UA_EMAIL');
+    LIVR.Validator.registerDefaultRules({ email: strictEmail });
+
+    try {
+        const validator = new LIVR.Validator({ email: 'email' });
+        assert.equal(validator.validate({ email: 'a@b.com' }), false);
+        assert.deepEqual(validator.getErrors(), { email: 'NOT_UA_EMAIL' });
+
+        const asyncValidator = new AsyncLIVR.AsyncValidator({ email: 'email' });
+        const errors = await asyncValidator.validate({ email: 'a@b.com' }).catch(e => e);
+        assert.deepEqual(errors, { email: 'NOT_UA_EMAIL' });
+    } finally {
+        LIVR.Validator.registerDefaultRules({ email: LIVR.rules.email });
+    }
+});
+
 test('getDefaultRules() returns rules of the validator family', () => {
     assert.equal(LIVR.Validator.getDefaultRules().nested_object, LIVR.rules.nested_object);
     assert.equal(AsyncLIVR.AsyncValidator.getDefaultRules().nested_object, AsyncLIVR.rules.nested_object);
