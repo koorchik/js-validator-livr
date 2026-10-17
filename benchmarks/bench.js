@@ -2,6 +2,7 @@
 
 const Benchmark = require('benchmark');
 const LIVR = require('../lib/LIVR');
+const AsyncLIVR = require('../async');
 
 const suite = new Benchmark.Suite();
 
@@ -167,6 +168,101 @@ const enumData = {
     category: 'electronics'
 };
 
+// Scenario 9: Nested objects with a list
+const nestedSchema = {
+    id: ['required', 'positive_integer'],
+    user: [
+        'required',
+        {
+            nested_object: {
+                name: ['required', { max_length: 50 }],
+                email: ['required', 'email'],
+                address: {
+                    nested_object: {
+                        city: 'required',
+                        zip: { length_between: [3, 10] },
+                        country: { one_of: ['UA', 'US', 'PL'] }
+                    }
+                }
+            }
+        }
+    ],
+    tags: { list_of: ['required', { max_length: 20 }] }
+};
+const nestedValidator = new LIVR.Validator(nestedSchema);
+nestedValidator.prepare();
+
+const nestedData = {
+    id: 1,
+    user: {
+        name: 'John',
+        email: 'john@example.com',
+        address: { city: 'Kyiv', zip: '01001', country: 'UA' }
+    },
+    tags: ['a', 'b', 'c']
+};
+
+// Scenario 10: List of 100 primitives
+const listOfValidator = new LIVR.Validator({ ids: { list_of: ['required', 'positive_integer'] } });
+listOfValidator.prepare();
+
+const listOfData = { ids: Array.from({ length: 100 }, (_, i) => i + 1) };
+
+// Scenario 11: List of 50 objects
+const listOfObjectsSchema = {
+    items: [
+        'required',
+        {
+            list_of_objects: {
+                id: ['required', 'positive_integer'],
+                name: ['required', { max_length: 50 }],
+                price: ['required', 'positive_decimal'],
+                status: { one_of: ['new', 'old'] }
+            }
+        }
+    ]
+};
+const listOfObjectsValidator = new LIVR.Validator(listOfObjectsSchema);
+listOfObjectsValidator.prepare();
+
+const listOfObjectsData = {
+    items: Array.from({ length: 50 }, (_, i) => ({
+        id: i + 1,
+        name: 'Item ' + i,
+        price: '9.99',
+        status: 'new'
+    }))
+};
+
+// Scenario 12: Aliased rules and "or"
+const aliasesValidator = new LIVR.Validator({
+    age: 'adult_age',
+    sku: 'product_sku',
+    contact: { or: ['email', 'url'] }
+});
+aliasesValidator.registerAliasedRule({
+    name: 'adult_age',
+    rules: ['required', 'positive_integer', { min_number: 18 }],
+    error: 'MUST_BE_ADULT'
+});
+aliasesValidator.registerAliasedRule({
+    name: 'product_sku',
+    rules: ['required', { like: '^[A-Z]{3}-\\d{6}$' }]
+});
+aliasesValidator.prepare();
+
+const aliasesData = { age: 30, sku: 'ABC-123456', contact: 'https://example.com' };
+
+// Scenarios 13-15: Async validator
+const asyncSimpleValidator = new AsyncLIVR.AsyncValidator(simpleSchema);
+asyncSimpleValidator.prepare();
+
+const asyncNestedValidator = new AsyncLIVR.AsyncValidator(nestedSchema);
+asyncNestedValidator.prepare();
+
+const asyncListOfObjectsValidator = new AsyncLIVR.AsyncValidator(listOfObjectsSchema);
+asyncListOfObjectsValidator.prepare();
+
 console.log('LIVR Validator Benchmark Suite');
 console.log('==============================\n');
 
@@ -194,6 +290,42 @@ suite
     })
     .add('enum-validation (5 fields, one_of/eq)', () => {
         enumValidator.validate(enumData);
+    })
+    .add('nested (2 nested objects + list_of)', () => {
+        nestedValidator.validate(nestedData);
+    })
+    .add('list_of (100 integers)', () => {
+        listOfValidator.validate(listOfData);
+    })
+    .add('list_of_objects (50 objects, 4 fields)', () => {
+        listOfObjectsValidator.validate(listOfObjectsData);
+    })
+    .add('aliases and or', () => {
+        aliasesValidator.validate(aliasesData);
+    })
+    .add('dynamic simple-form (new Validator per call)', () => {
+        new LIVR.Validator(simpleSchema).validate(simpleData);
+    })
+    .add('dynamic nested (new Validator per call)', () => {
+        new LIVR.Validator(nestedSchema).validate(nestedData);
+    })
+    .add('async simple-form (6 fields, basic rules)', {
+        defer: true,
+        fn: deferred => {
+            asyncSimpleValidator.validate(simpleData).then(() => deferred.resolve());
+        }
+    })
+    .add('async nested (2 nested objects + list_of)', {
+        defer: true,
+        fn: deferred => {
+            asyncNestedValidator.validate(nestedData).then(() => deferred.resolve());
+        }
+    })
+    .add('async list_of_objects (50 objects, 4 fields)', {
+        defer: true,
+        fn: deferred => {
+            asyncListOfObjectsValidator.validate(listOfObjectsData).then(() => deferred.resolve());
+        }
     })
     .on('cycle', event => {
         console.log(String(event.target));
