@@ -4,6 +4,12 @@ Unreleased
 -   Fix: `livr/async`, `livr/lib/*` (tree-shaking) and `livr/types` were not importable since 2.9.2 (`ERR_PACKAGE_PATH_NOT_EXPORTED`), as the `exports` field listed only `.` and `./types/inference`
 -   Fix: `validate()` threw a `TypeError` when the input had its own `hasOwnProperty` key
 -   Fix: when both `livr` and `livr/async` were loaded, the one loaded last replaced meta rules (`nested_object`, `list_of`, etc.) of the other. Default rules are now stored per validator family; custom rules registered through one class still work in the other
+-   Fix: `list_of_different_objects` passed a list when all its invalid items were not objects or had a missing or unknown selector value, and dropped such items from the output. A `null` item threw a `TypeError`
+-   Fix: `variable_object` and `list_of_different_objects` threw a `TypeError` when the selector value was the name of an `Object.prototype` property (`"constructor"`, `"toString"`, `"__proto__"`, ...), and accepted arrays as selector values. Both return `FORMAT_ERROR` now
+-   Fix: missing fields named like `Object.prototype` methods (`constructor`, `toString`, `hasOwnProperty`, ...) got the inherited method as a value: `required` passed and `default` was not applied
+-   Fix: objects with own `constructor` key failed with `FORMAT_ERROR` (on any level) and were not auto trimmed
+-   Objects without prototype (`Object.create(null)`, `querystring.parse()` output) are validated as objects, `util.isObject()` returns `true` for them
+-   Test suite: sync with the LIVR spec repository, which got cases for the fixes above
 -   Performance (no API changes):
     -   Sync validator: 1.1-1.4x faster for flat and nested forms, `list_of` 2.2x, `or` and aliases 1.6-1.7x, `iso_date` 2.4x, invalid emails 1.8x, `one_of` with long lists up to 4.7x
     -   Validator construction (new validator per validation): 1.2-1.3x faster
