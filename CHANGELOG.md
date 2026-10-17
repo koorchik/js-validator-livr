@@ -16,6 +16,7 @@ Unreleased
     -   Validator construction (new validator per validation): 1.2-1.3x faster
     -   Async validator: 1.7-2.9x faster. Rules that return plain values no longer cost an `await`. With synchronous rules the key order of results and errors is the same as before; with rules returning promises (async meta rules, aliases, custom async rules) it may differ, as it depended on microtask timing
 -   Benchmarks moved to the separate `validators-benchmarks` repository: `benchmarks/bench.js`, the `bench` script and the `benchmark` dev dependency are removed
+-   Tests: migrated from AVA and nyc to the built-in `node:test` and `node:assert/strict` with built-in coverage, both dev dependencies are removed. Running the tests needs Node.js 22.8+
 -   Docs: re-measure the comparison with Zod, Valibot, Joi, fastest-validator and Ajv in `docs/DESIGN.md` and README
 
 v2.10.2

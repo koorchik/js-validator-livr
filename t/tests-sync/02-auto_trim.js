@@ -1,4 +1,5 @@
-const test = require('ava');
+const test = require('node:test');
+const assert = require('node:assert/strict');
 const LIVR = require('../../lib/LIVR');
 
 const validator = new LIVR.Validator(
@@ -15,7 +16,7 @@ const validator = new LIVR.Validator(
     true
 );
 
-test('NEGATIVE: Validate data with automatic trim', t => {
+test('NEGATIVE: Validate data with automatic trim', () => {
     const output = validator.validate({
         code: '  ',
         password: ' 12  ',
@@ -24,9 +25,9 @@ test('NEGATIVE: Validate data with automatic trim', t => {
         }
     });
 
-    t.true(!output, 'should return false due to validation errors for trimmed values');
+    assert.ok(!output, 'should return false due to validation errors for trimmed values');
 
-    t.deepEqual(
+    assert.deepEqual(
         validator.getErrors(),
         {
             code: 'REQUIRED',
@@ -39,7 +40,7 @@ test('NEGATIVE: Validate data with automatic trim', t => {
     );
 });
 
-test('POSITIVE: Validate data with automatic trim', t => {
+test('POSITIVE: Validate data with automatic trim', () => {
     const cleanData = validator.validate({
         code: ' A ',
         password: ' 123  ',
@@ -49,9 +50,9 @@ test('POSITIVE: Validate data with automatic trim', t => {
         }
     });
 
-    t.truthy(cleanData, 'should return clean data');
+    assert.ok(cleanData, 'should return clean data');
 
-    t.deepEqual(
+    assert.deepEqual(
         cleanData,
         {
             code: 'A',

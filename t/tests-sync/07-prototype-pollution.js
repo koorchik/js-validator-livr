@@ -1,7 +1,8 @@
-const test = require('ava');
+const test = require('node:test');
+const assert = require('node:assert/strict');
 const LIVR = require('../../lib/LIVR');
 
-test('SECURITY: autoTrim should not allow prototype pollution bypass', t => {
+test('SECURITY: autoTrim should not allow prototype pollution bypass', () => {
     const validator = new LIVR.Validator({
         password: 'required',
         password_confirm: ['required', { equal_to_field: 'password' }]
@@ -12,26 +13,26 @@ test('SECURITY: autoTrim should not allow prototype pollution bypass', t => {
 
     const result = validator.validate(attackData);
 
-    t.false(result, 'Validation should fail - password is required');
-    t.deepEqual(validator.getErrors(), {
+    assert.equal(result, false, 'Validation should fail - password is required');
+    assert.deepEqual(validator.getErrors(), {
         password: 'REQUIRED',
         password_confirm: 'FIELDS_NOT_EQUAL'
     }, 'Should report both password required and fields not equal');
 });
 
-test('SECURITY: schema with __proto__ field should not cause errors', t => {
+test('SECURITY: schema with __proto__ field should not cause errors', () => {
     const schema = JSON.parse('{"name": "required", "__proto__": "required"}');
 
     const validator = new LIVR.Validator(schema);
 
-    t.notThrows(() => validator.prepare(), 'prepare() should not throw');
-    t.notThrows(() => validator.validate({ name: 'test' }), 'validate() should not throw');
+    assert.doesNotThrow(() => validator.prepare(), 'prepare() should not throw');
+    assert.doesNotThrow(() => validator.validate({ name: 'test' }), 'validate() should not throw');
 
     const result = validator.validate({ name: 'test' });
-    t.deepEqual(result, { name: 'test' }, 'Should return valid result');
+    assert.deepEqual(result, { name: 'test' }, 'Should return valid result');
 });
 
-test('SECURITY: __proto__ in input should be stripped from output', t => {
+test('SECURITY: __proto__ in input should be stripped from output', () => {
     const validator = new LIVR.Validator({
         name: 'required'
     }, { autoTrim: true });
@@ -39,15 +40,15 @@ test('SECURITY: __proto__ in input should be stripped from output', t => {
     const input = JSON.parse('{"name": "test", "__proto__": {"malicious": true}}');
     const result = validator.validate(input);
 
-    t.truthy(result, 'Validation should pass');
-    t.deepEqual(Object.keys(result), ['name'], 'Result should only have name key');
-    t.is(result.malicious, undefined, 'Malicious property should not be accessible');
-    t.is(Object.getPrototypeOf(result), Object.prototype, 'Result prototype should be Object.prototype');
+    assert.ok(result, 'Validation should pass');
+    assert.deepEqual(Object.keys(result), ['name'], 'Result should only have name key');
+    assert.equal(result.malicious, undefined, 'Malicious property should not be accessible');
+    assert.equal(Object.getPrototypeOf(result), Object.prototype, 'Result prototype should be Object.prototype');
 });
 
-test('SECURITY: Object.prototype should not be polluted', t => {
+test('SECURITY: Object.prototype should not be polluted', () => {
     const testObj = {};
-    t.is(testObj.polluted, undefined, 'Empty object should not have polluted property before test');
+    assert.equal(testObj.polluted, undefined, 'Empty object should not have polluted property before test');
 
     const validator = new LIVR.Validator({
         name: 'required'
@@ -56,20 +57,20 @@ test('SECURITY: Object.prototype should not be polluted', t => {
     const input = JSON.parse('{"name": "test", "__proto__": {"polluted": "yes"}}');
     validator.validate(input);
 
-    t.is(testObj.polluted, undefined, 'Object.prototype should not be polluted after validation');
-    t.is(({}).polluted, undefined, 'New empty objects should not have polluted property');
+    assert.equal(testObj.polluted, undefined, 'Object.prototype should not be polluted after validation');
+    assert.equal(({}).polluted, undefined, 'New empty objects should not have polluted property');
 });
 
-test('SECURITY: input with own "hasOwnProperty" key should not crash validation', t => {
+test('SECURITY: input with own "hasOwnProperty" key should not crash validation', () => {
     const validator = new LIVR.Validator({ name: 'required', age: 'positive_integer' });
 
     const input = JSON.parse('{"name": "test", "hasOwnProperty": "x"}');
 
-    t.deepEqual(validator.validate(input), { name: 'test' });
+    assert.deepEqual(validator.validate(input), { name: 'test' });
 });
 
-test('SECURITY: schema field named "hasOwnProperty" should work', t => {
+test('SECURITY: schema field named "hasOwnProperty" should work', () => {
     const validator = new LIVR.Validator({ hasOwnProperty: ['required', 'trim'], name: 'required' });
 
-    t.deepEqual(validator.validate({ hasOwnProperty: ' x ', name: 'test' }), { hasOwnProperty: 'x', name: 'test' });
+    assert.deepEqual(validator.validate({ hasOwnProperty: ' x ', name: 'test' }), { hasOwnProperty: 'x', name: 'test' });
 });

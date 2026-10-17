@@ -1,4 +1,5 @@
-const test = require('ava');
+const test = require('node:test');
+const assert = require('node:assert/strict');
 const LIVR = require('../../async');
 
 LIVR.AsyncValidator.registerDefaultRules({
@@ -33,7 +34,7 @@ LIVR.AsyncValidator.registerDefaultRules({
     }
 });
 
-test('Validate data with registered rules', async (t) => {
+test('Validate data with registered rules', async () => {
     const validator = new LIVR.AsyncValidator({
         word1: ['my_trim', 'my_lc', 'my_ucfirst'],
         word2: ['my_trim', 'my_lc'],
@@ -46,7 +47,7 @@ test('Validate data with registered rules', async (t) => {
         word3: 'wordThree '
     });
 
-    t.deepEqual(
+    assert.deepEqual(
         output,
         {
             word1: 'Wordone',

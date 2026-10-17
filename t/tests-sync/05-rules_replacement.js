@@ -1,4 +1,5 @@
-const test = require('ava');
+const test = require('node:test');
+const assert = require('node:assert/strict');
 const LIVR = require('../../lib/LIVR');
 
 function patchRule(ruleName, ruleBuilder) {
@@ -23,7 +24,7 @@ function patchRule(ruleName, ruleBuilder) {
     };
 }
 
-test('Rules replacement: Validate data with registered rules', t => {
+test('Rules replacement: Validate data with registered rules', () => {
     // Patch rules
     const defaultRules = LIVR.Validator.getDefaultRules();
 
@@ -48,9 +49,9 @@ test('Rules replacement: Validate data with registered rules', t => {
         phone: '123456789123456'
     });
 
-    t.true(!output, 'Validation should fail');
+    assert.ok(!output, 'Validation should fail');
 
-    t.deepEqual(
+    assert.deepEqual(
         validator.getErrors(),
         {
             name: {

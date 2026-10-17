@@ -1,7 +1,8 @@
-const test = require('ava');
+const test = require('node:test');
+const assert = require('node:assert/strict');
 const LIVR = require('../../async');
 
-test('Should support camelized and underscore rules by default', async (t) => {
+test('Should support camelized and underscore rules by default', async () => {
     const validator = new LIVR.AsyncValidator({
         name1: { maxLength: 5 },
         name2: { max_length: 5 },
@@ -13,7 +14,7 @@ test('Should support camelized and underscore rules by default', async (t) => {
             name2: 'myname2',
         });
     } catch (errors) {
-        t.deepEqual(
+        assert.deepEqual(
             errors,
             {
                 name1: 'TOO_LONG',
@@ -24,7 +25,7 @@ test('Should support camelized and underscore rules by default', async (t) => {
     }
 });
 
-test('Camelization should not overide custom rules', async (t) => {
+test('Camelization should not overide custom rules', async () => {
     LIVR.AsyncValidator.registerDefaultRules({
         minLength() {
             return () => 'MY_MIN_RULE';
@@ -48,7 +49,7 @@ test('Camelization should not overide custom rules', async (t) => {
             password2: '123',
         });
     } catch (errors) {
-        t.deepEqual(
+        assert.deepEqual(
             errors,
             {
                 password1: 'MY_MAX_RULE',

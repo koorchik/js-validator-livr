@@ -1,35 +1,36 @@
-const test = require('ava');
+const test = require('node:test');
+const assert = require('node:assert/strict');
 
 const fs   = require('fs');
 const LIVR = require('../../lib/LIVR');
 const util = require('util');
 
 iterateTestData('test_suite/positive', data => {
-    test(`Positive: ${data.name}`, t => {
+    test(`Positive: ${data.name}`, () => {
         const validator = new LIVR.Validator(data.rules);
         const output = validator.validate(data.input);
 
         const errors = validator.getErrors();
-        t.true(
+        assert.ok(
             !errors,
             'Validator should contain no errors. The error was ' + util.inspect(errors)
         );
-        t.deepEqual(output, data.output, 'Output should contain correct data');
+        assert.deepEqual(output, data.output, 'Output should contain correct data');
     });
 });
 
 iterateTestData('test_suite/negative', data => {
-    test(`Negative ${data.name}`, t => {
+    test(`Negative ${data.name}`, () => {
         const validator = new LIVR.Validator(data.rules);
         const output = validator.validate(data.input);
 
-        t.true(!output, 'Output should be false');
-        t.deepEqual(validator.getErrors(), data.errors, 'Validator should contain errors');
+        assert.ok(!output, 'Output should be false');
+        assert.deepEqual(validator.getErrors(), data.errors, 'Validator should contain errors');
     });
 });
 
 iterateTestData('test_suite/aliases_positive', data => {
-    test(`Aliases positive: ${data.name}`, t => {
+    test(`Aliases positive: ${data.name}`, () => {
         const validator = new LIVR.Validator(data.rules);
 
         data.aliases.forEach(alias => {
@@ -38,13 +39,13 @@ iterateTestData('test_suite/aliases_positive', data => {
 
         const output = validator.validate(data.input);
 
-        t.true(!validator.getErrors(), 'Validator should contain no errors');
-        t.deepEqual(output, data.output, 'Output should contain correct data');
+        assert.ok(!validator.getErrors(), 'Validator should contain no errors');
+        assert.deepEqual(output, data.output, 'Output should contain correct data');
     });
 });
 
 iterateTestData('test_suite/aliases_negative', data => {
-    test(`Aliases negative: ${data.name}`, t => {
+    test(`Aliases negative: ${data.name}`, () => {
         const validator = new LIVR.Validator(data.rules);
 
         data.aliases.forEach(alias => {
@@ -53,8 +54,8 @@ iterateTestData('test_suite/aliases_negative', data => {
 
         const output = validator.validate(data.input);
 
-        t.true(!output, 'Output should be false');
-        t.deepEqual(validator.getErrors(), data.errors, 'Validator should contain errors');
+        assert.ok(!output, 'Output should be false');
+        assert.deepEqual(validator.getErrors(), data.errors, 'Validator should contain errors');
     });
 });
 

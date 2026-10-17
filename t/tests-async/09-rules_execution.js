@@ -1,7 +1,8 @@
-const test = require('ava');
+const test = require('node:test');
+const assert = require('node:assert/strict');
 const LIVR = require('../../async');
 
-test('Keeps order of result and errors keys for synchronous rules', async t => {
+test('Keeps order of result and errors keys for synchronous rules', async () => {
     const validator = new LIVR.AsyncValidator({
         a: ['required', 'email'],
         b: 'required',
@@ -10,13 +11,13 @@ test('Keeps order of result and errors keys for synchronous rules', async t => {
     });
 
     const errors = await validator.validate({ a: 'bad', d: ' d ' }).catch(e => e);
-    t.deepEqual(Object.keys(errors), ['b', 'a']);
+    assert.deepEqual(Object.keys(errors), ['b', 'a']);
 
     const output = await validator.validate({ a: 'a@b.com', b: 1, d: ' d ' });
-    t.deepEqual(Object.keys(output), ['a', 'b', 'd', 'c']);
+    assert.deepEqual(Object.keys(output), ['a', 'b', 'd', 'c']);
 });
 
-test('Awaits promises and thenables returned by rules', async t => {
+test('Awaits promises and thenables returned by rules', async () => {
     const validator = new LIVR.AsyncValidator({
         a: ['my_promise', 'my_thenable', 'to_uc'],
         b: ['my_thenable', 'required'],
@@ -36,11 +37,11 @@ test('Awaits promises and thenables returned by rules', async t => {
         }),
     });
 
-    t.deepEqual(await validator.validate({ a: 'x', b: 'y' }), { a: 'X12', b: 'y2' });
-    t.deepEqual(await validator.validate({ a: 'bad' }).catch(e => e), { a: 'BAD', b: 'REQUIRED' });
+    assert.deepEqual(await validator.validate({ a: 'x', b: 'y' }), { a: 'X12', b: 'y2' });
+    assert.deepEqual(await validator.validate({ a: 'bad' }).catch(e => e), { a: 'BAD', b: 'REQUIRED' });
 });
 
-test('Rejects with exception thrown by a rule', async t => {
+test('Rejects with exception thrown by a rule', async () => {
     const validator = new LIVR.AsyncValidator({ a: 'required', b: 'my_throw' });
 
     validator.registerRules({
@@ -49,10 +50,10 @@ test('Rejects with exception thrown by a rule', async t => {
         },
     });
 
-    await t.throwsAsync(validator.validate({ a: 1, b: 2 }), { message: 'Boom' });
+    await assert.rejects(validator.validate({ a: 1, b: 2 }), { message: 'Boom' });
 });
 
-test('Exception of a rule leaves no unhandled rejections of fields validated asynchronously', async t => {
+test('Exception of a rule leaves no unhandled rejections of fields validated asynchronously', async () => {
     const validator = new LIVR.AsyncValidator({ a: 'my_reject_later', b: 'my_throw' });
 
     validator.registerRules({
@@ -68,17 +69,17 @@ test('Exception of a rule leaves no unhandled rejections of fields validated asy
     process.on('unhandledRejection', onUnhandledRejection);
 
     try {
-        await t.throwsAsync(validator.validate({ a: 1, b: 2 }), { message: 'Boom' });
+        await assert.rejects(validator.validate({ a: 1, b: 2 }), { message: 'Boom' });
         // The rule of "a" rejects after validate() has rejected
         await new Promise(resolve => setTimeout(resolve, 50));
     } finally {
         process.off('unhandledRejection', onUnhandledRejection);
     }
 
-    t.deepEqual(unhandledRejections, []);
+    assert.deepEqual(unhandledRejections, []);
 });
 
-test('Meta rules and aliases wait for asynchronous rules of nested schemas', async t => {
+test('Meta rules and aliases wait for asynchronous rules of nested schemas', async () => {
     const nestedRules = { type: 'required', value: 'my_async_uc' };
     const validator = new LIVR.AsyncValidator({
         nested: { nested_object: { value: 'my_async_uc' } },
@@ -108,7 +109,7 @@ test('Meta rules and aliases wait for asynchronous rules of nested schemas', asy
         aliased: 'a',
     });
 
-    t.deepEqual(output, {
+    assert.deepEqual(output, {
         nested: { value: 'A' },
         list: ['A', 'B'],
         objects: [{ value: 'A' }],
@@ -130,7 +131,7 @@ test('Meta rules and aliases wait for asynchronous rules of nested schemas', asy
         })
         .catch(e => e);
 
-    t.deepEqual(errors, {
+    assert.deepEqual(errors, {
         nested: { value: 'BAD' },
         list: [null, 'BAD'],
         objects: [{ value: 'BAD' }],
@@ -141,7 +142,7 @@ test('Meta rules and aliases wait for asynchronous rules of nested schemas', asy
     });
 });
 
-test('Meta rules return exceptions of nested rules as errors', async t => {
+test('Meta rules return exceptions of nested rules as errors', async () => {
     const validator = new LIVR.AsyncValidator({
         items: { list_of_objects: { a: 'my_throw' } },
         values: { list_of: 'my_async_throw' },
@@ -161,10 +162,10 @@ test('Meta rules return exceptions of nested rules as errors', async t => {
     const errors = await validator.validate({ items: [{ a: 1 }], values: [1], object: { a: 1 } })
         .catch(e => e);
 
-    t.deepEqual(errors, { items: [boom], values: ['ASYNC_BOOM'], object: boom });
+    assert.deepEqual(errors, { items: [boom], values: ['ASYNC_BOOM'], object: boom });
 });
 
-test('Subclass can override validateField()', async t => {
+test('Subclass can override validateField()', async () => {
     class LoggingValidator extends LIVR.AsyncValidator {
         validateField(fieldName, ...args) {
             this.fieldNames.push(fieldName);
@@ -175,6 +176,6 @@ test('Subclass can override validateField()', async t => {
     const validator = new LoggingValidator({ a: 'required', b: ['trim', { max_length: 2 }] });
     validator.fieldNames = [];
 
-    t.deepEqual(await validator.validate({ a: 1, b: ' xy ' }), { a: 1, b: 'xy' });
-    t.deepEqual(validator.fieldNames, ['a', 'b']);
+    assert.deepEqual(await validator.validate({ a: 1, b: ' xy ' }), { a: 1, b: 'xy' });
+    assert.deepEqual(validator.fieldNames, ['a', 'b']);
 });

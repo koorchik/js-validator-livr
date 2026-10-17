@@ -1,4 +1,5 @@
-const test = require('ava');
+const test = require('node:test');
+const assert = require('node:assert/strict');
 const LIVR = require('../../async');
 
 function patchRule(ruleName, ruleBuilder) {
@@ -23,7 +24,7 @@ function patchRule(ruleName, ruleBuilder) {
     };
 }
 
-test('Rules replacement: Validate data with registered rules', async (t) => {
+test('Rules replacement: Validate data with registered rules', async () => {
     // Patch rules
     const defaultRules = LIVR.AsyncValidator.getDefaultRules();
 
@@ -49,7 +50,7 @@ test('Rules replacement: Validate data with registered rules', async (t) => {
             phone: '123456789123456'
         });    
     } catch (errors) {
-        t.deepEqual(
+        assert.deepEqual(
             errors,
             {
                 name: {

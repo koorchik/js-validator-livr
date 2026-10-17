@@ -1,4 +1,5 @@
-const test = require('ava');
+const test = require('node:test');
+const assert = require('node:assert/strict');
 const LIVR = require('../../lib/LIVR');
 
 LIVR.Validator.registerAliasedDefaultRule({
@@ -7,7 +8,7 @@ LIVR.Validator.registerAliasedDefaultRule({
     error: 'WEAK_PASSWORD1'
 });
 
-test('Validate data with registered rules', t => {
+test('Validate data with registered rules', () => {
     const validator = new LIVR.Validator({
         password1: 'strong_password1',
         password2: 'strong_password2'
@@ -24,9 +25,9 @@ test('Validate data with registered rules', t => {
         password2: 'mypass'
     });
 
-    t.true(!output, 'should return false due to validation errors');
+    assert.ok(!output, 'should return false due to validation errors');
 
-    t.deepEqual(
+    assert.deepEqual(
         validator.getErrors(),
         {
             password1: 'WEAK_PASSWORD1',

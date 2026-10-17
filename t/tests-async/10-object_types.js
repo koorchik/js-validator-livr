@@ -1,4 +1,5 @@
-const test = require('ava');
+const test = require('node:test');
+const assert = require('node:assert/strict');
 const querystring = require('querystring');
 const LIVR = require('../../async');
 
@@ -6,7 +7,7 @@ const LIVR = require('../../async');
 
 const nullProto = props => Object.assign(Object.create(null), props);
 
-test('Objects without prototype are validated as objects', async t => {
+test('Objects without prototype are validated as objects', async () => {
     const productRules = ['type', { book: { type: 'required', title: 'required' } }];
 
     const validator = new LIVR.AsyncValidator({
@@ -29,7 +30,7 @@ test('Objects without prototype are validated as objects', async t => {
         })
     );
 
-    t.deepEqual(
+    assert.deepEqual(
         { ...output, meta: { ...output.meta } },
         {
             name: 'John',
@@ -42,27 +43,27 @@ test('Objects without prototype are validated as objects', async t => {
     );
 });
 
-test('querystring.parse() output is validated and auto trimmed', async t => {
+test('querystring.parse() output is validated and auto trimmed', async () => {
     const validator = new LIVR.AsyncValidator(
         { name: 'required', age: 'positive_integer' },
         { autoTrim: true }
     );
 
     const output = await validator.validate(querystring.parse('name=%20John%20&age=30&extra=1'));
-    t.deepEqual(output, { name: 'John', age: 30 });
+    assert.deepEqual(output, { name: 'John', age: 30 });
 });
 
-test('autoTrim trims objects with own "constructor" key', async t => {
+test('autoTrim trims objects with own "constructor" key', async () => {
     const validator = new LIVR.AsyncValidator(
         { user: { nested_object: { constructor: 'required', name: 'required' } } },
         { autoTrim: true }
     );
 
     const output = await validator.validate({ user: { constructor: ' value ', name: ' John ' } });
-    t.deepEqual(output, { user: { constructor: 'value', name: 'John' } });
+    assert.deepEqual(output, { user: { constructor: 'value', name: 'John' } });
 });
 
-test('Class instances and arrays are not objects', async t => {
+test('Class instances and arrays are not objects', async () => {
     const validator = new LIVR.AsyncValidator({
         object: 'any_object',
         nested: { nested_object: { name: 'required' } },
@@ -70,6 +71,6 @@ test('Class instances and arrays are not objects', async t => {
 
     for (const value of [[], new Date(), new Map(), new (class User {})()]) {
         const errors = await validator.validate({ object: value, nested: value }).catch(e => e);
-        t.deepEqual(errors, { object: 'FORMAT_ERROR', nested: 'FORMAT_ERROR' });
+        assert.deepEqual(errors, { object: 'FORMAT_ERROR', nested: 'FORMAT_ERROR' });
     }
 });

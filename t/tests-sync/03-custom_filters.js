@@ -1,4 +1,5 @@
-const test = require('ava');
+const test = require('node:test');
+const assert = require('node:assert/strict');
 const LIVR = require('../../lib/LIVR');
 
 LIVR.Validator.registerDefaultRules({
@@ -33,7 +34,7 @@ LIVR.Validator.registerDefaultRules({
     }
 });
 
-test('Validate data with registered rules', t => {
+test('Validate data with registered rules', () => {
     const validator = new LIVR.Validator({
         word1: ['my_trim', 'my_lc', 'my_ucfirst'],
         word2: ['my_trim', 'my_lc'],
@@ -46,7 +47,7 @@ test('Validate data with registered rules', t => {
         word3: 'wordThree '
     });
 
-    t.deepEqual(
+    assert.deepEqual(
         output,
         {
             word1: 'Wordone',
@@ -57,7 +58,7 @@ test('Validate data with registered rules', t => {
     );
 });
 
-test('list_of, or and aliases pass the same arguments to rules as validate()', t => {
+test('list_of, or and aliases pass the same arguments to rules as validate()', () => {
     const calls = [];
     const validator = new LIVR.Validator({
         list: { list_of: ['my_spy', 'my_spy'] },
@@ -78,8 +79,8 @@ test('list_of, or and aliases pass the same arguments to rules as validate()', t
 
     const output = validator.validate({ list: ['a'], any: 'b', aliased: 'c', empty: [1, 2] });
 
-    t.deepEqual(output, { list: ['a!!'], any: 'b!', aliased: 'c!', empty: [undefined, undefined] });
-    t.deepEqual(calls, [
+    assert.deepEqual(output, { list: ['a!!'], any: 'b!', aliased: 'c!', empty: [undefined, undefined] });
+    assert.deepEqual(calls, [
         ['a', { field: 'a' }],
         ['a!', { field: 'a' }],
         ['b', { field: 'b' }],
@@ -88,7 +89,7 @@ test('list_of, or and aliases pass the same arguments to rules as validate()', t
     ]);
 });
 
-test('Rules edge cases keep their results', t => {
+test('Rules edge cases keep their results', () => {
     const validator = new LIVR.Validator({
         emails: { list_of: 'email' },
         dates: { list_of: 'iso_date' },
@@ -103,7 +104,7 @@ test('Rules edge cases keep their results', t => {
         other: '1',
     });
 
-    t.deepEqual(validator.getErrors(), {
+    assert.deepEqual(validator.getErrors(), {
         emails: [null, null, 'WRONG_EMAIL', 'WRONG_EMAIL', 'WRONG_EMAIL', 'WRONG_EMAIL', null],
         dates: [null, 'WRONG_DATE', 'WRONG_DATE', 'WRONG_DATE', null, 'WRONG_DATE', 'WRONG_DATE'],
     });
@@ -111,5 +112,5 @@ test('Rules edge cases keep their results', t => {
     const output = new LIVR.Validator({ choice: { one_of: ['1', 1, 'b'] }, other: { one_of: [1, '1'] } })
         .validate({ choice: 1, other: '1' });
 
-    t.deepEqual(output, { choice: '1', other: 1 }, 'one_of returns the first matching allowed value');
+    assert.deepEqual(output, { choice: '1', other: 1 }, 'one_of returns the first matching allowed value');
 });

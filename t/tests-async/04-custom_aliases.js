@@ -1,4 +1,5 @@
-const test = require('ava');
+const test = require('node:test');
+const assert = require('node:assert/strict');
 const LIVR = require('../../async');
 
 LIVR.AsyncValidator.registerAliasedDefaultRule({
@@ -7,7 +8,7 @@ LIVR.AsyncValidator.registerAliasedDefaultRule({
     error: 'WEAK_PASSWORD1'
 });
 
-test('Validate data with registered rules', async (t) => {
+test('Validate data with registered rules', async () => {
     const validator = new LIVR.AsyncValidator({
         password1: 'strong_password1',
         password2: 'strong_password2'
@@ -25,7 +26,7 @@ test('Validate data with registered rules', async (t) => {
             password2: 'mypass'
         });    
     } catch (errors) {
-        t.deepEqual(
+        assert.deepEqual(
             errors,
             {
                 password1: 'WEAK_PASSWORD1',

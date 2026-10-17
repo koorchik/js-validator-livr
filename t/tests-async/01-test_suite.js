@@ -1,31 +1,32 @@
-const test = require('ava');
+const test = require('node:test');
+const assert = require('node:assert/strict');
 
 const fs   = require('fs');
 const LIVR = require('../../async');
 
 iterateTestData('test_suite/positive', data => {
-    test(`Positive: ${data.name}`, async (t) => {
+    test(`Positive: ${data.name}`, async () => {
         const validator = new LIVR.AsyncValidator(data.rules);
         const output = await validator.validate(data.input);
 
-        t.deepEqual(output, data.output, 'Output should contain correct data');
+        assert.deepEqual(output, data.output, 'Output should contain correct data');
     });
 });
 
 iterateTestData('test_suite/negative', data => {
-    test(`Negative ${data.name}`, async (t) => {
+    test(`Negative ${data.name}`, async () => {
         const validator = new LIVR.AsyncValidator(data.rules);
 
         try {
             const output = await validator.validate(data.input);    
         } catch (errors) {
-            t.deepEqual(errors, data.errors, 'Validator should contain errors');    
+            assert.deepEqual(errors, data.errors, 'Validator should contain errors');    
         }
     });
 });
 
 iterateTestData('test_suite/aliases_positive', data => {
-    test(`Aliases positive: ${data.name}`, async (t) => {
+    test(`Aliases positive: ${data.name}`, async () => {
         const validator = new LIVR.AsyncValidator(data.rules);
 
         data.aliases.forEach(alias => {
@@ -33,12 +34,12 @@ iterateTestData('test_suite/aliases_positive', data => {
         });
 
         const output = await validator.validate(data.input);
-        t.deepEqual(output, data.output, 'Output should contain correct data');
+        assert.deepEqual(output, data.output, 'Output should contain correct data');
     });
 });
 
 iterateTestData('test_suite/aliases_negative', data => {
-    test(`Aliases negative: ${data.name}`, async (t) => {
+    test(`Aliases negative: ${data.name}`, async () => {
         const validator = new LIVR.AsyncValidator(data.rules);
 
         data.aliases.forEach(alias => {
@@ -48,7 +49,7 @@ iterateTestData('test_suite/aliases_negative', data => {
         try {
             const output = await validator.validate(data.input);    
         } catch (errors) {
-            t.deepEqual(errors, data.errors, 'Validator should contain errors');    
+            assert.deepEqual(errors, data.errors, 'Validator should contain errors');    
         }
     });
 });

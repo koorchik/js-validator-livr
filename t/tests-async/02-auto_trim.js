@@ -1,4 +1,5 @@
-const test = require('ava');
+const test = require('node:test');
+const assert = require('node:assert/strict');
 const LIVR = require('../../async');
 
 const validator = new LIVR.AsyncValidator(
@@ -16,7 +17,7 @@ const validator = new LIVR.AsyncValidator(
 );
 
 
-test('NEGATIVE: Validate data with automatic trim', async (t) => {
+test('NEGATIVE: Validate data with automatic trim', async () => {
     try {
         const output = await validator.validate({
             code: '  ',
@@ -26,7 +27,7 @@ test('NEGATIVE: Validate data with automatic trim', async (t) => {
             }
         });    
     } catch (errors) {
-        t.deepEqual(
+        assert.deepEqual(
             errors,
             {
                 code: 'REQUIRED',
@@ -40,7 +41,7 @@ test('NEGATIVE: Validate data with automatic trim', async (t) => {
     }
 });
 
-test('POSITIVE: Validate data with automatic trim', async (t) => {
+test('POSITIVE: Validate data with automatic trim', async () => {
     const cleanData = await validator.validate({
         code: ' A ',
         password: ' 123  ',
@@ -50,9 +51,9 @@ test('POSITIVE: Validate data with automatic trim', async (t) => {
         }
     });
 
-    t.truthy(cleanData, 'should return clean data');
+    assert.ok(cleanData, 'should return clean data');
 
-    t.deepEqual(
+    assert.deepEqual(
         cleanData,
         {
             code: 'A',

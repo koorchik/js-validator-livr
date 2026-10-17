@@ -1,9 +1,10 @@
-const test = require('ava');
+const test = require('node:test');
+const assert = require('node:assert/strict');
 // Load order matters for this test: async entry point first, then sync one
 const AsyncLIVR = require('../../async');
 const LIVR = require('../../lib/LIVR');
 
-test('Async validator keeps async meta rules when sync entry point is loaded after it', async t => {
+test('Async validator keeps async meta rules when sync entry point is loaded after it', async () => {
     AsyncLIVR.AsyncValidator.registerDefaultRules({
         is_free_name() {
             return async value => {
@@ -18,17 +19,17 @@ test('Async validator keeps async meta rules when sync entry point is loaded aft
         names: { list_of: ['required', 'is_free_name'] },
     });
 
-    t.deepEqual(
+    assert.deepEqual(
         await validator.validate({ user: { name: 'free' }, names: ['a', 'b'] }),
         { user: { name: 'free' }, names: ['a', 'b'] }
     );
 
     const errors = await validator.validate({ user: { name: 'taken' }, names: ['a', 'taken'] }).catch(e => e);
-    t.deepEqual(errors, { user: { name: 'NAME_TAKEN' }, names: [null, 'NAME_TAKEN'] });
+    assert.deepEqual(errors, { user: { name: 'NAME_TAKEN' }, names: [null, 'NAME_TAKEN'] });
 });
 
-test('Sync validator keeps sync meta rules when it is loaded after async entry point', t => {
+test('Sync validator keeps sync meta rules when it is loaded after async entry point', () => {
     const validator = new LIVR.Validator({ user: { nested_object: { name: 'required' } } });
 
-    t.deepEqual(validator.validate({ user: { name: 'John' } }), { user: { name: 'John' } });
+    assert.deepEqual(validator.validate({ user: { name: 'John' } }), { user: { name: 'John' } });
 });
