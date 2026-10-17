@@ -16,9 +16,18 @@
             "require": "./lib/LIVR.js",
             "import": "./lib/LIVR.js"
         },
+        "./async": "./async.js",
+        "./async.js": "./async.js",
+        "./types": {
+            "types": "./types/index.d.ts"
+        },
         "./types/inference": {
             "types": "./types/inference.d.ts"
-        }
+        },
+        "./lib/*.js": "./lib/*.js",
+        "./lib/*": "./lib/*.js",
+        "./dist/*": "./dist/*",
+        "./package.json": "./package.json"
     },
     "scripts": {
         "test": "nyc ava && tsc --noEmit",
