@@ -1,6 +1,6 @@
 # LIVR Validator
 
-> Lightweight, fast, and language-independent validation for JavaScript & TypeScript
+> Lightweight, very fast, and language-independent validation for JavaScript & TypeScript
 
 [![npm version](https://badge.fury.io/js/livr.svg)](https://badge.fury.io/js/livr)
 [![npm downloads](https://img.shields.io/npm/dm/livr.svg)](https://www.npmjs.com/package/livr)
@@ -35,6 +35,7 @@
 
 ### Why LIVR?
 
+- **Very fast** - Faster than Valibot, Zod, fastest-validator, Ajv and Joi in [benchmarks](#performance), without code generation
 - **Zero dependencies** - No external runtime dependencies
 - **Tiny footprint** - Validator core < 1KB, with all rules ~3KB (min+gzip)
 - **TypeScript support** - Full type inference from validation schemas
@@ -523,7 +524,20 @@ See the **[TypeScript Type Inference Guide](./docs/TYPESCRIPT.md)**.
 
 ## Performance
 
-LIVR is designed for speed:
+LIVR is one of the fastest JavaScript validators: it leads both when a validator is created once and reused, and when a validator is created for every validation (for example, for schemas built at runtime).
+
+| Validator         | Precompiled, simple form | Precompiled, nested object | Created per call, simple form | Created per call, nested object |
+| ----------------- | ------------------------ | -------------------------- | ----------------------------- | ------------------------------- |
+| **LIVR**          | **3.46M**                | **1.76M**                  | **1.36M**                     | **634K**                        |
+| Valibot           | 2.88M                    | 1.54M                      | 921K                          | 534K                            |
+| fastest-validator | 2.86M                    | 1.17M                      | 10.7K                         | 5.9K                            |
+| Zod               | 2.79M                    | 1.25M                      | 15.7K                         | 8.6K                            |
+| Ajv               | 2.51M                    | 1.27M                      | 1.4K                          | 0.8K                            |
+| Joi               | 313K                     | 176K                       | 41K                           | 23K                             |
+
+Operations per second, more is better. Node.js 26, AMD Ryzen 9 5950X. All validators get equivalent schemas and strip unknown fields; absolute numbers depend on the hardware, so compare the ratios. fastest-validator and Ajv compile schemas to JavaScript code. LIVR gets its speed without code generation, so schemas stay plain data and are safe to load from untrusted sources. Details and methodology: [Design Decisions](docs/DESIGN.md#performance-summary).
+
+Tips:
 
 - **Reuse validators** - Construct once, validate many times. `validator.validate()` is extremely fast.
 - **Lazy compilation** - Rules are compiled on first validation (or call `prepare()` for warmup).
