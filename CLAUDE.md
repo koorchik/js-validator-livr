@@ -21,10 +21,9 @@ node --test --test-name-pattern="variable_object" t/tests-async/01-test_suite.js
 
 # Type check only (verify TypeScript definitions and type inference)
 npx tsc --noEmit
-
-# Build browser bundles (sync and async, dev and production)
-npm run build
 ```
+
+There is no build step: the package ships `lib/` as it is, browsers use it through a bundler or an ESM CDN.
 
 ## Architecture
 

@@ -24,6 +24,7 @@ v2.11.0
 -   Benchmarks moved to the separate `validators-benchmarks` repository: `benchmarks/bench.js`, the `bench` script and the `benchmark` dev dependency are removed
 -   Tests: migrated from AVA and nyc to the built-in `node:test` and `node:assert/strict` with built-in coverage, both dev dependencies are removed. Running the tests needs Node.js 22.8+
 -   CI: GitHub Actions (Node.js 22, 24 and 26) instead of Travis CI
+-   Removed the `dist/` browser bundles (last built for 2.7.1, so later releases shipped outdated code), the webpack build and the `livr/dist/*` export. Use a bundler or an ESM CDN (see README). Dev dependencies are down to TypeScript
 -   Docs: re-measure the comparison with Zod, Valibot, Joi, fastest-validator and Ajv in `docs/DESIGN.md` and README
 
 v2.10.2

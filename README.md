@@ -110,16 +110,17 @@ if (validData) {
 npm install livr
 ```
 
-### Browser (without npm)
+### Browser
 
-Pre-built versions are available in the `dist` folder:
+LIVR has no dependencies and works in browsers through any bundler (Vite, esbuild, Rollup, webpack). Without a build step, load it from an ESM CDN:
 
-| Build | Description |
-|-------|-------------|
-| `dist/production/main.js` | Minified sync validator |
-| `dist/production-async/main.js` | Minified async validator |
-| `dist/development/main.js` | Development build with source maps |
-| `dist/development-async/main.js` | Async development build |
+```html
+<script type="module">
+    import LIVR from 'https://esm.sh/livr';
+
+    const validator = new LIVR.Validator({ name: 'required' });
+</script>
+```
 
 ---
 
