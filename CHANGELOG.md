@@ -16,10 +16,10 @@ v2.11.0
 -   `validator.getFieldRule(fieldName)` (sync and async): all rules of a schema field as one rule function, for custom meta rules that validate many values with the same rules. Like any rule, it pushes the output value only when the rules change it. Built-in `list_of`, `or` and aliases use it
 -   Fix: an alias or `or` on a missing field added the field to the output with the value `undefined` (the key was there, unlike with other rules). A missing field stays missing now
 -   Test suite: sync with the LIVR spec repository, which got cases for the fixes above
--   Performance (no API changes):
-    -   Sync validator: 1.1-1.4x faster for flat and nested forms, `list_of` 2.2x, `or` and aliases 1.6-1.7x, `iso_date` 2.4x, invalid emails 1.8x, `one_of` with long lists up to 4.7x
-    -   Validator construction (new validator per validation): 1.2-1.3x faster
-    -   Async validator: 1.7-2.9x faster. Rules that return plain values no longer cost an `await`. With synchronous rules the key order of results and errors is the same as before; with rules returning promises (async meta rules, aliases, custom async rules) it may differ, as it depended on microtask timing
+-   Performance (no API changes; compared with 2.10.2 on Node.js 26):
+    -   Sync validator: 1.1-1.5x faster for flat and nested forms, `list_of` 2.1x, `or` and aliases 1.7x, `iso_date` 2.5x, `email` 2.4-3x, `one_of` with long lists up to 4.7x
+    -   Validator construction (new validator per validation): 1.6x faster
+    -   Async validator: 2.2-2.5x faster. Rules that return plain values no longer cost an `await`. With synchronous rules the key order of results and errors is the same as before; with rules returning promises (async meta rules, aliases, custom async rules) it may differ, as it depended on microtask timing
     -   Async `or`, `list_of` and aliases return their result without a promise while their rules are synchronous, so such fields need no `await` either
 -   Benchmarks moved to the separate `validators-benchmarks` repository: `benchmarks/bench.js`, the `bench` script and the `benchmark` dev dependency are removed
 -   Tests: migrated from AVA and nyc to the built-in `node:test` and `node:assert/strict` with built-in coverage, both dev dependencies are removed. Running the tests needs Node.js 22.8+
