@@ -51,9 +51,10 @@ test('getFieldRule awaits thenables and passes rejections on', async () => {
 
     assert.equal(await validator.getFieldRule('name')('bad', {}, []), 'BAD');
 
+    // The rule does not change the value, so nothing is pushed
     const output = [];
     assert.equal(await validator.getFieldRule('name')('good', {}, output), undefined);
-    assert.deepEqual(output, ['good']);
+    assert.deepEqual(output, []);
 
     await assert.rejects(validator.getFieldRule('other')('value', {}, []), { message: 'Boom' });
 });
@@ -70,5 +71,19 @@ test('getFieldRule trims values when autoTrim is on', () => {
 test('getFieldRule throws for a field that is not in the schema', () => {
     assert.throws(() => new LIVR.AsyncValidator({ name: 'required' }).getFieldRule('age'), {
         message: 'Field [age] is not in the schema',
+    });
+});
+
+test('A missing field stays missing when it goes through an alias or "or"', async () => {
+    const validator = new LIVR.AsyncValidator({
+        aliased: 'my_integer',
+        either: { or: ['integer', 'email'] },
+    });
+    validator.registerAliasedRule({ name: 'my_integer', rules: 'integer' });
+
+    assert.deepEqual(await validator.validate({}), {});
+    assert.deepEqual(await validator.validate({ aliased: '', either: '' }), {
+        aliased: '',
+        either: '',
     });
 });

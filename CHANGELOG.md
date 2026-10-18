@@ -13,7 +13,8 @@ v2.11.0
 -   Fix: `AsyncValidator`: an exception thrown by a rule inside `or` or an alias without its own error code was lost, and the value passed validation. Inside `list_of` the error of such item was `undefined`. The exception is the error now, as in `nested_object`
 -   Objects without prototype (`Object.create(null)`, `querystring.parse()` output) are validated as objects, `util.isObject()` returns `true` for them
 -   `util.isThenable()` and `util.getFieldValue()` (value of a data field; inherited methods like `constructor` are not taken as values)
--   `validator.getFieldRule(fieldName)` (sync and async): all rules of a schema field as one rule function, for custom meta rules that validate many values with the same rules. Built-in `list_of`, `or` and aliases use it
+-   `validator.getFieldRule(fieldName)` (sync and async): all rules of a schema field as one rule function, for custom meta rules that validate many values with the same rules. Like any rule, it pushes the output value only when the rules change it. Built-in `list_of`, `or` and aliases use it
+-   Fix: an alias or `or` on a missing field added the field to the output with the value `undefined` (the key was there, unlike with other rules). A missing field stays missing now
 -   Test suite: sync with the LIVR spec repository, which got cases for the fixes above
 -   Performance (no API changes):
     -   Sync validator: 1.1-1.4x faster for flat and nested forms, `list_of` 2.2x, `or` and aliases 1.6-1.7x, `iso_date` 2.4x, invalid emails 1.8x, `one_of` with long lists up to 4.7x
