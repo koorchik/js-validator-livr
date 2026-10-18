@@ -53,10 +53,10 @@ Every rule file is self-contained: it may use the generic helpers of `lib/util.j
 Each rule is a factory function that receives rule arguments and returns a validator function:
 ```javascript
 function ruleName(arg1, arg2, ruleBuilders) {
-    return (value, allValues, outputArr) => {
-        // Return error code string on failure, undefined on success
-        // Push to outputArr to modify the output value
-    };
+  return (value, allValues, outputArr) => {
+    // Return error code string on failure, undefined on success
+    // Push to outputArr to modify the output value
+  };
 }
 ```
 

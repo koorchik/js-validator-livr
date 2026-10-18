@@ -13,9 +13,9 @@ import LIVR from 'livr';
 import type { InferFromSchema } from 'livr/types';
 
 const schema = {
-    email: ['required', 'email'],
-    age: ['required', 'positiveInteger'],
-    role: { oneOf: ['admin', 'user'] as const },
+  email: ['required', 'email'],
+  age: ['required', 'positiveInteger'],
+  role: { oneOf: ['admin', 'user'] as const },
 } as const;
 
 type User = InferFromSchema<typeof schema>;
@@ -24,14 +24,14 @@ type User = InferFromSchema<typeof schema>;
 const validator = new LIVR.Validator<User>(schema);
 
 const result = validator.validate({
-    email: 'user@example.com',
-    age: '25', // String from form → automatically becomes number
-    role: 'admin',
-    hackAttempt: true, // Unknown field → automatically stripped
+  email: 'user@example.com',
+  age: '25', // String from form → automatically becomes number
+  role: 'admin',
+  hackAttempt: true, // Unknown field → automatically stripped
 });
 
 if (result) {
-    console.log(result.role); // TypeScript knows: 'admin' | 'user'
+  console.log(result.role); // TypeScript knows: 'admin' | 'user'
 }
 // result: { email: 'user@example.com', age: 25, role: 'admin' }
 ```
@@ -79,9 +79,9 @@ const validator = new LIVR.Validator(schema);
 
 ```javascript
 validator.registerAliasedRule({
-    name: 'productSku',
-    rules: ['required', { like: '^[A-Z]{3}-\\d{6}$' }],
-    error: 'INVALID_PRODUCT_SKU', // Semantic error code
+  name: 'productSku',
+  rules: ['required', { like: '^[A-Z]{3}-\\d{6}$' }],
+  error: 'INVALID_PRODUCT_SKU', // Semantic error code
 });
 
 // Now use it like a built-in rule
@@ -92,10 +92,10 @@ const schema = { sku: 'productSku' };
 
 ```javascript
 LIVR.Validator.registerDefaultRules({
-    uniqueEmail: () => async (email) => {
-        const exists = await db.users.findByEmail(email);
-        if (exists) return 'EMAIL_ALREADY_TAKEN';
-    },
+  uniqueEmail: () => async (email) => {
+    const exists = await db.users.findByEmail(email);
+    if (exists) return 'EMAIL_ALREADY_TAKEN';
+  },
 });
 ```
 
@@ -103,15 +103,15 @@ LIVR.Validator.registerDefaultRules({
 
 ```javascript
 const schema = {
-    tags: { listOf: 'string' },
-    items: {
-        listOf: {
-            nestedObject: {
-                id: ['required', 'positiveInteger'],
-                name: 'string',
-            },
-        },
+  tags: { listOf: 'string' },
+  items: {
+    listOf: {
+      nestedObject: {
+        id: ['required', 'positiveInteger'],
+        name: 'string',
+      },
     },
+  },
 };
 
 // Input: { tags: ["js", "node"], items: [{ id: 1, name: "Item" }] }
@@ -197,9 +197,9 @@ Before diving into design decisions, here's a comprehensive comparison of LIVR a
 ```javascript
 // Can be stored in DB, sent over API, loaded from config file
 const schema = {
-    username: ['required', { minLength: 3 }, { maxLength: 50 }],
-    email: ['required', 'email'],
-    role: { oneOf: ['admin', 'user', 'guest'] },
+  username: ['required', { minLength: 3 }, { maxLength: 50 }],
+  email: ['required', 'email'],
+  role: { oneOf: ['admin', 'user', 'guest'] },
 };
 
 // Store in database
@@ -215,9 +215,9 @@ const validator = new LIVR.Validator(loadedSchema);
 ```typescript
 // Cannot serialize - this is JavaScript code, not data
 const schema = z.object({
-    username: z.string().min(3).max(50),
-    email: z.string().email(),
-    role: z.enum(['admin', 'user', 'guest']),
+  username: z.string().min(3).max(50),
+  email: z.string().email(),
+  role: z.enum(['admin', 'user', 'guest']),
 });
 
 // Cannot store in database
@@ -233,22 +233,22 @@ Because LIVR schemas are data, they can be embedded within larger configuration 
 
 ```json
 {
-    "formId": "contact-form",
-    "fields": [
-        {
-            "name": "email",
-            "type": "text",
-            "label": "Email Address",
-            "placeholder": "you@example.com",
-            "validation": ["required", "email"]
-        },
-        {
-            "name": "age",
-            "type": "number",
-            "label": "Age",
-            "validation": ["positiveInteger", { "numberBetween": [18, 120] }]
-        }
-    ]
+  "formId": "contact-form",
+  "fields": [
+    {
+      "name": "email",
+      "type": "text",
+      "label": "Email Address",
+      "placeholder": "you@example.com",
+      "validation": ["required", "email"]
+    },
+    {
+      "name": "age",
+      "type": "number",
+      "label": "Age",
+      "validation": ["positiveInteger", { "numberBetween": [18, 120] }]
+    }
+  ]
 }
 ```
 
@@ -256,16 +256,16 @@ Because LIVR schemas are data, they can be embedded within larger configuration 
 
 ```json
 {
-    "route": "/api/users",
-    "method": "POST",
-    "auth": "jwt",
-    "rateLimit": { "requests": 100, "window": "1m" },
-    "validation": {
-        "body": {
-            "email": ["required", "email"],
-            "password": ["required", { "minLength": 8 }]
-        }
+  "route": "/api/users",
+  "method": "POST",
+  "auth": "jwt",
+  "rateLimit": { "requests": 100, "window": "1m" },
+  "validation": {
+    "body": {
+      "email": ["required", "email"],
+      "password": ["required", { "minLength": 8 }]
     }
+  }
 }
 ```
 
@@ -273,18 +273,18 @@ Because LIVR schemas are data, they can be embedded within larger configuration 
 
 ```json
 {
-    "contentType": "BlogPost",
-    "fields": {
-        "title": {
-            "type": "string",
-            "required": true,
-            "validation": ["required", { "maxLength": 200 }]
-        },
-        "slug": {
-            "type": "string",
-            "validation": ["required", { "like": "^[a-z0-9-]+$" }]
-        }
+  "contentType": "BlogPost",
+  "fields": {
+    "title": {
+      "type": "string",
+      "required": true,
+      "validation": ["required", { "maxLength": 200 }]
+    },
+    "slug": {
+      "type": "string",
+      "validation": ["required", { "like": "^[a-z0-9-]+$" }]
     }
+  }
 }
 ```
 
@@ -302,12 +302,12 @@ This is impossible with code-based validators—you cannot embed JavaScript clas
 // | product     | {"sku": "productSku", "price": "..."}    | 5       |
 
 async function validateEntity(entityType, data) {
-    const { schema } = await db.query(
-        'SELECT schema FROM validation_schemas WHERE entity_type = ?',
-        [entityType]
-    );
-    const validator = new LIVR.Validator(JSON.parse(schema));
-    return validator.validate(data);
+  const { schema } = await db.query(
+    'SELECT schema FROM validation_schemas WHERE entity_type = ?',
+    [entityType]
+  );
+  const validator = new LIVR.Validator(JSON.parse(schema));
+  return validator.validate(data);
 }
 ```
 
@@ -316,24 +316,24 @@ async function validateEntity(entityType, data) {
 ```javascript
 // Each tenant has customized validation requirements
 const tenantSchemas = {
-    'tenant-acme': {
-        order: {
-            amount: ['required', { maxNumber: 10000 }], // Conservative limit
-            approver: 'required', // Requires approval
-        },
+  'tenant-acme': {
+    order: {
+      amount: ['required', { maxNumber: 10000 }], // Conservative limit
+      approver: 'required', // Requires approval
     },
-    'tenant-bigcorp': {
-        order: {
-            amount: ['required', { maxNumber: 1000000 }], // Higher limit
-            // No approver required
-        },
+  },
+  'tenant-bigcorp': {
+    order: {
+      amount: ['required', { maxNumber: 1000000 }], // Higher limit
+      // No approver required
     },
+  },
 };
 
 function validateForTenant(tenantId, entityType, data) {
-    const schema = tenantSchemas[tenantId]?.[entityType];
-    if (!schema) throw new Error('Unknown entity type');
-    return new LIVR.Validator(schema).validate(data);
+  const schema = tenantSchemas[tenantId]?.[entityType];
+  if (!schema) throw new Error('Unknown entity type');
+  return new LIVR.Validator(schema).validate(data);
 }
 ```
 
@@ -386,10 +386,10 @@ const v = new Validator();
 
 // Attacker controls schema (e.g., from database, API, user input)
 const maliciousSchema = {
-    id: {
-        type: 'number',
-        max: 'console.log(process.env) || 999', // Injected code!
-    },
+  id: {
+    type: 'number',
+    max: 'console.log(process.env) || 999', // Injected code!
+  },
 };
 
 const check = v.compile(maliciousSchema);
@@ -405,7 +405,7 @@ const LIVR = require('livr');
 
 // Even with malicious input, no code execution
 const schema = {
-    id: ['required', { maxNumber: 'console.log(process.env)' }],
+  id: ['required', { maxNumber: 'console.log(process.env)' }],
 };
 
 const validator = new LIVR.Validator(schema);
@@ -455,12 +455,12 @@ With LIVR, you maintain a single translation table mapping codes to messages. Ot
 
 ```javascript
 const input = {
-    user: {
-        email: 'not-an-email',
-        profile: {
-            age: 'not-a-number',
-        },
+  user: {
+    email: 'not-an-email',
+    profile: {
+      age: 'not-a-number',
     },
+  },
 };
 ```
 
@@ -481,16 +481,16 @@ const input = {
 
 ```javascript
 [
-    {
-        path: ['user', 'email'],
-        message: 'Invalid email format',
-        code: 'invalid_string',
-    },
-    {
-        path: ['user', 'profile', 'age'],
-        message: 'Expected number, received string',
-        code: 'invalid_type',
-    },
+  {
+    path: ['user', 'email'],
+    message: 'Invalid email format',
+    code: 'invalid_string',
+  },
+  {
+    path: ['user', 'profile', 'age'],
+    message: 'Expected number, received string',
+    code: 'invalid_type',
+  },
 ];
 ```
 
@@ -592,28 +592,28 @@ const validator = new LIVR.Validator(schema);
 
 // E-commerce domain rules
 validator.registerAliasedRule({
-    name: 'productSku',
-    rules: ['required', { like: '^[A-Z]{3}-\\d{6}$' }],
-    error: 'INVALID_PRODUCT_SKU', // Custom error code!
+  name: 'productSku',
+  rules: ['required', { like: '^[A-Z]{3}-\\d{6}$' }],
+  error: 'INVALID_PRODUCT_SKU', // Custom error code!
 });
 
 validator.registerAliasedRule({
-    name: 'priceUsd',
-    rules: ['required', 'positiveDecimal', { maxNumber: 999999.99 }],
-    error: 'INVALID_PRICE',
+  name: 'priceUsd',
+  rules: ['required', 'positiveDecimal', { maxNumber: 999999.99 }],
+  error: 'INVALID_PRICE',
 });
 
 validator.registerAliasedRule({
-    name: 'quantity',
-    rules: ['required', 'positiveInteger', { maxNumber: 10000 }],
-    error: 'INVALID_QUANTITY',
+  name: 'quantity',
+  rules: ['required', 'positiveInteger', { maxNumber: 10000 }],
+  error: 'INVALID_QUANTITY',
 });
 
 // Clean, domain-focused schema
 const orderSchema = {
-    sku: 'productSku',
-    price: 'priceUsd',
-    qty: 'quantity',
+  sku: 'productSku',
+  price: 'priceUsd',
+  qty: 'quantity',
 };
 ```
 
@@ -621,27 +621,27 @@ const orderSchema = {
 
 ```javascript
 validator.registerAliasedRule({
-    name: 'patientMrn',
-    rules: ['required', { lengthEqual: 10 }, { like: '^MRN\\d{7}$' }],
-    error: 'INVALID_MEDICAL_RECORD_NUMBER',
+  name: 'patientMrn',
+  rules: ['required', { lengthEqual: 10 }, { like: '^MRN\\d{7}$' }],
+  error: 'INVALID_MEDICAL_RECORD_NUMBER',
 });
 
 validator.registerAliasedRule({
-    name: 'diagnosisCode',
-    rules: ['required', { like: '^[A-Z]\\d{2}\\.?\\d{0,4}$' }],
-    error: 'INVALID_ICD10_CODE',
+  name: 'diagnosisCode',
+  rules: ['required', { like: '^[A-Z]\\d{2}\\.?\\d{0,4}$' }],
+  error: 'INVALID_ICD10_CODE',
 });
 
 validator.registerAliasedRule({
-    name: 'npiNumber',
-    rules: ['required', { lengthEqual: 10 }, 'integer'],
-    error: 'INVALID_NPI',
+  name: 'npiNumber',
+  rules: ['required', { lengthEqual: 10 }, 'integer'],
+  error: 'INVALID_NPI',
 });
 
 const patientSchema = {
-    mrn: 'patientMrn',
-    diagnosis: 'diagnosisCode',
-    provider: 'npiNumber',
+  mrn: 'patientMrn',
+  diagnosis: 'diagnosisCode',
+  provider: 'npiNumber',
 };
 ```
 
@@ -652,28 +652,28 @@ Aliases can reference other aliases, enabling hierarchical rule composition:
 ```javascript
 // Base rules
 validator.registerAliasedRule({
-    name: 'nonEmptyString',
-    rules: ['required', 'string', 'trim', { minLength: 1 }],
+  name: 'nonEmptyString',
+  rules: ['required', 'string', 'trim', { minLength: 1 }],
 });
 
 // Domain rules built on base rules
 validator.registerAliasedRule({
-    name: 'personName',
-    rules: ['nonEmptyString', { maxLength: 100 }],
-    error: 'INVALID_NAME',
+  name: 'personName',
+  rules: ['nonEmptyString', { maxLength: 100 }],
+  error: 'INVALID_NAME',
 });
 
 validator.registerAliasedRule({
-    name: 'companyName',
-    rules: ['nonEmptyString', { maxLength: 200 }],
-    error: 'INVALID_COMPANY_NAME',
+  name: 'companyName',
+  rules: ['nonEmptyString', { maxLength: 200 }],
+  error: 'INVALID_COMPANY_NAME',
 });
 
 // Higher-level aliases building on previous ones
 validator.registerAliasedRule({
-    name: 'contactEmail',
-    rules: ['required', 'email', 'toLc'],
-    error: 'INVALID_CONTACT_EMAIL',
+  name: 'contactEmail',
+  rules: ['required', 'email', 'toLc'],
+  error: 'INVALID_CONTACT_EMAIL',
 });
 ```
 
@@ -689,18 +689,18 @@ Since aliases are defined with plain objects, load them from configuration:
 
 ```json
 {
-    "aliases": [
-        {
-            "name": "productSku",
-            "rules": ["required", { "like": "^[A-Z]{3}-\\d{6}$" }],
-            "error": "INVALID_SKU"
-        },
-        {
-            "name": "priceUsd",
-            "rules": ["required", "positiveDecimal", { "maxNumber": 999999.99 }],
-            "error": "INVALID_PRICE"
-        }
-    ]
+  "aliases": [
+    {
+      "name": "productSku",
+      "rules": ["required", { "like": "^[A-Z]{3}-\\d{6}$" }],
+      "error": "INVALID_SKU"
+    },
+    {
+      "name": "priceUsd",
+      "rules": ["required", "positiveDecimal", { "maxNumber": 999999.99 }],
+      "error": "INVALID_PRICE"
+    }
+  ]
 }
 ```
 
@@ -768,7 +768,7 @@ LIVR is the fastest in both dynamic and static validation here, without generati
 
 #### How These Numbers Were Measured
 
-Measured with the separate `validators-benchmarks` repository (`npm run bench -- --runs 2`, with `LIVR_DIR` pointing to this repository). Node.js 26, AMD Ryzen 9 5950X; Zod 4.6, Valibot 1.5, Joi 18.3, fastest-validator 1.19, Ajv 8.20. Average of two runs, the runs differ by up to 6%.
+Measured with the separate [validators-benchmarks](https://github.com/koorchik/validators-benchmarks) repository (`npm run bench -- --runs 2`, with `LIVR_DIR` pointing to this repository). Node.js 26, AMD Ryzen 9 5950X; Zod 4.6, Valibot 1.5, Joi 18.3, fastest-validator 1.19, Ajv 8.20. Average of two runs, the runs differ by up to 6%.
 
 -   **Simple**: a 5-field form (required strings, email, positive integer, enum, min length)
 -   **Nested**: an object with two levels of nested objects and a list of strings
@@ -808,18 +808,18 @@ HTML forms submit everything as strings. LIVR handles this seamlessly:
 
 ```javascript
 const validator = new LIVR.Validator({
-    age: ['required', 'positiveInteger'],
-    price: ['required', 'decimal'],
-    name: ['required', 'trim'],
-    email: ['required', 'email', 'toLc'],
+  age: ['required', 'positiveInteger'],
+  price: ['required', 'decimal'],
+  name: ['required', 'trim'],
+  email: ['required', 'email', 'toLc'],
 });
 
 // Input from web form (all strings)
 const input = {
-    age: '25',
-    price: '19.99',
-    name: '  John Doe  ',
-    email: 'JOHN@EXAMPLE.COM',
+  age: '25',
+  price: '19.99',
+  name: '  John Doe  ',
+  email: 'JOHN@EXAMPLE.COM',
 };
 
 const result = validator.validate(input);
@@ -901,10 +901,10 @@ Every rule in LIVR—built-in or custom—follows the same pattern:
 
 ```javascript
 ruleName: (ruleArg) => (value, allValues, outputArr) => {
-    // Return error code if invalid
-    if (invalid) return 'ERROR_CODE';
-    // Optionally transform value
-    if (transform) outputArr.push(transformedValue);
+  // Return error code if invalid
+  if (invalid) return 'ERROR_CODE';
+  // Optionally transform value
+  if (transform) outputArr.push(transformedValue);
 };
 ```
 
@@ -914,13 +914,13 @@ ruleName: (ruleArg) => (value, allValues, outputArr) => {
 
 ```javascript
 LIVR.Validator.registerDefaultRules({
-    strongPassword: () => (value) => {
-        if (!value) return; // Let 'required' handle empty
-        if (value.length < 8) return 'TOO_SHORT';
-        if (!/[A-Z]/.test(value)) return 'MISSING_UPPERCASE';
-        if (!/[0-9]/.test(value)) return 'MISSING_NUMBER';
-        if (!/[!@#$%^&*]/.test(value)) return 'MISSING_SPECIAL';
-    },
+  strongPassword: () => (value) => {
+    if (!value) return; // Let 'required' handle empty
+    if (value.length < 8) return 'TOO_SHORT';
+    if (!/[A-Z]/.test(value)) return 'MISSING_UPPERCASE';
+    if (!/[0-9]/.test(value)) return 'MISSING_NUMBER';
+    if (!/[!@#$%^&*]/.test(value)) return 'MISSING_SPECIAL';
+  },
 });
 
 // Use like any built-in rule
@@ -931,10 +931,10 @@ const schema = { password: ['required', 'strongPassword'] };
 
 ```javascript
 LIVR.Validator.registerDefaultRules({
-    minAge: (minAge) => (value) => {
-        if (value === undefined || value === null) return;
-        if (value < minAge) return 'TOO_YOUNG';
-    },
+  minAge: (minAge) => (value) => {
+    if (value === undefined || value === null) return;
+    if (value < minAge) return 'TOO_YOUNG';
+  },
 });
 
 // Use with parameter
@@ -945,12 +945,12 @@ const schema = { age: ['required', 'positiveInteger', { minAge: 18 }] };
 
 ```javascript
 LIVR.Validator.registerDefaultRules({
-    toDate: () => (value, _, outputArr) => {
-        if (!value) return;
-        const date = new Date(value);
-        if (isNaN(date.getTime())) return 'INVALID_DATE';
-        outputArr.push(date); // Transform string to Date object
-    },
+  toDate: () => (value, _, outputArr) => {
+    if (!value) return;
+    const date = new Date(value);
+    if (isNaN(date.getTime())) return 'INVALID_DATE';
+    outputArr.push(date); // Transform string to Date object
+  },
 });
 
 const schema = { birthDate: ['required', 'toDate'] };
@@ -975,16 +975,16 @@ import LIVR from 'livr/async'; // Use async version
 
 // Register an async rule
 LIVR.Validator.registerDefaultRules({
-    uniqueEmail: () => async (email) => {
-        if (!email) return;
-        const exists = await db.users.findByEmail(email);
-        if (exists) return 'EMAIL_ALREADY_TAKEN';
-    },
+  uniqueEmail: () => async (email) => {
+    if (!email) return;
+    const exists = await db.users.findByEmail(email);
+    if (exists) return 'EMAIL_ALREADY_TAKEN';
+  },
 });
 
 // Use like any other rule
 const validator = new LIVR.AsyncValidator({
-    email: ['required', 'email', 'uniqueEmail'],
+  email: ['required', 'email', 'uniqueEmail'],
 });
 
 // Validate returns a Promise
@@ -1001,10 +1001,10 @@ Register rules per-validator instance to prevent cross-tenant rule pollution:
 // Tenant A's validator with custom rules
 const tenantAValidator = new LIVR.Validator(schemaA);
 tenantAValidator.registerRules({
-    tenantAFormat: () => (value) => {
-        if (!value) return;
-        if (!value.startsWith('ACME-')) return 'INVALID_FORMAT';
-    },
+  tenantAFormat: () => (value) => {
+    if (!value) return;
+    if (!value.startsWith('ACME-')) return 'INVALID_FORMAT';
+  },
 });
 
 // Tenant B's validator - cannot use tenantAFormat
@@ -1038,9 +1038,9 @@ This enables secure multi-tenant validation where each tenant can have custom ru
 
 ```javascript
 const input = {
-    name: '  John  ',
-    email: 'JOHN@EXAMPLE.COM',
-    extraField: 'will be stripped',
+  name: '  John  ',
+  email: 'JOHN@EXAMPLE.COM',
+  extraField: 'will be stripped',
 };
 
 const result = validator.validate(input);
@@ -1057,8 +1057,8 @@ console.log(input.name); // '  John  ' - still has whitespace!
 
 ```javascript
 const input = {
-    name: 'John',
-    extraField: 'will be removed',
+  name: 'John',
+  extraField: 'will be removed',
 };
 
 const result = check(input); // With $$strict: 'remove'
@@ -1096,16 +1096,16 @@ console.log(input.extraField); // undefined - gone!
 
 ```javascript
 const validator = new LIVR.Validator({
-    username: 'required',
-    email: 'email',
+  username: 'required',
+  email: 'email',
 });
 
 const input = {
-    username: 'john',
-    email: 'john@example.com',
-    isAdmin: true, // Attacker-injected
-    role: 'superuser', // Attacker-injected
-    __proto__: { hack: 1 }, // Prototype pollution attempt
+  username: 'john',
+  email: 'john@example.com',
+  isAdmin: true, // Attacker-injected
+  role: 'superuser', // Attacker-injected
+  __proto__: { hack: 1 }, // Prototype pollution attempt
 };
 
 const result = validator.validate(input);
@@ -1251,15 +1251,15 @@ import LIVR from 'livr';
 import type { InferFromSchema } from 'livr/types';
 
 const userSchema = {
-    id: ['required', 'positiveInteger'],
-    username: ['required', { minLength: 3 }, { maxLength: 50 }],
-    role: { oneOf: ['admin', 'user', 'guest'] as const },
-    settings: {
-        nestedObject: {
-            theme: { oneOf: ['light', 'dark'] as const },
-            notifications: 'boolean',
-        },
+  id: ['required', 'positiveInteger'],
+  username: ['required', { minLength: 3 }, { maxLength: 50 }],
+  role: { oneOf: ['admin', 'user', 'guest'] as const },
+  settings: {
+    nestedObject: {
+      theme: { oneOf: ['light', 'dark'] as const },
+      notifications: 'boolean',
     },
+  },
 } as const; // 'as const' required for literal type inference
 
 type User = InferFromSchema<typeof userSchema>;
@@ -1279,8 +1279,8 @@ const input = getUserInput(); // data from API, form, etc.
 const result = validator.validate(input);
 
 if (result) {
-    // result is typed as User
-    console.log(result.role); // TypeScript knows: 'admin' | 'user' | 'guest' | undefined
+  // result is typed as User
+  console.log(result.role); // TypeScript knows: 'admin' | 'user' | 'guest' | undefined
 }
 ```
 
@@ -1295,30 +1295,30 @@ import type { RuleTypeDef } from 'livr/types/inference';
 
 // Declare custom rule types via module augmentation
 declare module 'livr/types/inference' {
-    interface RuleTypeRegistry {
-        toDate: RuleTypeDef<Date, false, false>;
-        uuid: RuleTypeDef<string, false, false>;
-    }
+  interface RuleTypeRegistry {
+    toDate: RuleTypeDef<Date, false, false>;
+    uuid: RuleTypeDef<string, false, false>;
+  }
 }
 
 // Register the rules
 LIVR.Validator.registerDefaultRules({
-    toDate: () => (value, _, outputArr) => {
-        if (!value) return;
-        const date = new Date(value);
-        if (isNaN(date.getTime())) return 'INVALID_DATE';
-        outputArr.push(date);
-    },
-    uuid: () => (value) => {
-        if (!value) return;
-        const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
-        if (!uuidRegex.test(value)) return 'INVALID_UUID';
-    },
+  toDate: () => (value, _, outputArr) => {
+    if (!value) return;
+    const date = new Date(value);
+    if (isNaN(date.getTime())) return 'INVALID_DATE';
+    outputArr.push(date);
+  },
+  uuid: () => (value) => {
+    if (!value) return;
+    const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+    if (!uuidRegex.test(value)) return 'INVALID_UUID';
+  },
 });
 
 const schema = {
-    id: ['required', 'uuid'],
-    createdAt: ['required', 'toDate'],
+  id: ['required', 'uuid'],
+  createdAt: ['required', 'toDate'],
 } as const;
 
 type Entity = InferFromSchema<typeof schema>;

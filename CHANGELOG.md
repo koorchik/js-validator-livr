@@ -1,5 +1,9 @@
 ## CHANGELOG
 
+Unreleased
+-   The npm package contains only `lib`, `async.js`, `types`, README, LICENSE and CHANGELOG (89 files instead of 341): tests, editor and CI configs are no longer published
+-   Code examples in README and docs use 2-space indentation, like the code
+
 v2.11.0
 -   Fix: `livr/async`, `livr/lib/*` (tree-shaking) and `livr/types` were not importable since 2.9.2 (`ERR_PACKAGE_PATH_NOT_EXPORTED`), as the `exports` field listed only `.` and `./types/inference`
 -   Fix: `validate()` threw a `TypeError` when the input had its own `hasOwnProperty` key

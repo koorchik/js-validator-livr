@@ -61,22 +61,22 @@
 import LIVR from 'livr';
 
 const validator = new LIVR.Validator({
-    name:      'required',
-    email:     ['required', 'email'],
-    age:       'positive_integer',
-    password:  ['required', { min_length: 8 }],
-    password2: { equal_to_field: 'password' }
+  name:      'required',
+  email:     ['required', 'email'],
+  age:       'positive_integer',
+  password:  ['required', { min_length: 8 }],
+  password2: { equal_to_field: 'password' }
 });
 
 const validData = validator.validate(userData);
 
 if (validData) {
-    // Use validated & sanitized data
-    saveUser(validData);
+  // Use validated & sanitized data
+  saveUser(validData);
 } else {
-    // Handle validation errors
-    console.log(validator.getErrors());
-    // { email: 'WRONG_EMAIL', password: 'TOO_SHORT' }
+  // Handle validation errors
+  console.log(validator.getErrors());
+  // { email: 'WRONG_EMAIL', password: 'TOO_SHORT' }
 }
 ```
 
@@ -116,9 +116,9 @@ LIVR has no dependencies and works in browsers through any bundler (Vite, esbuil
 
 ```html
 <script type="module">
-    import LIVR from 'https://esm.sh/livr';
+  import LIVR from 'https://esm.sh/livr';
 
-    const validator = new LIVR.Validator({ name: 'required' });
+  const validator = new LIVR.Validator({ name: 'required' });
 </script>
 ```
 
@@ -135,20 +135,20 @@ import LIVR from 'livr';
 LIVR.Validator.defaultAutoTrim(true);
 
 const validator = new LIVR.Validator({
-    name:     'required',
-    email:    ['required', 'email'],
-    gender:   { one_of: ['male', 'female'] },
-    phone:    { max_length: 10 },
-    password: ['required', { min_length: 10 }],
-    password2: { equal_to_field: 'password' }
+  name:     'required',
+  email:    ['required', 'email'],
+  gender:   { one_of: ['male', 'female'] },
+  phone:    { max_length: 10 },
+  password: ['required', { min_length: 10 }],
+  password2: { equal_to_field: 'password' }
 });
 
 const validData = validator.validate(userData);
 
 if (validData) {
-    saveUser(validData);
+  saveUser(validData);
 } else {
-    console.log(validator.getErrors());
+  console.log(validator.getErrors());
 }
 ```
 
@@ -163,10 +163,10 @@ import LIVR from 'livr';
 import type { InferFromSchema } from 'livr/types';
 
 const userSchema = {
-    name: ['required', 'string'],
-    email: ['required', 'email'],
-    age: 'positive_integer',
-    role: { one_of: ['admin', 'user'] as const },
+  name: ['required', 'string'],
+  email: ['required', 'email'],
+  age: 'positive_integer',
+  role: { one_of: ['admin', 'user'] as const },
 } as const;
 
 // Automatically infer type from schema
@@ -180,9 +180,9 @@ const input = getUserInput();
 const validData = validator.validate(input);
 
 if (validData) {
-    // validData is typed as User
-    console.log(validData.name);  // string
-    console.log(validData.age);   // number | undefined
+  // validData is typed as User
+  console.log(validData.name);  // string
+  console.log(validData.age);   // number | undefined
 }
 ```
 
@@ -198,15 +198,15 @@ For rules that require async operations (database lookups, API calls):
 import LIVR from 'livr/async';
 
 const validator = new LIVR.AsyncValidator({
-    username: ['required', 'unique_username'], // custom async rule
-    email:    ['required', 'email'],
+  username: ['required', 'unique_username'], // custom async rule
+  email:    ['required', 'email'],
 });
 
 try {
-    const validData = await validator.validate(userData);
-    saveUser(validData);
+  const validData = await validator.validate(userData);
+  saveUser(validData);
 } catch (errors) {
-    console.log(errors);
+  console.log(errors);
 }
 ```
 
@@ -223,8 +223,8 @@ Modifiers transform data during validation:
 
 ```javascript
 const validator = new LIVR.Validator({
-    email: ['required', 'trim', 'email', 'to_lc'],  // trim, validate, lowercase
-    age:   ['positive_integer', { default: 18 }],   // default value if empty
+  email: ['required', 'trim', 'email', 'to_lc'],  // trim, validate, lowercase
+  age:   ['positive_integer', { default: 18 }],   // default value if empty
 });
 ```
 
@@ -238,20 +238,20 @@ Create reusable rules by combining existing ones:
 
 ```javascript
 const validator = new LIVR.Validator({
-    password: ['required', 'strong_password'],
-    age:      ['required', 'adult_age'],
+  password: ['required', 'strong_password'],
+  age:      ['required', 'adult_age'],
 });
 
 validator.registerAliasedRule({
-    name: 'strong_password',
-    rules: { min_length: 8 },
-    error: 'WEAK_PASSWORD'
+  name: 'strong_password',
+  rules: { min_length: 8 },
+  error: 'WEAK_PASSWORD'
 });
 
 validator.registerAliasedRule({
-    name: 'adult_age',
-    rules: ['positive_integer', { min_number: 18 }],
-    error: 'MUST_BE_ADULT'
+  name: 'adult_age',
+  rules: ['positive_integer', { min_number: 18 }],
+  error: 'MUST_BE_ADULT'
 });
 ```
 
@@ -261,21 +261,21 @@ For complex validation logic:
 
 ```javascript
 const validator = new LIVR.Validator({
-    password: ['required', 'strong_password'],
+  password: ['required', 'strong_password'],
 });
 
 validator.registerRules({
-    strong_password() {
-        return (value) => {
-            // Empty values are handled by 'required' rule
-            if (value === undefined || value === null || value === '') return;
+  strong_password() {
+    return (value) => {
+      // Empty values are handled by 'required' rule
+      if (value === undefined || value === null || value === '') return;
 
-            if (!/[A-Z]/.test(value)) return 'MISSING_UPPERCASE';
-            if (!/[a-z]/.test(value)) return 'MISSING_LOWERCASE';
-            if (!/[0-9]/.test(value)) return 'MISSING_DIGIT';
-            if (value.length < 8) return 'TOO_SHORT';
-        };
-    }
+      if (!/[A-Z]/.test(value)) return 'MISSING_UPPERCASE';
+      if (!/[a-z]/.test(value)) return 'MISSING_LOWERCASE';
+      if (!/[0-9]/.test(value)) return 'MISSING_DIGIT';
+      if (value.length < 8) return 'TOO_SHORT';
+    };
+  }
 });
 ```
 
@@ -285,18 +285,18 @@ validator.registerRules({
 import LIVR from 'livr/async';
 
 const validator = new LIVR.AsyncValidator({
-    username: ['required', 'unique_username'],
+  username: ['required', 'unique_username'],
 });
 
 validator.registerRules({
-    unique_username() {
-        return async (value) => {
-            if (value === undefined || value === null || value === '') return;
+  unique_username() {
+    return async (value) => {
+      if (value === undefined || value === null || value === '') return;
 
-            const exists = await db.users.exists({ username: value });
-            if (exists) return 'USERNAME_TAKEN';
-        };
-    }
+      const exists = await db.users.exists({ username: value });
+      if (exists) return 'USERNAME_TAKEN';
+    };
+  }
 });
 ```
 
@@ -305,17 +305,17 @@ validator.registerRules({
 ```javascript
 // Register for all future validator instances
 LIVR.Validator.registerDefaultRules({
-    my_rule(arg1, arg2) {
-        return (value, allValues, outputArr) => {
-            // Return error code on failure, undefined on success
-            if (invalid) return 'ERROR_CODE';
-        };
-    }
+  my_rule(arg1, arg2) {
+    return (value, allValues, outputArr) => {
+      // Return error code on failure, undefined on success
+      if (invalid) return 'ERROR_CODE';
+    };
+  }
 });
 
 LIVR.Validator.registerAliasedDefaultRule({
-    name: 'valid_address',
-    rules: { nested_object: { country: 'required', city: 'required' }}
+  name: 'valid_address',
+  rules: { nested_object: { country: 'required', city: 'required' }}
 });
 ```
 
@@ -327,11 +327,11 @@ Import only the rules you need:
 import Validator from 'livr/lib/Validator';
 
 Validator.registerDefaultRules({
-    required:       require('livr/lib/rules/common/required'),
-    email:          require('livr/lib/rules/special/email'),
-    min_length:     require('livr/lib/rules/string/min_length'),
-    max_length:     require('livr/lib/rules/string/max_length'),
-    equal_to_field: require('livr/lib/rules/special/equal_to_field'),
+  required:       require('livr/lib/rules/common/required'),
+  email:          require('livr/lib/rules/special/email'),
+  min_length:     require('livr/lib/rules/string/min_length'),
+  max_length:     require('livr/lib/rules/string/max_length'),
+  equal_to_field: require('livr/lib/rules/special/equal_to_field'),
 });
 
 const validator = new Validator({ /* schema */ });
@@ -369,9 +369,9 @@ Register custom rules globally.
 
 ```javascript
 LIVR.Validator.registerDefaultRules({
-    my_rule(arg) {
-        return (value) => { /* ... */ };
-    }
+  my_rule(arg) {
+    return (value) => { /* ... */ };
+  }
 });
 ```
 
@@ -381,9 +381,9 @@ Register a rule alias globally.
 
 ```javascript
 LIVR.Validator.registerAliasedDefaultRule({
-    name: 'adult_age',
-    rules: ['positive_integer', { min_number: 18 }],
-    error: 'MUST_BE_ADULT'  // optional custom error
+  name: 'adult_age',
+  rules: ['positive_integer', { min_number: 18 }],
+  error: 'MUST_BE_ADULT'  // optional custom error
 });
 ```
 
@@ -401,18 +401,18 @@ Validates input data against the schema.
 ```javascript
 const result = validator.validate(data);
 if (result) {
-    // result contains validated data
+  // result contains validated data
 } else {
-    const errors = validator.getErrors();
+  const errors = validator.getErrors();
 }
 ```
 
 **Async Validator:**
 ```javascript
 try {
-    const result = await validator.validate(data);
+  const result = await validator.validate(data);
 } catch (errors) {
-    // errors object
+  // errors object
 }
 ```
 
@@ -423,9 +423,9 @@ Returns the errors object from the last validation (sync only).
 ```javascript
 // Example output:
 {
-    email: 'WRONG_EMAIL',
-    password: 'TOO_SHORT',
-    address: { zip: 'NOT_POSITIVE_INTEGER' }
+  email: 'WRONG_EMAIL',
+  password: 'TOO_SHORT',
+  address: { zip: 'NOT_POSITIVE_INTEGER' }
 }
 ```
 
@@ -445,25 +445,25 @@ Use it in custom meta rules that validate many values with the same rules: it sk
 
 ```javascript
 function list_of_tags(itemRules, ruleBuilders) {
-    const validateItem = new LIVR.Validator({ item: itemRules })
-        .registerRules(ruleBuilders)
-        .getFieldRule('item');
+  const validateItem = new LIVR.Validator({ item: itemRules })
+    .registerRules(ruleBuilders)
+    .getFieldRule('item');
 
-    return (values, params, outputArr) => {
-        if (!Array.isArray(values)) return 'FORMAT_ERROR';
+  return (values, params, outputArr) => {
+    if (!Array.isArray(values)) return 'FORMAT_ERROR';
 
-        const output = [];
-        for (const value of values) {
-            const itemOutput = [];
-            const errorCode = validateItem(value, params, itemOutput);
-            if (errorCode) return errorCode;
+    const output = [];
+    for (const value of values) {
+      const itemOutput = [];
+      const errorCode = validateItem(value, params, itemOutput);
+      if (errorCode) return errorCode;
 
-            // The value as is, unless the rules changed it
-            output.push(itemOutput.length ? itemOutput[0] : value);
-        }
+      // The value as is, unless the rules changed it
+      output.push(itemOutput.length ? itemOutput[0] : value);
+    }
 
-        outputArr.push(output);
-    };
+    outputArr.push(output);
+  };
 }
 ```
 
@@ -473,7 +473,7 @@ Register rules for this instance only.
 
 ```javascript
 validator.registerRules({
-    custom_rule() { return (value) => { /* ... */ }; }
+  custom_rule() { return (value) => { /* ... */ }; }
 });
 ```
 
@@ -483,9 +483,9 @@ Register a rule alias for this instance only.
 
 ```javascript
 validator.registerAliasedRule({
-    name: 'strong_password',
-    rules: { min_length: 8 },
-    error: 'WEAK_PASSWORD'
+  name: 'strong_password',
+  rules: { min_length: 8 },
+  error: 'WEAK_PASSWORD'
 });
 ```
 
@@ -504,9 +504,9 @@ import LIVR from 'livr';
 import type { InferFromSchema } from 'livr/types';
 
 const schema = {
-    name: ['required', 'string'],
-    age: 'positive_integer',
-    role: { one_of: ['admin', 'user'] as const },
+  name: ['required', 'string'],
+  age: 'positive_integer',
+  role: { one_of: ['admin', 'user'] as const },
 } as const;
 
 type User = InferFromSchema<typeof schema>;
@@ -536,7 +536,7 @@ LIVR is one of the fastest JavaScript validators: it leads both when a validator
 | Ajv               | 2.51M                    | 1.27M                      | 1.4K                          | 0.8K                            |
 | Joi               | 313K                     | 176K                       | 41K                           | 23K                             |
 
-Operations per second, more is better. Node.js 26, AMD Ryzen 9 5950X. All validators get equivalent schemas and strip unknown fields; absolute numbers depend on the hardware, so compare the ratios. fastest-validator and Ajv compile schemas to JavaScript code. LIVR gets its speed without code generation, so schemas stay plain data and are safe to load from untrusted sources. Details and methodology: [Design Decisions](docs/DESIGN.md#performance-summary).
+Operations per second, more is better. Node.js 26, AMD Ryzen 9 5950X. All validators get equivalent schemas and strip unknown fields; absolute numbers depend on the hardware, so compare the ratios. fastest-validator and Ajv compile schemas to JavaScript code. LIVR gets its speed without code generation, so schemas stay plain data and are safe to load from untrusted sources. Details and methodology: [Design Decisions](docs/DESIGN.md#performance-summary), benchmark code: [validators-benchmarks](https://github.com/koorchik/validators-benchmarks).
 
 Tips:
 
@@ -549,13 +549,13 @@ Tips:
 const validator = new LIVR.Validator(schema);
 
 for (const item of items) {
-    const result = validator.validate(item);
+  const result = validator.validate(item);
 }
 
 // Avoid: Creating validator for each validation
 for (const item of items) {
-    const validator = new LIVR.Validator(schema);  // Slower
-    const result = validator.validate(item);
+  const validator = new LIVR.Validator(schema);  // Slower
+  const result = validator.validate(item);
 }
 ```
 

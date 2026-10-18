@@ -30,9 +30,9 @@ import LIVR from 'livr';
 import type { InferFromSchema } from 'livr/types';
 
 const userSchema = {
-    name: ['required', 'string'],
-    email: ['required', 'email'],
-    age: 'positive_integer',
+  name: ['required', 'string'],
+  email: ['required', 'email'],
+  age: 'positive_integer',
 } as const;
 
 // Infer the type from the schema
@@ -47,9 +47,9 @@ const input = getUserInput();
 const result = validator.validate(input);
 
 if (result) {
-    // result is typed as User
-    console.log(result.name); // string
-    console.log(result.age);  // number | undefined
+  // result is typed as User
+  console.log(result.name); // string
+  console.log(result.age);  // number | undefined
 }
 ```
 
@@ -65,8 +65,8 @@ By default, all fields are **optional**. Use the `required` rule to make a field
 
 ```typescript
 const schema = {
-    requiredField: ['required', 'string'],  // string (required)
-    optionalField: 'string',                 // string | undefined (optional)
+  requiredField: ['required', 'string'],  // string (required)
+  optionalField: 'string',                 // string | undefined (optional)
 } as const;
 
 type Data = InferFromSchema<typeof schema>;
@@ -77,8 +77,8 @@ The `default` rule also makes fields non-optional since they always have a value
 
 ```typescript
 const schema = {
-    count: [{ default: 0 }, 'integer'],     // number (has default)
-    enabled: { default: true },              // boolean (has default, widened)
+  count: [{ default: 0 }, 'integer'],     // number (has default)
+  enabled: { default: true },              // boolean (has default, widened)
 } as const;
 
 type Config = InferFromSchema<typeof schema>;
@@ -103,12 +103,12 @@ To get literal union types, use `as const` on the values array:
 
 ```typescript
 const schema = {
-    // Without as const: string
-    // With as const: 'admin' | 'user' | 'guest'
-    role: { one_of: ['admin', 'user', 'guest'] as const },
+  // Without as const: string
+  // With as const: 'admin' | 'user' | 'guest'
+  role: { one_of: ['admin', 'user', 'guest'] as const },
 
-    // Literal type: 'active'
-    status: { eq: 'active' as const },
+  // Literal type: 'active'
+  status: { eq: 'active' as const },
 } as const;
 
 type Data = InferFromSchema<typeof schema>;
@@ -121,13 +121,13 @@ The `default` rule automatically widens literal types to their primitive base:
 
 ```typescript
 const schema = {
-    // Widens to primitive types
-    count: { default: 0 },           // number (not 0)
-    name: { default: 'anonymous' },  // string (not 'anonymous')
-    active: { default: true },       // boolean (not true)
+  // Widens to primitive types
+  count: { default: 0 },           // number (not 0)
+  name: { default: 'anonymous' },  // string (not 'anonymous')
+  active: { default: true },       // boolean (not true)
 
-    // Use type assertions with unions to preserve specific types
-    status: { default: 'ACTIVE' as 'ACTIVE' | 'PENDING' },  // 'ACTIVE' | 'PENDING'
+  // Use type assertions with unions to preserve specific types
+  status: { default: 'ACTIVE' as 'ACTIVE' | 'PENDING' },  // 'ACTIVE' | 'PENDING'
 } as const;
 
 type Config = InferFromSchema<typeof schema>;
@@ -149,18 +149,18 @@ This is useful because default values typically represent any value of that type
 
 ```typescript
 const schema = {
-    user: {
+  user: {
+    nested_object: {
+      name: ['required', 'string'],
+      email: 'email',
+      address: {
         nested_object: {
-            name: ['required', 'string'],
-            email: 'email',
-            address: {
-                nested_object: {
-                    city: ['required', 'string'],
-                    zip: 'positive_integer',
-                },
-            },
+          city: ['required', 'string'],
+          zip: 'positive_integer',
         },
+      },
     },
+  },
 } as const;
 
 type Data = InferFromSchema<typeof schema>;
@@ -180,20 +180,20 @@ type Data = InferFromSchema<typeof schema>;
 
 ```typescript
 const schema = {
-    // List of numbers
-    ids: { list_of: 'positive_integer' },
+  // List of numbers
+  ids: { list_of: 'positive_integer' },
 
-    // List of strings with validation
-    tags: { list_of: ['required', 'string', { max_length: 50 }] },
+  // List of strings with validation
+  tags: { list_of: ['required', 'string', { max_length: 50 }] },
 
-    // List of objects
-    items: {
-        list_of_objects: {
-            id: ['required', 'positive_integer'],
-            name: ['required', 'string'],
-            quantity: 'positive_integer',
-        },
+  // List of objects
+  items: {
+    list_of_objects: {
+      id: ['required', 'positive_integer'],
+      name: ['required', 'string'],
+      quantity: 'positive_integer',
     },
+  },
 } as const;
 
 type Data = InferFromSchema<typeof schema>;
@@ -214,22 +214,22 @@ For polymorphic data with a type discriminator:
 
 ```typescript
 const schema = {
-    events: {
-        list_of_different_objects: [
-            'type',  // Discriminator field
-            {
-                click: {
-                    type: { eq: 'click' as const },
-                    x: ['required', 'integer'],
-                    y: ['required', 'integer'],
-                },
-                scroll: {
-                    type: { eq: 'scroll' as const },
-                    direction: { one_of: ['up', 'down'] as const },
-                },
-            },
-        ],
-    },
+  events: {
+    list_of_different_objects: [
+      'type',  // Discriminator field
+      {
+        click: {
+          type: { eq: 'click' as const },
+          x: ['required', 'integer'],
+          y: ['required', 'integer'],
+        },
+        scroll: {
+          type: { eq: 'scroll' as const },
+          direction: { one_of: ['up', 'down'] as const },
+        },
+      },
+    ],
+  },
 } as const;
 
 type Data = InferFromSchema<typeof schema>;
@@ -245,8 +245,8 @@ type Data = InferFromSchema<typeof schema>;
 
 ```typescript
 const schema = {
-    // Can be either a string or a number
-    value: { or: ['string', 'integer'] },
+  // Can be either a string or a number
+  value: { or: ['string', 'integer'] },
 } as const;
 
 type Data = InferFromSchema<typeof schema>;
@@ -264,15 +264,15 @@ When you create custom validation rules, you can also define their type inferenc
 ```typescript
 // my-rules/phone_number.js
 module.exports = function phoneNumber(countryCode) {
-    return (value) => {
-        if (value === undefined || value === null || value === '') return;
+  return (value) => {
+    if (value === undefined || value === null || value === '') return;
 
-        // Your validation logic here
-        const phoneRegex = /^\+?[\d\s-]{10,}$/;
-        if (!phoneRegex.test(value)) {
-            return 'INVALID_PHONE_NUMBER';
-        }
-    };
+    // Your validation logic here
+    const phoneRegex = /^\+?[\d\s-]{10,}$/;
+    if (!phoneRegex.test(value)) {
+      return 'INVALID_PHONE_NUMBER';
+    }
+  };
 };
 ```
 
@@ -285,13 +285,13 @@ Create a `.d.ts` file alongside your rule (or in your types directory):
 import type { RuleTypeDef } from 'livr/types/inference';
 
 declare module 'livr/types/inference' {
-    interface RuleTypeRegistry {
-        // Simple rule that outputs string
-        phone_number: RuleTypeDef<string, false, false>;
+  interface RuleTypeRegistry {
+    // Simple rule that outputs string
+    phone_number: RuleTypeDef<string, false, false>;
 
-        // Also register camelCase version
-        phoneNumber: RuleTypeRegistry['phone_number'];
-    }
+    // Also register camelCase version
+    phoneNumber: RuleTypeRegistry['phone_number'];
+  }
 }
 ```
 
@@ -306,8 +306,8 @@ import phoneNumber from './my-rules/phone_number';
 LIVR.Validator.registerDefaultRules({ phone_number: phoneNumber });
 
 const schema = {
-    name: ['required', 'string'],
-    phone: ['required', 'phone_number'],
+  name: ['required', 'string'],
+  phone: ['required', 'phone_number'],
 } as const;
 
 type Contact = InferFromSchema<typeof schema>;
@@ -343,17 +343,17 @@ LIVR provides several built-in templates for common patterns:
 import type { ParameterizedRuleDef } from 'livr/types/inference';
 
 declare module 'livr/types/inference' {
-    interface ParameterizedRuleRegistry {
-        // Uses 'array_element' template: output is union of array elements
-        allowed_status: ParameterizedRuleDef<'array_element', false, false>;
-    }
+  interface ParameterizedRuleRegistry {
+    // Uses 'array_element' template: output is union of array elements
+    allowed_status: ParameterizedRuleDef<'array_element', false, false>;
+  }
 }
 ```
 
 ```typescript
 // Usage
 const schema = {
-    status: { allowed_status: ['pending', 'active', 'closed'] as const },
+  status: { allowed_status: ['pending', 'active', 'closed'] as const },
 } as const;
 
 type Data = InferFromSchema<typeof schema>;
@@ -369,18 +369,18 @@ For rules that need custom type transformations, you can extend `TemplateOutputR
 import type { ParameterizedRuleDef } from 'livr/types/inference';
 
 declare module 'livr/types/inference' {
-    // Step 1: Define custom template computation
-    interface TemplateOutputRegistry<Args> {
-        // Extract instance type from constructor argument
-        my_instance: Args extends abstract new (...args: any) => any
-            ? InstanceType<Args>
-            : unknown;
-    }
+  // Step 1: Define custom template computation
+  interface TemplateOutputRegistry<Args> {
+    // Extract instance type from constructor argument
+    my_instance: Args extends abstract new (...args: any) => any
+      ? InstanceType<Args>
+      : unknown;
+  }
 
-    // Step 2: Register rule using the template
-    interface ParameterizedRuleRegistry {
-        my_instance_of: ParameterizedRuleDef<'my_instance', false, false>;
-    }
+  // Step 2: Register rule using the template
+  interface ParameterizedRuleRegistry {
+    my_instance_of: ParameterizedRuleDef<'my_instance', false, false>;
+  }
 }
 ```
 
@@ -389,7 +389,7 @@ declare module 'livr/types/inference' {
 import { Temporal } from '@js-temporal/polyfill';
 
 const schema = {
-    createdAt: { my_instance_of: Temporal.Instant },
+  createdAt: { my_instance_of: Temporal.Instant },
 } as const;
 
 type Data = InferFromSchema<typeof schema>;
@@ -415,7 +415,7 @@ ParameterizedRuleDef<TTemplate, TRequiredEffect, TDefaultEffect>
 ```typescript
 // Use one_of which already has proper type inference
 const schema = {
-    status: { one_of: ['pending', 'active', 'closed'] as const },
+  status: { one_of: ['pending', 'active', 'closed'] as const },
 } as const;
 ```
 
@@ -424,8 +424,8 @@ const schema = {
 ```typescript
 // Register as aliased rule - types will flow through
 LIVR.Validator.registerAliasedDefaultRule({
-    name: 'status_enum',
-    rules: { one_of: ['pending', 'active', 'closed'] },
+  name: 'status_enum',
+  rules: { one_of: ['pending', 'active', 'closed'] },
 });
 ```
 
@@ -479,16 +479,16 @@ For rules that always output the same type:
 import type { RuleTypeDef } from 'livr/types/inference';
 
 declare module 'livr/types/inference' {
-    interface RuleTypeRegistry {
-        // Your custom rules
-        uuid: RuleTypeDef<string, false, false>;
-        iso_timestamp: RuleTypeDef<string, false, false>;
-        json_string: RuleTypeDef<object, false, false>;
+  interface RuleTypeRegistry {
+    // Your custom rules
+    uuid: RuleTypeDef<string, false, false>;
+    iso_timestamp: RuleTypeDef<string, false, false>;
+    json_string: RuleTypeDef<object, false, false>;
 
-        // CamelCase aliases
-        isoTimestamp: RuleTypeRegistry['iso_timestamp'];
-        jsonString: RuleTypeRegistry['json_string'];
-    }
+    // CamelCase aliases
+    isoTimestamp: RuleTypeRegistry['iso_timestamp'];
+    jsonString: RuleTypeRegistry['json_string'];
+  }
 }
 ```
 
@@ -501,18 +501,18 @@ For rules where output type depends on arguments, use `ParameterizedRuleRegistry
 import type { RuleTypeDef, ParameterizedRuleDef } from 'livr/types/inference';
 
 declare module 'livr/types/inference' {
-    // Simple rules
-    interface RuleTypeRegistry {
-        uuid: RuleTypeDef<string, false, false>;
-    }
+  // Simple rules
+  interface RuleTypeRegistry {
+    uuid: RuleTypeDef<string, false, false>;
+  }
 
-    // Parameterized rules using built-in templates
-    interface ParameterizedRuleRegistry {
-        // Uses 'literal' template: output equals the argument
-        is: ParameterizedRuleDef<'literal', true, false>;
-        // Uses 'array_element' template: output is union of array elements
-        allowed_values: ParameterizedRuleDef<'array_element', false, false>;
-    }
+  // Parameterized rules using built-in templates
+  interface ParameterizedRuleRegistry {
+    // Uses 'literal' template: output equals the argument
+    is: ParameterizedRuleDef<'literal', true, false>;
+    // Uses 'array_element' template: output is union of array elements
+    allowed_values: ParameterizedRuleDef<'array_element', false, false>;
+  }
 }
 ```
 
@@ -525,18 +525,18 @@ For rules that need custom type transformations, extend `TemplateOutputRegistry`
 import type { ParameterizedRuleDef } from 'livr/types/inference';
 
 declare module 'livr/types/inference' {
-    // Define custom template computation
-    interface TemplateOutputRegistry<Args> {
-        instance_of: Args extends abstract new (...args: any) => any
-            ? InstanceType<Args>
-            : unknown;
-    }
+  // Define custom template computation
+  interface TemplateOutputRegistry<Args> {
+    instance_of: Args extends abstract new (...args: any) => any
+      ? InstanceType<Args>
+      : unknown;
+  }
 
-    // Register rules using the custom template
-    interface ParameterizedRuleRegistry {
-        instanceOf: ParameterizedRuleDef<'instance_of', false, false>;
-        instance_of: ParameterizedRuleDef<'instance_of', false, false>;
-    }
+  // Register rules using the custom template
+  interface ParameterizedRuleRegistry {
+    instanceOf: ParameterizedRuleDef<'instance_of', false, false>;
+    instance_of: ParameterizedRuleDef<'instance_of', false, false>;
+  }
 }
 ```
 
@@ -550,8 +550,8 @@ import type { InferFromSchema } from 'livr/types';
 import 'my-livr-rules'; // Imports rules and type augmentations
 
 const schema = {
-    id: ['required', 'uuid'],
-    createdAt: 'iso_timestamp',
+  id: ['required', 'uuid'],
+  createdAt: 'iso_timestamp',
 } as const;
 
 type Record = InferFromSchema<typeof schema>;
@@ -564,33 +564,33 @@ type Record = InferFromSchema<typeof schema>;
 
 ```typescript
 import type {
-    // Main inference type
-    InferFromSchema,
+  // Main inference type
+  InferFromSchema,
 
-    // Infer type from a single rule (useful for list elements)
-    InferRuleType,
+  // Infer type from a single rule (useful for list elements)
+  InferRuleType,
 
-    // Schema and rule definition types
-    LIVRSchema,
-    LIVRRuleDefinition,
-    LIVRPrimitive,
+  // Schema and rule definition types
+  LIVRSchema,
+  LIVRRuleDefinition,
+  LIVRPrimitive,
 
-    // For defining custom rule types (fixed output)
-    RuleTypeDef,
-    RuleTypeRegistry,
+  // For defining custom rule types (fixed output)
+  RuleTypeDef,
+  RuleTypeRegistry,
 
-    // For defining parameterized rules (output depends on arguments)
-    ParameterizedRuleDef,
-    ParameterizedRuleRegistry,
+  // For defining parameterized rules (output depends on arguments)
+  ParameterizedRuleDef,
+  ParameterizedRuleRegistry,
 
-    // For defining custom output templates
-    TemplateOutputRegistry,
+  // For defining custom output templates
+  TemplateOutputRegistry,
 
-    // Utility types
-    Simplify,
-    SimpleRule,
-    RequiredRule,
-    ParameterizedRule,
-    DefaultRule,
+  // Utility types
+  Simplify,
+  SimpleRule,
+  RequiredRule,
+  ParameterizedRule,
+  DefaultRule,
 } from 'livr/types';
 ```

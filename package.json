@@ -10,6 +10,12 @@
   "license": "MIT",
   "main": "./lib/LIVR.js",
   "types": "types/index.d.ts",
+  "files": [
+    "lib",
+    "async.js",
+    "types",
+    "CHANGELOG.md"
+  ],
   "exports": {
     ".": {
       "types": "./types/index.d.ts",
