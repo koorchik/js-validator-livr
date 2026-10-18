@@ -6,7 +6,7 @@ declare module '../../../types/inference' {
     default: RuleTypeDef<
       <T>(defaultValue: T) => T,
       false,
-      true  // Sets defaultEffect - makes field non-optional
+      true // Sets defaultEffect - makes field non-optional
     >;
   }
 }

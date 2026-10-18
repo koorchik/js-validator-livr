@@ -10,9 +10,7 @@ import LIVR = require('../lib/LIVR');
 
 type Expect<T extends true> = T;
 type Equal<X, Y> =
-  (<T>() => T extends X ? 1 : 2) extends (<T>() => T extends Y ? 1 : 2)
-    ? true
-    : false;
+  (<T>() => T extends X ? 1 : 2) extends <T>() => T extends Y ? 1 : 2 ? true : false;
 
 // ============================================================================
 // Default Rule - Widening Tests
@@ -55,14 +53,14 @@ const schemaDefaultLiteralNumber = {
   code: { default: 42 as 42 },
 } as const;
 type DefaultLiteralNumber = InferFromSchema<typeof schemaDefaultLiteralNumber>;
-type _test4 = Expect<Equal<DefaultLiteralNumber, { code: number }>>;  // Widens to number
+type _test4 = Expect<Equal<DefaultLiteralNumber, { code: number }>>; // Widens to number
 
 // Test: Single literal string with assertion still widens
 const schemaDefaultLiteralString = {
   type: { default: 'user' as 'user' },
 } as const;
 type DefaultLiteralString = InferFromSchema<typeof schemaDefaultLiteralString>;
-type _test4b = Expect<Equal<DefaultLiteralString, { type: string }>>;  // Widens to string
+type _test4b = Expect<Equal<DefaultLiteralString, { type: string }>>; // Widens to string
 
 // Test: Type assertion with union type preserves union
 const schemaDefaultUnion = {
@@ -83,7 +81,7 @@ const schemaDefaultConst = {
   type: { default: 'user' as const },
 } as const;
 type DefaultConst = InferFromSchema<typeof schemaDefaultConst>;
-type _test6 = Expect<Equal<DefaultConst, { type: string }>>;  // Widens to string
+type _test6 = Expect<Equal<DefaultConst, { type: string }>>; // Widens to string
 
 // ============================================================================
 // one_of Rule - Should NOT be affected (regression test)
@@ -101,7 +99,7 @@ const schemaOneOfTwo = {
   active: { one_of: [true, false] as const },
 } as const;
 type OneOfTwo = InferFromSchema<typeof schemaOneOfTwo>;
-type _test7b = Expect<Equal<OneOfTwo, { active?: boolean }>>;  // true | false === boolean
+type _test7b = Expect<Equal<OneOfTwo, { active?: boolean }>>; // true | false === boolean
 
 // ============================================================================
 // eq Rule - Should NOT be affected (regression test)
@@ -126,12 +124,17 @@ const schemaMixed = {
   role: { one_of: ['admin', 'user'] as const },
 } as const;
 type Mixed = InferFromSchema<typeof schemaMixed>;
-type _test9 = Expect<Equal<Mixed, {
-  name: string;
-  count: number;
-  status: 'ACTIVE' | 'PENDING' | 'CLOSED';
-  role?: 'admin' | 'user';
-}>>;
+type _test9 = Expect<
+  Equal<
+    Mixed,
+    {
+      name: string;
+      count: number;
+      status: 'ACTIVE' | 'PENDING' | 'CLOSED';
+      role?: 'admin' | 'user';
+    }
+  >
+>;
 
 // Test: Default with other rules in chain
 const schemaDefaultWithRules = {
@@ -151,13 +154,18 @@ const schemaNestedDefaults = {
   },
 } as const;
 type NestedDefaults = InferFromSchema<typeof schemaNestedDefaults>;
-type _test11 = Expect<Equal<NestedDefaults, {
-  config?: {
-    timeout: number;
-    retries: number;
-    mode: 'auto' | 'manual';
-  };
-}>>;
+type _test11 = Expect<
+  Equal<
+    NestedDefaults,
+    {
+      config?: {
+        timeout: number;
+        retries: number;
+        mode: 'auto' | 'manual';
+      };
+    }
+  >
+>;
 
 // ============================================================================
 // Validator methods

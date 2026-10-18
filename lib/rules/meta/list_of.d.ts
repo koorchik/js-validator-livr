@@ -4,7 +4,9 @@ import type { RuleTypeDef, InferRuleType, LIVRRuleDefinition } from '../../../ty
 declare module '../../../types/inference' {
   interface RuleTypeRegistry {
     list_of: RuleTypeDef<
-      <R extends LIVRRuleDefinition | readonly LIVRRuleDefinition[]>(rules: R) => Array<InferRuleType<R>>,
+      <R extends LIVRRuleDefinition | readonly LIVRRuleDefinition[]>(
+        rules: R
+      ) => Array<InferRuleType<R>>,
       false,
       false
     >;

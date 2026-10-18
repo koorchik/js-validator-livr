@@ -88,3 +88,7 @@ Helper functions: `isPrimitiveValue`, `looksLikeNumber`, `isObject`, `isEmptyObj
 - Empty values (`undefined`, `null`, `''`) skip validation unless using `required` rule
 - Sync validator returns `false` on failure; async validator throws/rejects with errors object
 - Use `import LIVR from 'livr'` for sync, `import LIVR from 'livr/async'` for async
+
+## Code Style
+
+Prettier config is in `.prettierrc.json`: 2 spaces, single quotes, 100 columns, ES5 trailing commas, no parentheses around a single arrow function parameter. `t/test_suite` is a copy of the LIVR spec test suite and is not formatted.

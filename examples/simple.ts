@@ -20,11 +20,11 @@ type InferFromSchema<S> = LIVR.InferFromSchema<S>;
 // ============================================================================
 
 const userSchema = {
-    name: ['required', 'string'],
-    email: ['required', 'email'],
-    age: 'positive_integer',
-    role: { one_of: ['admin', 'user', 'guest'] as const },
-    status: { eq: 'active' as const },
+  name: ['required', 'string'],
+  email: ['required', 'email'],
+  age: 'positive_integer',
+  role: { one_of: ['admin', 'user', 'guest'] as const },
+  status: { eq: 'active' as const },
 } as const;
 
 // Infer TypeScript type from schema
@@ -45,23 +45,23 @@ const validator = new LIVR.Validator<User>(userSchema);
 
 // Sample input (simulating data from API, form, etc.)
 const input: unknown = {
-    name: 'John Doe',
-    email: 'john@example.com',
-    age: 30,
-    role: 'admin',
-    status: 'active',
+  name: 'John Doe',
+  email: 'john@example.com',
+  age: 30,
+  role: 'admin',
+  status: 'active',
 };
 
 const validData = validator.validate(input);
 
 if (validData) {
-    // validData is typed as User - hover to verify!
-    console.log('Validation passed!');
-    console.log('Name:', validData.name);           // string
-    console.log('Email:', validData.email);         // string
-    console.log('Age:', validData.age);             // number | undefined
-    console.log('Role:', validData.role);           // 'admin' | 'user' | 'guest' | undefined
-    console.log('Status:', validData.status);       // 'active' | undefined
+  // validData is typed as User - hover to verify!
+  console.log('Validation passed!');
+  console.log('Name:', validData.name); // string
+  console.log('Email:', validData.email); // string
+  console.log('Age:', validData.age); // number | undefined
+  console.log('Role:', validData.role); // 'admin' | 'user' | 'guest' | undefined
+  console.log('Status:', validData.status); // 'active' | undefined
 } else {
-    console.log('Validation failed:', validator.getErrors());
+  console.log('Validation failed:', validator.getErrors());
 }

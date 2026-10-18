@@ -24,24 +24,24 @@ type RuleTypeDef<O, R extends boolean, D extends boolean> = LIVR.RuleTypeDef<O, 
 
 // Define custom rule: phone_number
 function phoneNumber() {
-    return (value: unknown) => {
-        if (value === undefined || value === null || value === '') return;
-        if (typeof value !== 'string') return 'FORMAT_ERROR';
+  return (value: unknown) => {
+    if (value === undefined || value === null || value === '') return;
+    if (typeof value !== 'string') return 'FORMAT_ERROR';
 
-        const phoneRegex = /^\+?[\d\s-]{10,}$/;
-        if (!phoneRegex.test(value)) {
-            return 'INVALID_PHONE_NUMBER';
-        }
-    };
+    const phoneRegex = /^\+?[\d\s-]{10,}$/;
+    if (!phoneRegex.test(value)) {
+      return 'INVALID_PHONE_NUMBER';
+    }
+  };
 }
 
 // Register type for custom rule (declaration merging)
 // When using as npm package: declare module 'livr/types/inference'
 declare module '../types/inference' {
-    interface RuleTypeRegistry {
-        phone_number: RuleTypeDef<string, false, false>;
-        phoneNumber: RuleTypeRegistry['phone_number'];
-    }
+  interface RuleTypeRegistry {
+    phone_number: RuleTypeDef<string, false, false>;
+    phoneNumber: RuleTypeRegistry['phone_number'];
+  }
 }
 
 // Register the custom rule
@@ -52,64 +52,64 @@ LIVR.Validator.registerDefaultRules({ phone_number: phoneNumber });
 // ============================================================================
 
 const orderSchema = {
-    // Required fields
-    id: ['required', 'positive_integer'],
+  // Required fields
+  id: ['required', 'positive_integer'],
 
-    // Nested object
-    customer: {
+  // Nested object
+  customer: {
+    nested_object: {
+      name: ['required', 'string'],
+      email: ['required', 'email'],
+      phone: 'phone_number', // Using custom rule
+      address: {
         nested_object: {
-            name: ['required', 'string'],
-            email: ['required', 'email'],
-            phone: 'phone_number',  // Using custom rule
-            address: {
-                nested_object: {
-                    street: ['required', 'string'],
-                    city: ['required', 'string'],
-                    zip: 'string',
-                    country: { one_of: ['US', 'CA', 'UK', 'DE'] as const },
-                },
-            },
+          street: ['required', 'string'],
+          city: ['required', 'string'],
+          zip: 'string',
+          country: { one_of: ['US', 'CA', 'UK', 'DE'] as const },
         },
+      },
     },
+  },
 
-    // List of objects
-    items: {
-        list_of_objects: {
-            productId: ['required', 'positive_integer'],
-            name: ['required', 'string'],
-            quantity: ['required', 'positive_integer'],
-            price: 'positive_decimal',
+  // List of objects
+  items: {
+    list_of_objects: {
+      productId: ['required', 'positive_integer'],
+      name: ['required', 'string'],
+      quantity: ['required', 'positive_integer'],
+      price: 'positive_decimal',
+    },
+  },
+
+  // List of primitives
+  tags: { list_of: 'string' },
+
+  // Default value (widens to union type)
+  status: { default: 'pending' as 'pending' | 'processing' | 'shipped' | 'delivered' },
+
+  // Discriminated union with list_of_different_objects
+  events: {
+    list_of_different_objects: [
+      'type',
+      {
+        created: {
+          type: { eq: 'created' as const },
+          timestamp: ['required', 'iso_date'],
         },
-    },
-
-    // List of primitives
-    tags: { list_of: 'string' },
-
-    // Default value (widens to union type)
-    status: { default: 'pending' as 'pending' | 'processing' | 'shipped' | 'delivered' },
-
-    // Discriminated union with list_of_different_objects
-    events: {
-        list_of_different_objects: [
-            'type',
-            {
-                created: {
-                    type: { eq: 'created' as const },
-                    timestamp: ['required', 'iso_date'],
-                },
-                updated: {
-                    type: { eq: 'updated' as const },
-                    timestamp: ['required', 'iso_date'],
-                    changes: { list_of: 'string' },
-                },
-                shipped: {
-                    type: { eq: 'shipped' as const },
-                    timestamp: ['required', 'iso_date'],
-                    trackingNumber: ['required', 'string'],
-                },
-            },
-        ],
-    },
+        updated: {
+          type: { eq: 'updated' as const },
+          timestamp: ['required', 'iso_date'],
+          changes: { list_of: 'string' },
+        },
+        shipped: {
+          type: { eq: 'shipped' as const },
+          timestamp: ['required', 'iso_date'],
+          trackingNumber: ['required', 'string'],
+        },
+      },
+    ],
+  },
 } as const;
 
 // Infer the complex type
@@ -123,15 +123,15 @@ const validator = new LIVR.Validator<Order>(orderSchema);
 
 // Register aliased rules for reusable validation patterns
 validator.registerAliasedRule({
-    name: 'valid_zip',
-    rules: ['string', { like: '^\\d{5}(-\\d{4})?$' }],
-    error: 'INVALID_ZIP_CODE'
+  name: 'valid_zip',
+  rules: ['string', { like: '^\\d{5}(-\\d{4})?$' }],
+  error: 'INVALID_ZIP_CODE',
 });
 
 validator.registerAliasedRule({
-    name: 'positive_price',
-    rules: ['required', 'positive_decimal', { min_number: 0.01 }],
-    error: 'INVALID_PRICE'
+  name: 'positive_price',
+  rules: ['required', 'positive_decimal', { min_number: 0.01 }],
+  error: 'INVALID_PRICE',
 });
 
 // ============================================================================
@@ -139,53 +139,53 @@ validator.registerAliasedRule({
 // ============================================================================
 
 const input: unknown = {
-    id: 12345,
-    customer: {
-        name: 'Jane Smith',
-        email: 'jane@example.com',
-        phone: '+1-555-123-4567',
-        address: {
-            street: '123 Main St',
-            city: 'New York',
-            zip: '10001',
-            country: 'US',
-        },
+  id: 12345,
+  customer: {
+    name: 'Jane Smith',
+    email: 'jane@example.com',
+    phone: '+1-555-123-4567',
+    address: {
+      street: '123 Main St',
+      city: 'New York',
+      zip: '10001',
+      country: 'US',
     },
-    items: [
-        { productId: 1, name: 'Widget', quantity: 2, price: 29.99 },
-        { productId: 2, name: 'Gadget', quantity: 1, price: 49.99 },
-    ],
-    tags: ['express', 'gift-wrap'],
-    events: [
-        { type: 'created', timestamp: '2024-01-15' },
-        { type: 'updated', timestamp: '2024-01-16', changes: ['address'] },
-    ],
+  },
+  items: [
+    { productId: 1, name: 'Widget', quantity: 2, price: 29.99 },
+    { productId: 2, name: 'Gadget', quantity: 1, price: 49.99 },
+  ],
+  tags: ['express', 'gift-wrap'],
+  events: [
+    { type: 'created', timestamp: '2024-01-15' },
+    { type: 'updated', timestamp: '2024-01-16', changes: ['address'] },
+  ],
 };
 
 const validData = validator.validate(input);
 
 if (validData) {
-    // validData is typed as Order - hover to verify!
-    console.log('Validation passed!');
+  // validData is typed as Order - hover to verify!
+  console.log('Validation passed!');
 
-    // Access nested data with full type safety
-    console.log('Order ID:', validData.id);                           // number
-    console.log('Customer:', validData.customer?.name);               // string | undefined
-    console.log('City:', validData.customer?.address?.city);          // string | undefined
-    console.log('Country:', validData.customer?.address?.country);    // 'US' | 'CA' | 'UK' | 'DE' | undefined
-    console.log('Status:', validData.status);                         // 'pending' | 'processing' | 'shipped' | 'delivered'
+  // Access nested data with full type safety
+  console.log('Order ID:', validData.id); // number
+  console.log('Customer:', validData.customer?.name); // string | undefined
+  console.log('City:', validData.customer?.address?.city); // string | undefined
+  console.log('Country:', validData.customer?.address?.country); // 'US' | 'CA' | 'UK' | 'DE' | undefined
+  console.log('Status:', validData.status); // 'pending' | 'processing' | 'shipped' | 'delivered'
 
-    // Iterate items with proper types
-    validData.items?.forEach(item => {
-        console.log(`  ${item.name}: ${item.quantity} x $${item.price}`);
-    });
+  // Iterate items with proper types
+  validData.items?.forEach(item => {
+    console.log(`  ${item.name}: ${item.quantity} x $${item.price}`);
+  });
 
-    // Handle discriminated union
-    validData.events?.forEach(event => {
-        if (event.type === 'shipped') {
-            console.log('Tracking:', event.trackingNumber);  // TypeScript knows this exists!
-        }
-    });
+  // Handle discriminated union
+  validData.events?.forEach(event => {
+    if (event.type === 'shipped') {
+      console.log('Tracking:', event.trackingNumber); // TypeScript knows this exists!
+    }
+  });
 } else {
-    console.log('Validation failed:', validator.getErrors());
+  console.log('Validation failed:', validator.getErrors());
 }

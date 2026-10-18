@@ -6,20 +6,19 @@
 // ============================================================================
 
 /** Check if T is a union type (has more than one member) */
-type IsUnion<T, U = T> = T extends any
-  ? [U] extends [T]
-    ? false
-    : true
-  : never;
+type IsUnion<T, U = T> = T extends any ? ([U] extends [T] ? false : true) : never;
 
 /** Widen single literal types to their primitive base types, preserve unions */
 type Widen<T> =
   IsUnion<T> extends true
-    ? T  // Keep unions as-is (e.g., 'ACTIVE' | 'PENDING')
-    : T extends number ? number
-    : T extends string ? string
-    : T extends boolean ? boolean
-    : T;
+    ? T // Keep unions as-is (e.g., 'ACTIVE' | 'PENDING')
+    : T extends number
+      ? number
+      : T extends string
+        ? string
+        : T extends boolean
+          ? boolean
+          : T;
 
 // ============================================================================
 // Base Types
@@ -30,9 +29,7 @@ export type LIVRPrimitive = string | number | boolean | null | undefined;
 
 /** A single rule definition - can be string, object with args, or array of rules */
 export type LIVRRuleDefinition =
-  | string
-  | { readonly [ruleName: string]: unknown }
-  | readonly LIVRRuleDefinition[];
+  string | { readonly [ruleName: string]: unknown } | readonly LIVRRuleDefinition[];
 
 /** Schema is a record of field names to rule definitions */
 export type LIVRSchema = { readonly [field: string]: LIVRRuleDefinition };
@@ -48,7 +45,7 @@ export type LIVRSchema = { readonly [field: string]: LIVRRuleDefinition };
 export interface RuleTypeDef<
   TOutput = unknown,
   TRequiredEffect extends boolean = false,
-  TDefaultEffect extends boolean = false
+  TDefaultEffect extends boolean = false,
 > {
   output: TOutput;
   requiredEffect: TRequiredEffect;
@@ -98,10 +95,12 @@ export interface TemplateOutputRegistry<Args> {
 }
 
 /** Compute output type from template name and arguments */
-type ComputeFromTemplate<Template extends string, Args> =
-  Template extends keyof TemplateOutputRegistry<Args>
-    ? TemplateOutputRegistry<Args>[Template]
-    : unknown;
+type ComputeFromTemplate<
+  Template extends string,
+  Args,
+> = Template extends keyof TemplateOutputRegistry<Args>
+  ? TemplateOutputRegistry<Args>[Template]
+  : unknown;
 
 /**
  * Parameterized rule definition structure.
@@ -110,7 +109,7 @@ type ComputeFromTemplate<Template extends string, Args> =
 export interface ParameterizedRuleDef<
   TTemplate extends string = string,
   TRequiredEffect extends boolean = false,
-  TDefaultEffect extends boolean = false
+  TDefaultEffect extends boolean = false,
 > {
   template: TTemplate;
   requiredEffect: TRequiredEffect;
@@ -149,16 +148,19 @@ export interface ParameterizedRuleRegistry {
 }
 
 /** Check if a rule is in the parameterized registry */
-type IsInParameterizedRegistry<Name extends string> =
-  Name extends keyof ParameterizedRuleRegistry ? true : false;
+type IsInParameterizedRegistry<Name extends string> = Name extends keyof ParameterizedRuleRegistry
+  ? true
+  : false;
 
 /** Get output from parameterized registry */
-type GetParameterizedOutput<Name extends string, Args> =
-  Name extends keyof ParameterizedRuleRegistry
-    ? ParameterizedRuleRegistry[Name] extends { template: infer T extends string }
-      ? ComputeFromTemplate<T, Args>
-      : unknown
-    : never;
+type GetParameterizedOutput<
+  Name extends string,
+  Args,
+> = Name extends keyof ParameterizedRuleRegistry
+  ? ParameterizedRuleRegistry[Name] extends { template: infer T extends string }
+    ? ComputeFromTemplate<T, Args>
+    : unknown
+  : never;
 
 /** Get required effect from parameterized registry */
 type GetParameterizedRequiredEffect<Name extends string> =
@@ -184,16 +186,17 @@ type GetParameterizedDefaultEffect<Name extends string> =
 type NormalizeRules<R> = R extends readonly unknown[] ? R : readonly [R];
 
 /** Parse a single rule and extract name and args */
-type ParseRule<R> =
-  R extends string
-    ? { name: R; args: undefined }
-    : R extends { readonly [K in infer RuleName extends string]: infer Args }
-      ? { name: RuleName; args: Args }
-      : never;
+type ParseRule<R> = R extends string
+  ? { name: R; args: undefined }
+  : R extends { readonly [K in infer RuleName extends string]: infer Args }
+    ? { name: RuleName; args: Args }
+    : never;
 
 /** Extract the first key from an object type */
 type FirstKey<T> = T extends { readonly [K in infer Key extends string]: unknown }
-  ? Key extends string ? Key : never
+  ? Key extends string
+    ? Key
+    : never
   : never;
 
 // ============================================================================
@@ -225,93 +228,130 @@ type InitialTypeState = {
 type ComputeParameterizedOutput<Name extends string, Args> =
   // one_of: output is union of array elements
   Name extends 'one_of' | 'oneOf'
-    ? Args extends readonly (infer T)[] ? T : unknown
-  // eq: output is the literal type of the argument
-  : Name extends 'eq'
-    ? Args
-  // default: output is widened type of the default value (use type assertion to preserve literals)
-  : Name extends 'default'
-    ? Widen<Args>
-  // nested_object: output is inferred from nested schema
-  : Name extends 'nested_object' | 'nestedObject'
-    ? Args extends LIVRSchema ? InferFromSchema<Args> : unknown
-  // list_of: output is array of inferred element type
-  : Name extends 'list_of' | 'listOf'
-    ? Args extends LIVRRuleDefinition ? Array<InferRuleType<Args>> : unknown
-  // list_of_objects: output is array of inferred object type
-  : Name extends 'list_of_objects' | 'listOfObjects'
-    ? Args extends LIVRSchema ? Array<InferFromSchema<Args>> : unknown
-  // list_of_different_objects: output is array of discriminated union
-  : Name extends 'list_of_different_objects' | 'listOfDifferentObjects'
-    ? Args extends readonly [infer D extends string, infer Schemas extends Record<string, LIVRSchema>]
-      ? Array<{ [K in keyof Schemas]: Simplify<InferFromSchema<Schemas[K]> & { readonly [P in D]: K }> }[keyof Schemas]>
+    ? Args extends readonly (infer T)[]
+      ? T
       : unknown
-  // variable_object: output is discriminated union
-  : Name extends 'variable_object' | 'variableObject'
-    ? Args extends readonly [infer D extends string, infer Schemas extends Record<string, LIVRSchema>]
-      ? { [K in keyof Schemas]: Simplify<InferFromSchema<Schemas[K]> & { readonly [P in D]: K }> }[keyof Schemas]
-      : unknown
-  // or: output is union of all rule outputs
-  : Name extends 'or'
-    ? Args extends readonly LIVRRuleDefinition[]
-      ? InferOrUnion<Args>
-      : unknown
-  // Not a parameterized rule
-  : never;
+    : // eq: output is the literal type of the argument
+      Name extends 'eq'
+      ? Args
+      : // default: output is widened type of the default value (use type assertion to preserve literals)
+        Name extends 'default'
+        ? Widen<Args>
+        : // nested_object: output is inferred from nested schema
+          Name extends 'nested_object' | 'nestedObject'
+          ? Args extends LIVRSchema
+            ? InferFromSchema<Args>
+            : unknown
+          : // list_of: output is array of inferred element type
+            Name extends 'list_of' | 'listOf'
+            ? Args extends LIVRRuleDefinition
+              ? Array<InferRuleType<Args>>
+              : unknown
+            : // list_of_objects: output is array of inferred object type
+              Name extends 'list_of_objects' | 'listOfObjects'
+              ? Args extends LIVRSchema
+                ? Array<InferFromSchema<Args>>
+                : unknown
+              : // list_of_different_objects: output is array of discriminated union
+                Name extends 'list_of_different_objects' | 'listOfDifferentObjects'
+                ? Args extends readonly [
+                    infer D extends string,
+                    infer Schemas extends Record<string, LIVRSchema>,
+                  ]
+                  ? Array<
+                      {
+                        [K in keyof Schemas]: Simplify<
+                          InferFromSchema<Schemas[K]> & { readonly [P in D]: K }
+                        >;
+                      }[keyof Schemas]
+                    >
+                  : unknown
+                : // variable_object: output is discriminated union
+                  Name extends 'variable_object' | 'variableObject'
+                  ? Args extends readonly [
+                      infer D extends string,
+                      infer Schemas extends Record<string, LIVRSchema>,
+                    ]
+                    ? {
+                        [K in keyof Schemas]: Simplify<
+                          InferFromSchema<Schemas[K]> & { readonly [P in D]: K }
+                        >;
+                      }[keyof Schemas]
+                    : unknown
+                  : // or: output is union of all rule outputs
+                    Name extends 'or'
+                    ? Args extends readonly LIVRRuleDefinition[]
+                      ? InferOrUnion<Args>
+                      : unknown
+                    : // Not a parameterized rule
+                      never;
 
 /** Helper to infer union type from 'or' rule arguments */
-type InferOrUnion<Rules extends readonly LIVRRuleDefinition[]> =
-  Rules extends readonly [infer First extends LIVRRuleDefinition, ...infer Rest extends readonly LIVRRuleDefinition[]]
-    ? InferRuleType<First> | InferOrUnion<Rest>
-    : never;
+type InferOrUnion<Rules extends readonly LIVRRuleDefinition[]> = Rules extends readonly [
+  infer First extends LIVRRuleDefinition,
+  ...infer Rest extends readonly LIVRRuleDefinition[],
+]
+  ? InferRuleType<First> | InferOrUnion<Rest>
+  : never;
 
 /** Check if a rule is parameterized (output depends on args) */
-type IsParameterizedRule<Name extends string> =
-  Name extends 'one_of' | 'oneOf' | 'eq' | 'default' | 'nested_object' | 'nestedObject'
-    | 'list_of' | 'listOf' | 'list_of_objects' | 'listOfObjects'
-    | 'list_of_different_objects' | 'listOfDifferentObjects'
-    | 'variable_object' | 'variableObject' | 'or'
-    ? true
-    : false;
+type IsParameterizedRule<Name extends string> = Name extends
+  | 'one_of'
+  | 'oneOf'
+  | 'eq'
+  | 'default'
+  | 'nested_object'
+  | 'nestedObject'
+  | 'list_of'
+  | 'listOf'
+  | 'list_of_objects'
+  | 'listOfObjects'
+  | 'list_of_different_objects'
+  | 'listOfDifferentObjects'
+  | 'variable_object'
+  | 'variableObject'
+  | 'or'
+  ? true
+  : false;
 
 /** Get the output type for a known rule */
 type GetRuleOutput<Name extends string, Args> =
   // First check extensible parameterized registry
   IsInParameterizedRegistry<Name> extends true
     ? GetParameterizedOutput<Name, Args>
-  // Then check built-in parameterized rules (for backwards compatibility)
-  : IsParameterizedRule<Name> extends true
-    ? ComputeParameterizedOutput<Name, Args>
-  // Finally look up in simple rule registry
-  : Name extends keyof RuleTypeRegistry
-    ? RuleTypeRegistry[Name] extends RuleTypeDef<infer O, any, any>
-      ? O
-      : unknown
-    : unknown;
+    : // Then check built-in parameterized rules (for backwards compatibility)
+      IsParameterizedRule<Name> extends true
+      ? ComputeParameterizedOutput<Name, Args>
+      : // Finally look up in simple rule registry
+        Name extends keyof RuleTypeRegistry
+        ? RuleTypeRegistry[Name] extends RuleTypeDef<infer O, any, any>
+          ? O
+          : unknown
+        : unknown;
 
 /** Check if a rule sets the required effect */
 type GetRequiredEffect<Name extends string> =
   // First check parameterized registry
   IsInParameterizedRegistry<Name> extends true
     ? GetParameterizedRequiredEffect<Name>
-  // Then check simple registry
-  : Name extends keyof RuleTypeRegistry
-    ? RuleTypeRegistry[Name] extends RuleTypeDef<any, infer R, any>
-      ? R
-      : false
-    : false;
+    : // Then check simple registry
+      Name extends keyof RuleTypeRegistry
+      ? RuleTypeRegistry[Name] extends RuleTypeDef<any, infer R, any>
+        ? R
+        : false
+      : false;
 
 /** Check if a rule sets the default effect */
 type GetDefaultEffect<Name extends string> =
   // First check parameterized registry
   IsInParameterizedRegistry<Name> extends true
     ? GetParameterizedDefaultEffect<Name>
-  // Then check simple registry
-  : Name extends keyof RuleTypeRegistry
-    ? RuleTypeRegistry[Name] extends RuleTypeDef<any, any, infer D>
-      ? D
-      : false
-    : false;
+    : // Then check simple registry
+      Name extends keyof RuleTypeRegistry
+      ? RuleTypeRegistry[Name] extends RuleTypeDef<any, any, infer D>
+        ? D
+        : false
+      : false;
 
 // ============================================================================
 // Rule Chain Processing
@@ -322,9 +362,11 @@ type ApplyRule<Rule, State extends TypeState> =
   ParseRule<Rule> extends { name: infer N extends string; args: infer A }
     ? {
         type: [GetRuleOutput<N, A>] extends [never]
-          ? State['type']  // Unknown rule, pass through
+          ? State['type'] // Unknown rule, pass through
           : GetRuleOutput<N, A> extends unknown
-            ? GetRuleOutput<N, A> extends never ? State['type'] : GetRuleOutput<N, A>
+            ? GetRuleOutput<N, A> extends never
+              ? State['type']
+              : GetRuleOutput<N, A>
             : State['type'];
         isRequired: State['isRequired'] extends true ? true : GetRequiredEffect<N>;
         hasDefault: State['hasDefault'] extends true ? true : GetDefaultEffect<N>;
@@ -332,22 +374,23 @@ type ApplyRule<Rule, State extends TypeState> =
     : State;
 
 /** Process a chain of rules and determine final type state */
-type ProcessRuleChain<Rules, State extends TypeState = InitialTypeState> =
-  Rules extends readonly [infer First, ...infer Rest]
-    ? ProcessRuleChain<Rest, ApplyRule<First, State>>
-    : State;
+type ProcessRuleChain<Rules, State extends TypeState = InitialTypeState> = Rules extends readonly [
+  infer First,
+  ...infer Rest,
+]
+  ? ProcessRuleChain<Rest, ApplyRule<First, State>>
+  : State;
 
 // ============================================================================
 // Optionality Handling
 // ============================================================================
 
 /** Determine if a field should be optional based on its type state */
-type IsFieldOptional<State extends TypeState> =
-  State['isRequired'] extends true
+type IsFieldOptional<State extends TypeState> = State['isRequired'] extends true
+  ? false
+  : State['hasDefault'] extends true
     ? false
-    : State['hasDefault'] extends true
-      ? false
-      : true;
+    : true;
 
 // ============================================================================
 // Object Type Building
@@ -369,9 +412,9 @@ type OptionalKeys<Fields extends Record<string, TypeState>> = {
 }[keyof Fields];
 
 /** Build the final object type with proper optionality */
-type BuildObjectType<Fields extends Record<string, TypeState>> =
-  { [K in RequiredKeys<Fields>]: Fields[K]['type'] } &
-  { [K in OptionalKeys<Fields>]?: Fields[K]['type'] };
+type BuildObjectType<Fields extends Record<string, TypeState>> = {
+  [K in RequiredKeys<Fields>]: Fields[K]['type'];
+} & { [K in OptionalKeys<Fields>]?: Fields[K]['type'] };
 
 /** Simplify complex intersection types for better IDE display */
 export type Simplify<T> = { [K in keyof T]: T[K] } & {};

@@ -3,57 +3,57 @@ const assert = require('node:assert/strict');
 const LIVR = require('../../async');
 
 LIVR.AsyncValidator.registerDefaultRules({
-    my_trim() {
-        return (value, undefined, outputArr) => {
-            if (value === undefined || value === null || typeof value === 'object' || value === '')
-                return;
+  my_trim() {
+    return (value, undefined, outputArr) => {
+      if (value === undefined || value === null || typeof value === 'object' || value === '')
+        return;
 
-            value += '';
-            outputArr.push(value.replace(/^\s*/, '').replace(/\s*$/, ''));
-        };
-    },
+      value += '';
+      outputArr.push(value.replace(/^\s*/, '').replace(/\s*$/, ''));
+    };
+  },
 
-    my_lc() {
-        return (value, undefined, outputArr) => {
-            if (value === undefined || value === null || typeof value === 'object' || value === '')
-                return;
+  my_lc() {
+    return (value, undefined, outputArr) => {
+      if (value === undefined || value === null || typeof value === 'object' || value === '')
+        return;
 
-            value += '';
-            outputArr.push(value.toLowerCase());
-        };
-    },
+      value += '';
+      outputArr.push(value.toLowerCase());
+    };
+  },
 
-    my_ucfirst() {
-        return (value, undefined, outputArr) => {
-            if (value === undefined || value === null || typeof value === 'object' || value === '')
-                return;
+  my_ucfirst() {
+    return (value, undefined, outputArr) => {
+      if (value === undefined || value === null || typeof value === 'object' || value === '')
+        return;
 
-            value += '';
-            outputArr.push(value.charAt(0).toUpperCase() + value.slice(1));
-        };
-    }
+      value += '';
+      outputArr.push(value.charAt(0).toUpperCase() + value.slice(1));
+    };
+  },
 });
 
 test('Validate data with registered rules', async () => {
-    const validator = new LIVR.AsyncValidator({
-        word1: ['my_trim', 'my_lc', 'my_ucfirst'],
-        word2: ['my_trim', 'my_lc'],
-        word3: ['my_ucfirst']
-    });
+  const validator = new LIVR.AsyncValidator({
+    word1: ['my_trim', 'my_lc', 'my_ucfirst'],
+    word2: ['my_trim', 'my_lc'],
+    word3: ['my_ucfirst'],
+  });
 
-    const output = await validator.validate({
-        word1: ' wordOne ',
-        word2: ' wordTwo ',
-        word3: 'wordThree '
-    });
+  const output = await validator.validate({
+    word1: ' wordOne ',
+    word2: ' wordTwo ',
+    word3: 'wordThree ',
+  });
 
-    assert.deepEqual(
-        output,
-        {
-            word1: 'Wordone',
-            word2: 'wordtwo',
-            word3: 'WordThree '
-        },
-        'Should apply changes to values'
-    );
+  assert.deepEqual(
+    output,
+    {
+      word1: 'Wordone',
+      word2: 'wordtwo',
+      word3: 'WordThree ',
+    },
+    'Should apply changes to values'
+  );
 });

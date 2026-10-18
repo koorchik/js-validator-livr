@@ -7,10 +7,5 @@
     "skipLibCheck": true,
     "esModuleInterop": true
   },
-  "include": [
-    "types/**/*.d.ts",
-    "lib/**/*.d.ts",
-    "t/types-test.ts",
-    "examples/**/*.ts"
-  ]
+  "include": ["types/**/*.d.ts", "lib/**/*.d.ts", "t/types-test.ts", "examples/**/*.ts"]
 }
