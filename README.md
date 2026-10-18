@@ -527,7 +527,7 @@ LIVR is designed for speed:
 
 - **Reuse validators** - Construct once, validate many times. `validator.validate()` is extremely fast.
 - **Lazy compilation** - Rules are compiled on first validation (or call `prepare()` for warmup).
-- **Faster than alternatives** - On par with fastest-validator, Valibot and Zod for precompiled schemas, 9x faster than Joi. When a validator is created per validation: 20x faster than Joi, 50-90x faster than Zod and fastest-validator, over 500x faster than Ajv. See [benchmarks](docs/DESIGN.md#performance-summary).
+- **Faster than alternatives** - For precompiled schemas 1.15-1.5x faster than Valibot, fastest-validator and Zod, 10x faster than Joi. When a validator is created per validation: 1.2-1.5x faster than Valibot, 27-33x faster than Joi, 70-130x faster than Zod and fastest-validator, over 750x faster than Ajv. See [benchmarks](docs/DESIGN.md#performance-summary).
 
 ```javascript
 // Good: Create once, use many times
