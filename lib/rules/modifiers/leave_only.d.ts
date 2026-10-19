@@ -1,9 +1,11 @@
 // Type inference for 'leave_only' rule
-import type { RuleTypeDef } from '../../../types/inference';
+// A new string: literal types of earlier rules are not kept
 
 declare module '../../../types/inference' {
-  interface RuleTypeRegistry {
-    leave_only: RuleTypeDef<string, false, false>;
-    leaveOnly: RuleTypeRegistry['leave_only'];
+  interface BuiltInRuleTypes {
+    leave_only: string;
   }
 }
+
+// A module, so that "declare module" above adds to the types instead of replacing them
+export {};

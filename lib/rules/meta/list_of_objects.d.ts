@@ -1,13 +1,13 @@
 // Type inference for 'list_of_objects' rule
-import type { RuleTypeDef, InferFromSchema, LIVRSchema } from '../../../types/inference';
+import type { RuleType, InferFromSchema } from '../../../types/inference';
+
+/** { list_of_objects: schema } -> an array of the schema type */
+interface ListOfObjectsType extends RuleType {
+  output: Array<InferFromSchema<this['args'][0]>>;
+}
 
 declare module '../../../types/inference' {
-  interface RuleTypeRegistry {
-    list_of_objects: RuleTypeDef<
-      <S extends LIVRSchema>(schema: S) => Array<InferFromSchema<S>>,
-      false,
-      false
-    >;
-    listOfObjects: RuleTypeRegistry['list_of_objects'];
+  interface BuiltInRuleTypes {
+    list_of_objects: ListOfObjectsType;
   }
 }

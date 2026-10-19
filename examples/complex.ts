@@ -7,16 +7,17 @@
 // - Lists using `list_of` and `list_of_objects`
 // - Discriminated unions with `list_of_different_objects`
 // - Default values with type widening
-// - Rules aliasing with `registerAliasedRule`
+// - Rules aliasing with `registerAliasedRule` and `AliasType`
 
 // When using as an npm package:
 //   import LIVR from 'livr';
-//   import type { InferFromSchema, RuleTypeDef } from 'livr/types';
+//   import type { InferFromSchema } from 'livr/types';
+//   import type { As, AliasType } from 'livr/types/inference';
 
 // Within the repo, use relative imports:
 import LIVR = require('../lib/LIVR');
+import type { As, AliasType } from '../types/inference';
 type InferFromSchema<S> = LIVR.InferFromSchema<S>;
-type RuleTypeDef<O, R extends boolean, D extends boolean> = LIVR.RuleTypeDef<O, R, D>;
 
 // ============================================================================
 // SECTION 1: Custom Rule with Type Definition
@@ -35,12 +36,18 @@ function phoneNumber() {
   };
 }
 
-// Register type for custom rule (declaration merging)
+// Rules of aliases, `as const` for their types
+const validZipRules = ['string', { like: '^\\d{5}(-\\d{4})?$' }] as const;
+const positivePriceRules = ['required', 'positive_decimal', { min_number: 0.01 }] as const;
+
+// Register types for the custom rule and the aliases (declaration merging).
+// camelCase names (phoneNumber) are typed too
 // When using as npm package: declare module 'livr/types/inference'
 declare module '../types/inference' {
-  interface RuleTypeRegistry {
-    phone_number: RuleTypeDef<string, false, false>;
-    phoneNumber: RuleTypeRegistry['phone_number'];
+  interface RuleTypes {
+    phone_number: As<string>; // checks a string
+    valid_zip: AliasType<typeof validZipRules>;
+    positive_price: AliasType<typeof positivePriceRules>;
   }
 }
 
@@ -65,7 +72,7 @@ const orderSchema = {
         nested_object: {
           street: ['required', 'string'],
           city: ['required', 'string'],
-          zip: 'string',
+          zip: 'valid_zip', // Using an alias
           country: { one_of: ['US', 'CA', 'UK', 'DE'] as const },
         },
       },
@@ -78,7 +85,7 @@ const orderSchema = {
       productId: ['required', 'positive_integer'],
       name: ['required', 'string'],
       quantity: ['required', 'positive_integer'],
-      price: 'positive_decimal',
+      price: 'positive_price', // An alias with required
     },
   },
 
@@ -121,16 +128,16 @@ type Order = InferFromSchema<typeof orderSchema>;
 
 const validator = new LIVR.Validator<Order>(orderSchema);
 
-// Register aliased rules for reusable validation patterns
+// Register aliased rules for reusable validation patterns, before the first validation
 validator.registerAliasedRule({
   name: 'valid_zip',
-  rules: ['string', { like: '^\\d{5}(-\\d{4})?$' }],
+  rules: validZipRules,
   error: 'INVALID_ZIP_CODE',
 });
 
 validator.registerAliasedRule({
   name: 'positive_price',
-  rules: ['required', 'positive_decimal', { min_number: 0.01 }],
+  rules: positivePriceRules,
   error: 'INVALID_PRICE',
 });
 
@@ -177,7 +184,7 @@ if (validData) {
 
   // Iterate items with proper types
   validData.items?.forEach(item => {
-    console.log(`  ${item.name}: ${item.quantity} x $${item.price}`);
+    console.log(`  ${item.name}: ${item.quantity} x $${item.price.toFixed(2)}`); // price: number
   });
 
   // Handle discriminated union

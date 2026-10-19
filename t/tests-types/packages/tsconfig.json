@@ -1,0 +1,19 @@
+{
+  "compilerOptions": {
+    "target": "ES2020",
+    "module": "commonjs",
+    "strict": true,
+    "noEmit": true,
+    "skipLibCheck": false,
+    "esModuleInterop": true,
+    "paths": {
+      "livr": ["../../../types/index.d.ts"],
+      "livr/types": ["../../../types/index.d.ts"],
+      "livr/types/inference": ["../../../types/inference.d.ts"],
+      "livr-extra-rules": ["./livr-extra-rules.d.ts"],
+      "livr-money-rules": ["./livr-money-rules.d.ts"],
+      "livr-id-rules": ["./livr-id-rules.d.ts"]
+    }
+  },
+  "files": ["app.ts"]
+}

@@ -1,13 +1,13 @@
 // Type inference for 'nested_object' rule
-import type { RuleTypeDef, InferFromSchema, LIVRSchema } from '../../../types/inference';
+import type { RuleType, InferFromSchema } from '../../../types/inference';
+
+/** { nested_object: schema } -> the type of the schema */
+interface NestedObjectType extends RuleType {
+  output: InferFromSchema<this['args'][0]>;
+}
 
 declare module '../../../types/inference' {
-  interface RuleTypeRegistry {
-    nested_object: RuleTypeDef<
-      <S extends LIVRSchema>(schema: S) => InferFromSchema<S>,
-      false,
-      false
-    >;
-    nestedObject: RuleTypeRegistry['nested_object'];
+  interface BuiltInRuleTypes {
+    nested_object: NestedObjectType;
   }
 }

@@ -1,8 +1,8 @@
 // Type inference for 'url' rule
-import type { RuleTypeDef } from '../../../types/inference';
+import type { As } from '../../../types/inference';
 
 declare module '../../../types/inference' {
-  interface RuleTypeRegistry {
-    url: RuleTypeDef<string, false, false>;
+  interface BuiltInRuleTypes {
+    url: As<string>;
   }
 }

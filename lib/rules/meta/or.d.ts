@@ -1,20 +1,24 @@
 // Type inference for 'or' rule
-import type { RuleTypeDef, InferRuleType, LIVRRuleDefinition } from '../../../types/inference';
+import type { RuleType, InferRuleType, MakesPresent } from '../../../types/inference';
 
-/** Helper type to build union from array of rule definitions */
-type BuildOrUnion<Rules extends readonly LIVRRuleDefinition[]> = Rules extends readonly [
-  infer First extends LIVRRuleDefinition,
-  ...infer Rest extends readonly LIVRRuleDefinition[],
-]
-  ? InferRuleType<First> | BuildOrUnion<Rest>
-  : never;
+/** A union of the types of the rule sets, each applied to the value like an alias */
+type OrOutput<RuleSets, Input> = RuleSets extends unknown ? InferRuleType<RuleSets, Input> : never;
+
+/** The field is present when every rule set makes it present */
+type OrPresent<RuleSets, Input> = [RuleSets] extends [never]
+  ? false
+  : false extends (RuleSets extends unknown ? MakesPresent<RuleSets, Input> : never)
+    ? false
+    : true;
+
+/** { or: ['string', ['required', 'integer']] } -> string | number */
+interface OrType extends RuleType {
+  output: OrOutput<this['args'][number], this['input']>;
+  present: OrPresent<this['args'][number], this['input']>;
+}
 
 declare module '../../../types/inference' {
-  interface RuleTypeRegistry {
-    or: RuleTypeDef<
-      <R extends readonly LIVRRuleDefinition[]>(rules: R) => BuildOrUnion<R>,
-      false,
-      false
-    >;
+  interface BuiltInRuleTypes {
+    or: OrType;
   }
 }

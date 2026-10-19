@@ -4,8 +4,8 @@
     "module": "commonjs",
     "strict": true,
     "noEmit": true,
-    "skipLibCheck": true,
+    "skipLibCheck": false,
     "esModuleInterop": true
   },
-  "include": ["types/**/*.d.ts", "lib/**/*.d.ts", "t/types-test.ts", "examples/**/*.ts"]
+  "include": ["types/**/*.d.ts", "lib/**/*.d.ts", "t/tests-types/*.ts", "examples/**/*.ts"]
 }

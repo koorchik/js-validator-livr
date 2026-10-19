@@ -1,8 +1,11 @@
 // Type inference for 'remove' rule
-import type { RuleTypeDef } from '../../../types/inference';
+// A new string: literal types of earlier rules are not kept
 
 declare module '../../../types/inference' {
-  interface RuleTypeRegistry {
-    remove: RuleTypeDef<string, false, false>;
+  interface BuiltInRuleTypes {
+    remove: string;
   }
 }
+
+// A module, so that "declare module" above adds to the types instead of replacing them
+export {};

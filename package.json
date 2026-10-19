@@ -35,8 +35,9 @@
     "./package.json": "./package.json"
   },
   "scripts": {
-    "test": "npm run test:unit && tsc --noEmit",
-    "test:unit": "node --test --experimental-test-coverage --test-coverage-include=\"lib/**\" --test-coverage-lines=95 --test-coverage-branches=90 --test-coverage-functions=95 \"t/tests-sync/*.js\" \"t/tests-async/*.js\""
+    "test": "npm run test:unit && npm run test:types",
+    "test:unit": "node --test --experimental-test-coverage --test-coverage-include=\"lib/**\" --test-coverage-lines=95 --test-coverage-branches=90 --test-coverage-functions=95 \"t/tests-sync/*.js\" \"t/tests-async/*.js\"",
+    "test:types": "tsc --noEmit && tsc --noEmit -p t/tests-types/packages"
   },
   "repository": {
     "type": "git",

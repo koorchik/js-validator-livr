@@ -40,9 +40,16 @@
 import {
   InferFromSchema as _InferFromSchema,
   InferRuleType as _InferRuleType,
+  MakesPresent as _MakesPresent,
   LIVRSchema as _LIVRSchema,
   LIVRRuleDefinition as _LIVRRuleDefinition,
   LIVRPrimitive as _LIVRPrimitive,
+  RuleTypes as _RuleTypes,
+  BuiltInRuleTypes as _BuiltInRuleTypes,
+  RuleType as _RuleType,
+  Present as _Present,
+  As as _As,
+  AliasType as _AliasType,
   RuleTypeDef as _RuleTypeDef,
   RuleTypeRegistry as _RuleTypeRegistry,
   ParameterizedRuleDef as _ParameterizedRuleDef,
@@ -58,7 +65,7 @@ type Schema = Record<string, any>;
 
 interface Alias {
   name: string;
-  rules: Schema;
+  rules: _LIVRRuleDefinition | Schema;
   error?: string;
 }
 
@@ -160,26 +167,44 @@ declare namespace LIVR {
 
   // Type inference exports
   export type InferFromSchema<S> = _InferFromSchema<S>;
-  export type InferRuleType<R> = _InferRuleType<R>;
+  export type InferRuleType<Rules, Input = unknown> = _InferRuleType<Rules, Input>;
+  export type MakesPresent<Rules, Input = unknown> = _MakesPresent<Rules, Input>;
   export type LIVRSchema = _LIVRSchema;
   export type LIVRRuleDefinition = _LIVRRuleDefinition;
   export type LIVRPrimitive = _LIVRPrimitive;
+  export type Simplify<T> = _Simplify<T>;
+
+  // Types of rules. Add types of your rules to RuleTypes in 'livr/types/inference'
+  export type RuleTypes = _RuleTypes;
+  export type BuiltInRuleTypes = _BuiltInRuleTypes;
+  export type RuleType = _RuleType;
+  export type Present<T> = _Present<T>;
+  export type As<T> = _As<T>;
+  export type AliasType<Rules> = _AliasType<Rules>;
+
+  /** @deprecated Add the rule to RuleTypes, see the migration guide in TYPESCRIPT.md */
   export type RuleTypeDef<
     TOutput = unknown,
     TRequiredEffect extends boolean = false,
     TDefaultEffect extends boolean = false,
   > = _RuleTypeDef<TOutput, TRequiredEffect, TDefaultEffect>;
+  /** @deprecated Use RuleTypes */
   export type RuleTypeRegistry = _RuleTypeRegistry;
+  /** @deprecated Use RuleTypes with an interface that extends RuleType */
   export type ParameterizedRuleDef<
     TTemplate extends string = string,
     TRequiredEffect extends boolean = false,
     TDefaultEffect extends boolean = false,
   > = _ParameterizedRuleDef<TTemplate, TRequiredEffect, TDefaultEffect>;
+  /** @deprecated Use RuleTypes with an interface that extends RuleType */
   export type ParameterizedRuleRegistry = _ParameterizedRuleRegistry;
-  export type Simplify<T> = _Simplify<T>;
+  /** @deprecated `my_rule: string` or `my_rule: As<string>` in RuleTypes */
   export type SimpleRule<T> = _SimpleRule<T>;
+  /** @deprecated An interface that extends RuleType with `present: true`, like `required` */
   export type RequiredRule = _RequiredRule;
+  /** @deprecated Use RuleTypes with an interface that extends RuleType */
   export type ParameterizedRule<F> = _ParameterizedRule<F>;
+  /** @deprecated `my_rule: Present<T>` in RuleTypes */
   export type DefaultRule<T> = _DefaultRule<T>;
 
   export const rules: Record<string, RuleFactory>;

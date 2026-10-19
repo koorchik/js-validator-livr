@@ -1,15 +1,20 @@
 // Type inference for 'list_of' rule
-import type { RuleTypeDef, InferRuleType, LIVRRuleDefinition } from '../../../types/inference';
+import type { RuleType, InferRuleType } from '../../../types/inference';
+
+/**
+ * An array of the type of the item rules:
+ * { list_of: 'string' }, { list_of: ['required', 'string'] } or { list_of: [['required', 'string']] }
+ */
+interface ListOfType extends RuleType {
+  output: Array<
+    this['args'][0] extends infer Rules extends readonly unknown[]
+      ? InferRuleType<Rules>
+      : InferRuleType<this['args']>
+  >;
+}
 
 declare module '../../../types/inference' {
-  interface RuleTypeRegistry {
-    list_of: RuleTypeDef<
-      <R extends LIVRRuleDefinition | readonly LIVRRuleDefinition[]>(
-        rules: R
-      ) => Array<InferRuleType<R>>,
-      false,
-      false
-    >;
-    listOf: RuleTypeRegistry['list_of'];
+  interface BuiltInRuleTypes {
+    list_of: ListOfType;
   }
 }

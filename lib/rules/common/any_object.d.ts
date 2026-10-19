@@ -1,9 +1,8 @@
 // Type inference for 'any_object' rule
-import type { RuleTypeDef } from '../../../types/inference';
+import type { As } from '../../../types/inference';
 
 declare module '../../../types/inference' {
-  interface RuleTypeRegistry {
-    any_object: RuleTypeDef<Record<string, unknown>, false, false>;
-    anyObject: RuleTypeRegistry['any_object'];
+  interface BuiltInRuleTypes {
+    any_object: As<Record<string, unknown>>;
   }
 }

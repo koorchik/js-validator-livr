@@ -1,9 +1,8 @@
 // Type inference for 'max_number' rule
-import type { RuleTypeDef } from '../../../types/inference';
+import type { As } from '../../../types/inference';
 
 declare module '../../../types/inference' {
-  interface RuleTypeRegistry {
-    max_number: RuleTypeDef<number, false, false>;
-    maxNumber: RuleTypeRegistry['max_number'];
+  interface BuiltInRuleTypes {
+    max_number: As<number>;
   }
 }

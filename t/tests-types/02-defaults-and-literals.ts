@@ -1,16 +1,9 @@
-// t/types-test.ts
+// t/tests-types/02-defaults-and-literals.ts
 // Type inference tests - verified at compile time via `npx tsc --noEmit`
 
-import type { InferFromSchema } from '../types';
-import LIVR = require('../lib/LIVR');
-
-// ============================================================================
-// Test Utilities
-// ============================================================================
-
-type Expect<T extends true> = T;
-type Equal<X, Y> =
-  (<T>() => T extends X ? 1 : 2) extends <T>() => T extends Y ? 1 : 2 ? true : false;
+import type { InferFromSchema } from '../../types';
+import type { Expect, Equal } from './utils';
+import LIVR = require('../../lib/LIVR');
 
 // ============================================================================
 // Default Rule - Widening Tests
