@@ -104,7 +104,7 @@ BENCHMARK_RESULTS=../../livr-benchmark/results npm run dev
 
 - The README is short: pitch, install, quick start, rules table. Guides, API, TypeScript and design go to the site
 - `docs/DESIGN.md` and `docs/TYPESCRIPT.md` keep their names (old links) and are mapped to `/why/design-decisions` and `/typescript` by `rewrites` in `docs/.vitepress/config.mts`. Anchors are GitHub-style, so links work on GitHub and on the site
-- The site leads with three pillars: rules are just data, performance, zero dependencies, plus trust (since 2013, the spec and its shared test suite). Pages in `docs/why/` explain them
+- The site leads with four pillars: rules are just data, performance (also for rules built at runtime, the benchmark with a validator created per call), type inference, zero dependencies, plus trust (since 2013, the spec and its shared test suite). Pages in `docs/why/` explain them
 - Benchmark charts and numbers are not stored here: `docs/scripts/fetch-benchmark.mjs` downloads `results/latest*.{json,svg}` of validators-benchmarks into `docs/public/benchmark/` (gitignored) before every build
 - The home page example is validated at build time by `lib/` (`docs/.vitepress/data/hero.data.ts`), so its output is always real
 

@@ -1,6 +1,6 @@
 # LIVR Validator
 
-> Validation rules that are just data. The fastest JavaScript validator in the benchmarks, with zero dependencies and TypeScript types inferred from the schema.
+> Validation rules that are just data. The fastest JavaScript validator in the benchmarks, also when rules are built at runtime, with TypeScript types inferred from the schema and zero dependencies.
 
 [![npm version](https://badge.fury.io/js/livr.svg)](https://badge.fury.io/js/livr)
 [![npm downloads](https://img.shields.io/npm/dm/livr.svg)](https://www.npmjs.com/package/livr)
@@ -14,17 +14,22 @@
 
 ## Why LIVR
 
-**Rules are just data.** A schema is a plain JSON structure, not code. Store it in a database, send it over the wire, share it with services written in other languages, and load it safely even from untrusted sources: LIVR never turns a schema into code. [Why schemas as data →](https://js.livr-spec.org/why/schemas-are-data)
+**Rules are just data.** A schema is a plain JSON structure, not code. Store it in a database, send it over the wire, share it with services written in other languages, build it at runtime, and load it safely even from untrusted sources: LIVR never turns a schema into code. [Why schemas as data →](https://js.livr-spec.org/why/schemas-are-data)
 
-**Incredible performance.** The fastest in the benchmarks against Valibot, Zod, fastest-validator, Ajv and Joi, both with a validator created once and with a validator created per call, and without code generation. [Benchmarks →](https://js.livr-spec.org/why/performance)
+**Incredible performance, also for rules built at runtime.** The fastest in the benchmarks against Valibot, Zod, fastest-validator, Ajv and Joi. Most validators are fast only when a schema is compiled once; when rules come from a database, differ per tenant or come from a form builder, every call needs a new validator. There LIVR is tens to hundreds of times faster than Zod, fastest-validator and Ajv, and needs less than a microsecond to create a validator and validate a form. [Benchmarks →](https://js.livr-spec.org/why/performance)
 
-[![Benchmark: validator created once, operations per second](https://js.livr-spec.org/benchmark/latest-static.svg)](https://js.livr-spec.org/why/performance)
+<p>
+  <a href="https://js.livr-spec.org/why/performance"><img src="https://js.livr-spec.org/benchmark/latest-static.svg" alt="Benchmark: rules fixed in code, validator created once" width="49%"></a>
+  <a href="https://js.livr-spec.org/why/performance#rules-built-at-runtime"><img src="https://js.livr-spec.org/benchmark/latest-dynamic.svg" alt="Benchmark: rules built at runtime, validator created per call" width="49%"></a>
+</p>
+
+**Type inference.** TypeScript infers the type of the validated data from the schema itself: required and optional fields, literal unions from `one_of`, nested objects, lists and your own rules. No second definition to keep in sync. [How it works →](https://js.livr-spec.org/why/type-inference)
 
 **Zero dependencies.** Nothing to audit but LIVR itself. About 2 KB for the core and 5 KB with every built-in rule, min+gzip, and it runs in Node.js, browsers and edge runtimes. [Why zero dependencies →](https://js.livr-spec.org/why/zero-dependencies)
 
 **Proven.** Maintained since 2013 and built on the [LIVR specification](https://livr-spec.org), whose shared test suite collects edge cases found in implementations in 11 languages. [More →](https://js.livr-spec.org/why/proven)
 
-Also: [type inference](https://js.livr-spec.org/typescript) with `InferFromSchema`, error codes shaped like your data, validation and transformation in one pass, [aliases and custom rules](https://js.livr-spec.org/guide/custom-rules), and a sync and an async validator. The [design decisions](https://js.livr-spec.org/why/design-decisions) explain why LIVR works the way it does.
+Also: error codes shaped like your data, validation and transformation in one pass, [aliases and custom rules](https://js.livr-spec.org/guide/custom-rules), and a sync and an async validator. The [design decisions](https://js.livr-spec.org/why/design-decisions) explain why LIVR works the way it does.
 
 ---
 

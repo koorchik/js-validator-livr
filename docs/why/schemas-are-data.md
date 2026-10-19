@@ -57,6 +57,8 @@ const { schema } = await db.query('SELECT schema FROM validation_rules WHERE ten
 const validator = new LIVR.Validator(JSON.parse(schema));
 ```
 
+Creating a validator from such rules for every request costs less than a microsecond, and LIVR is the fastest validator in this case too: see [Rules built at runtime](/why/performance#rules-built-at-runtime).
+
 **Embed rules in larger configurations.** A form builder can keep the UI and the validation of a field in one JSON document, an API gateway can keep the validation next to the route:
 
 ```json

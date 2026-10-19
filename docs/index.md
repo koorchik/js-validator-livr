@@ -6,7 +6,7 @@ titleTemplate: false
 hero:
   name: LIVR
   text: Validation rules that are just data
-  tagline: The fastest JavaScript validator in the benchmarks. Zero dependencies. TypeScript types inferred from the schema. Built on a cross-language specification and maintained since 2013.
+  tagline: Keep rules in code or build them at runtime, LIVR is the fastest JavaScript validator either way. TypeScript types inferred from the schema. Zero dependencies. Built on a cross-language specification and maintained since 2013.
   actions:
     - theme: brand
       text: Get started
@@ -26,9 +26,14 @@ features:
     linkText: Why data beats code
   - icon: ⚡
     title: Incredible performance
-    details: The fastest in the benchmarks against Valibot, Zod, fastest-validator, Ajv and Joi, both with a validator created once and with one created per call. Without code generation.
+    details: The fastest in the benchmarks against Valibot, Zod, fastest-validator, Ajv and Joi. Also when rules are built at runtime, where it is tens to hundreds of times faster than Zod, fastest-validator and Ajv.
     link: /why/performance
     linkText: See the benchmarks
+  - icon: 🔷
+    title: Type inference
+    details: TypeScript infers the type of the validated data from the schema itself, with required fields, literal unions, nested objects, lists and your own rules. No second definition to keep in sync.
+    link: /why/type-inference
+    linkText: How it works
   - icon: 📦
     title: Zero dependencies
     details: Nothing to audit but LIVR itself, no supply-chain risk, no version conflicts. About 2 KB for the core and 5 KB with every built-in rule, min+gzip.
@@ -80,7 +85,7 @@ if (!user) {
 </div>
 </div>
 
-The same JSON works in the browser, in Node.js, and in the Perl, PHP, Python, Go, Java, Ruby, Erlang and other [implementations](https://livr-spec.org/introduction/implementations.html).
+The same JSON works in the browser, in Node.js, and in the Perl, PHP, Python, Go, Java, Ruby, Erlang and other [implementations](https://livr-spec.org/introduction/implementations.html). And because rules are data, a program can build them at runtime: per tenant, per form, per request. Creating a validator from them takes less than a microsecond, [see below](#rules-built-at-runtime).
 
 <p class="home-more"><a href="/why/schemas-are-data">Why schemas as data →</a></p>
 
@@ -90,15 +95,70 @@ The same JSON works in the browser, in Node.js, and in the Perl, PHP, Python, Go
 
 <p class="home-pillar__eyebrow">Incredible performance</p>
 
-## The fastest, without generating code
+## The fastest, also when rules are built at runtime {#rules-built-at-runtime}
 
-fastest-validator and Ajv compile schemas into JavaScript code for speed, and that makes untrusted schemas dangerous. LIVR builds a closure for every rule once, and still leads both benchmarks: with a validator created once and reused, and with a validator created for every call, as with schemas loaded at runtime.
+Most validators are fast only when a schema is compiled once, at startup. When rules come from a database, differ per tenant or are put together in a form builder, every call needs a new validator, and validators that compile schemas into JavaScript code become 100–1000 times slower. LIVR builds a closure for every rule straight from the data, without generating code, and leads both benchmarks.
 
 <BenchmarkHighlights />
 
-<BenchmarkChart mode="static" />
+<BenchmarkPair />
 
-<p class="home-more"><a href="/why/performance">Both benchmarks and how they were measured →</a></p>
+<p class="home-more"><a href="/why/performance">All results and how they were measured →</a></p>
+
+</div>
+
+<div class="home-section">
+
+<p class="home-pillar__eyebrow">Type inference</p>
+
+## Types straight from the schema
+
+Add `as const` to a schema in your code, and `InferFromSchema` gives you the type of the validated data: required and optional fields, literal unions from `one_of`, nested objects and lists. There is no second definition to keep in sync and no code generator, and your own rules can declare their types too.
+
+<div class="home-columns">
+<div>
+<p class="home-file">user.ts</p>
+
+```ts
+import LIVR from 'livr';
+import type { InferFromSchema } from 'livr/types';
+
+const schema = {
+  email: ['required', 'email'],
+  role: { one_of: ['admin', 'user'] },
+  address: { nested_object: {
+    city: ['required', 'string'],
+    zip: 'positive_integer',
+  }},
+  tags: { list_of: 'string' },
+} as const;
+
+type User = InferFromSchema<typeof schema>;
+
+const validator = new LIVR.Validator<User>(schema);
+const user = validator.validate(input); // User | false
+```
+
+</div>
+<div>
+<p class="home-file">the inferred type of User</p>
+
+```ts
+{
+  email: string;
+  role?: 'admin' | 'user';
+  address?: {
+    city: string;
+    zip?: number;
+  };
+  tags?: string[];
+}
+```
+
+</div>
+</div>
+
+<p class="home-more"><a href="/why/type-inference">How type inference works →</a> &nbsp;·&nbsp; <a href="https://www.typescriptlang.org/play/?#code/JYWwDg9gTgLgBAGQJIDUBKcBmUIjgcgBtgA3KfAbgChRJY4YBPMAUzgG84kA7TFqAGI4QAZQDGACxYgAhnAC+WYQWJkA9E1YBnSlSpq1cAIKJUGLZOlzgWuGEIzg3OABMZMGQDo4AAxm2xCG4tGB84QhYYWwAVZhZxKGAweCc+KCVcOGAYKkDg+AspWTgAXg4qODgrYEIALjgAbXwoFgBHAFdgFpd8ABoCasJ8AF1eirgcCPrOIJYAfQhMeqaZFxAnPoJ2rX4RhTHK1ZcWrS1p8cruFhCWFwWAIwArFjEYc8qPuDFsxmXmts63U2+BCiW4AHMRgdPnAAF5Jer4SBabKkeZOGAscG7aGVeTQ-HjDzgs4ccI2GALJYEUFOSH7KiKfxfIIhaj6QwACQgJH4cAAqjt0jAIHAdmwYFIsrx+N0GHEqJo2IK+WUeGkhLhxEUZAAeJWLMWWWQAPnZeRCcBIMmIbhF6TKVwA7qZ0J4UDbgHboLqVVATQAKQpWACU1At8G2qqtnu9UE81tt7hYAc4g0RMm43AAAiwAB4ycARTyBECbSYsDNrDb9YmkpqPHTDBRhvTATBwANRqAh8qVbueI4nLQAfhLPwocAMYpgYPBcAAPnB2twXCxME5boyqoQdn2WcEIMXCBBwQHE173NBPNiYABRKA4KBaAMh1vyKhAA">Try it in the TypeScript Playground ↗</a></p>
 
 </div>
 
@@ -145,7 +205,6 @@ The library has been maintained since 2013 and its version 2 API has been stable
 
 ## Everything else you expect
 
-- **TypeScript inference**: `InferFromSchema<typeof schema>` gives you the type of the validated data, with no second definition to keep in sync. [TypeScript guide](/typescript)
 - **Error codes shaped like your data**: `{ address: { zip: 'NOT_POSITIVE_INTEGER' } }`, easy to translate and to map to form fields.
 - **Validation and transformation in one pass**: `trim`, `to_lc`, `default` and type coercion of form strings like `'42'` to `42`.
 - **Your own vocabulary**: combine rules into aliases such as `adult_age` with their own error codes, or write a rule in a few lines. [Custom rules](/guide/custom-rules)
@@ -180,6 +239,6 @@ const validator = new LIVR.Validator<User>(schema);
 const user = validator.validate(input); // User, or false with validator.getErrors()
 ```
 
-<p class="home-more"><a href="/guide/getting-started">Read the guide →</a> &nbsp;·&nbsp; <a href="https://www.typescriptlang.org/play/?#code/JYWwDg9gTgLgBAGQJIDUBKcBmUIjgcgBtgA3KfAbgChRJY4YBPMAUzgG84kA7TFqAGI4QAZQDGACxYgAhnAC+WYQWJkA9E1YBnSlSpq1cAIKJUGLZOlzgWuGEIzg3OABMZMGQDo4AAxm2xCG4tGB84QhYYWwAVZhZxKGAweCc+KCVcOGAYKkDg+AspWTgAXg4qODgrYEIALjgAbXwoFgBHAFdgFpd8ABoCasJ8AF1eirgZAHMWeqaWjq6WHv78SC1s0hYAfScYFmnyUfGcCPrOIO2ITFn8GRcQJz6Cdq1+EYUxyruXFq0tM-GlW4LBCSy2EAARgArFhiGAAyqIuBibKMG7zTrdJ74EKJbiTEafJFwABeSXqqwg6xgmx23D2Bz6gI+43kY0U-mRQRC1H0hgAEhASPw4ABVV7pGAQOCvNgwKRZXj8boMOJUTRscUiso8NJCXDiIoyAA8GquMsssgAfLy8iE4CQZMQ3FL0mVgQB3UzoTwoJ3AF3QY1aqBWgAUhSsAEpqHb4C9tQ7-YGoJ5Hc73Cww5xBhSZNxuAABFgADxk4AinkCICeUxmBAALAAmJ4neu3e6PBQxvTATBwMMJqBR8qVIeeNsUOAGAh3B7cfBwAA+zwli5X7W4LhYmCcSyoihYhFeo65wQglcIEEmYfTAfc0E80xgAFEoDgoFow1Ge-IqEA">Try type inference in the TypeScript Playground ↗</a></p>
+<p class="home-more"><a href="/guide/getting-started">Read the guide →</a> &nbsp;·&nbsp; <a href="https://www.typescriptlang.org/play/?#code/JYWwDg9gTgLgBAGQJIDUBKcBmUIjgcgBtgA3KfAbgChRJY4YBPMAUzgG84kA7TFqAGI4QAZQDGACxYgAhnAC+WYQWJkA9E1YBnSlSpq1cAIKJUGLZOlzgWuGEIzg3OABMZMGQDo4AAxm2xCG4tGB84QhYYWwAVZhZxKGAweCc+KCVcOGAYKkDg+AspWTgAXg4qODgrYEIALjgAbXwoFgBHAFdgFpd8ABoCasJ8AF1eirgcCPrOIJYAfQhMeqaZFxAnPoJ2rX4RhTHK1ZcWrS1p8cruFhCWFwWAIwArFjEYc8qPuDFsxmXmts63U2+BCiW4AHMRgdPnAAF5Jer4SBabKkeZOGAscG7aGVeTQ-HjDzgs4ccI2GALJYEUFOSH7KiKfxfIIhaj6QwACQgJH4cAAqjt0jAIHAdmwYFIsrx+N0GHEqJo2IK+WUeGkhLhxEUZAAeJWLMWWWQAPnZeRCcBIMmIbhF6TKVwA7qZ0J4UDbgHboLqVVATQAKQpWACU1At8G2qqtnu9UE81tt7hYAc4g0RMm43AAAiwAB4ycARTyBECbSYsDNrDb9YmkpqPHTDBRhvTATBwANRqAh8qVbueI4nLQAfhLPwocAMYpgYPBcAAPnB2twXCxME5boyqoQdn2WcEIMXCBBwQHE173NBPNiYABRKA4KBaAMh1vyKhAA">Try type inference in the TypeScript Playground ↗</a></p>
 
 </div>

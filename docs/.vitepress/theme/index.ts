@@ -5,6 +5,7 @@ import { h } from 'vue';
 import HeroDemo from './components/HeroDemo.vue';
 import BenchmarkChart from './components/BenchmarkChart.vue';
 import BenchmarkHighlights from './components/BenchmarkHighlights.vue';
+import BenchmarkPair from './components/BenchmarkPair.vue';
 import BenchmarkTable from './components/BenchmarkTable.vue';
 import TrustStrip from './components/TrustStrip.vue';
 import './custom.css';
@@ -20,6 +21,7 @@ export default {
   enhanceApp({ app }) {
     app.component('BenchmarkChart', BenchmarkChart);
     app.component('BenchmarkHighlights', BenchmarkHighlights);
+    app.component('BenchmarkPair', BenchmarkPair);
     app.component('BenchmarkTable', BenchmarkTable);
   },
 } satisfies Theme;

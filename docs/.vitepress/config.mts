@@ -25,6 +25,7 @@ const whySidebar: DefaultTheme.SidebarItem[] = [
     items: [
       { text: 'Rules are just data', link: '/why/schemas-are-data' },
       { text: 'Performance', link: '/why/performance' },
+      { text: 'Type inference', link: '/why/type-inference' },
       { text: 'Zero dependencies', link: '/why/zero-dependencies' },
       { text: 'Proven by 13 years and a spec', link: '/why/proven' },
       { text: 'All design decisions', link: '/why/design-decisions' },
@@ -121,6 +122,7 @@ export default defineConfig({
         items: [
           { text: 'Rules are just data', link: '/why/schemas-are-data' },
           { text: 'Performance', link: '/why/performance' },
+          { text: 'Type inference', link: '/why/type-inference' },
           { text: 'Zero dependencies', link: '/why/zero-dependencies' },
           { text: 'Proven by 13 years and a spec', link: '/why/proven' },
           { text: 'All design decisions', link: '/why/design-decisions' },

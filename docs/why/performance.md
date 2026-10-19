@@ -1,25 +1,39 @@
 ---
 title: Performance
-description: LIVR is the fastest JavaScript validator in the benchmarks, with a validator created once and with one created per call, and it generates no code.
+description: LIVR is the fastest JavaScript validator in the benchmarks, with rules fixed in code and with rules built at runtime, and it generates no code.
 ---
 
 # Performance
 
-LIVR is the fastest of the popular JavaScript validators in both benchmarks: when a validator is created once and reused, and when a validator is created for every call. It gets there without generating code, so its schemas stay [plain data](/why/schemas-are-data) that is safe to load from anywhere.
+LIVR is the fastest of the popular JavaScript validators in both benchmarks: with rules fixed in code, where a validator is created once and reused, and with rules built at runtime, where every call needs a new validator. It gets there without generating code, so its schemas stay [plain data](/why/schemas-are-data) that is safe to load from anywhere.
 
 > **Speed in both modes** is the priority → schemas are **compiled into closures once**, never into JavaScript source → no extra speed from code generation, and LIVR is still the fastest
 
 <BenchmarkHighlights />
 
-## Validator created once
+## Rules fixed in code
 
-The usual case: a schema in your code, one validator for the lifetime of the process.
+The usual case: a schema in your code, one validator for the lifetime of the process (static validation, hot start).
 
 <BenchmarkChart mode="static" />
 
-## Validator created per call
+## Rules built at runtime
 
-A new validator for every validation: schemas loaded from a database, rules per tenant, form builders, or code that simply creates validators inline. Validators that generate code pay the price of generating and compiling it again for every schema.
+Rules are often not known when the process starts: they live in a database and change without a deploy, differ per tenant or per customer plan, come from a form builder or a CMS, or are put together from the data of a request. Then every call needs a new validator (dynamic validation, cold start):
+
+```js
+// The rules of a form are edited by the customer in an admin panel
+app.post('/forms/:formId', async (req, res) => {
+  const rules = await db.getFormRules(req.params.formId);
+  const validator = new LIVR.Validator(rules); // a new validator for every request
+
+  const data = validator.validate(req.body);
+  if (!data) return res.status(422).json(validator.getErrors());
+  // ...
+});
+```
+
+A cache of validators helps only when the rules repeat, and it has to be invalidated when they change. With LIVR, creating a validator is so cheap that you can skip the cache. Validators that generate code pay for generating and compiling JavaScript again for every new schema, and here the gap grows to hundreds of times:
 
 <BenchmarkChart mode="dynamic" />
 
