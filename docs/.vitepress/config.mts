@@ -6,6 +6,8 @@ const pkg = JSON.parse(fs.readFileSync(new URL('../../package.json', import.meta
 const SITE_URL = 'https://js.livr-spec.org';
 const REPO_URL = 'https://github.com/koorchik/js-validator-livr';
 const SPEC_URL = 'https://livr-spec.org';
+// The rules reference of the specification: most visitors look for it
+const RULES_URL = `${SPEC_URL}/validation-rules.html`;
 const DESCRIPTION =
   'LIVR for JavaScript and TypeScript: validation rules that are just data, the fastest validator in the benchmarks, zero dependencies and type inference from the schema.';
 
@@ -19,21 +21,8 @@ function slugify(text: string) {
     .replace(/\s/g, '-');
 }
 
-const whySidebar: DefaultTheme.SidebarItem[] = [
-  {
-    text: 'Why LIVR',
-    items: [
-      { text: 'Rules are just data', link: '/why/schemas-are-data' },
-      { text: 'Performance', link: '/why/performance' },
-      { text: 'Type inference', link: '/why/type-inference' },
-      { text: 'Zero dependencies', link: '/why/zero-dependencies' },
-      { text: 'Proven by 13 years and a spec', link: '/why/proven' },
-      { text: 'All design decisions', link: '/why/design-decisions' },
-    ],
-  },
-];
-
-const docsSidebar: DefaultTheme.SidebarItem[] = [
+// One sidebar for all pages, so the whole menu stays visible everywhere
+const sidebar: DefaultTheme.SidebarItem[] = [
   {
     text: 'Guide',
     items: [
@@ -51,7 +40,17 @@ const docsSidebar: DefaultTheme.SidebarItem[] = [
       { text: 'Changelog', link: '/changelog' },
     ],
   },
-  ...whySidebar,
+  {
+    text: 'Why LIVR',
+    items: [
+      { text: 'Rules are just data', link: '/why/schemas-are-data' },
+      { text: 'Performance', link: '/why/performance' },
+      { text: 'Type inference', link: '/why/type-inference' },
+      { text: 'Zero dependencies', link: '/why/zero-dependencies' },
+      { text: 'Proven by 13 years and a spec', link: '/why/proven' },
+      { text: 'All design decisions', link: '/why/design-decisions' },
+    ],
+  },
 ];
 
 export default defineConfig({
@@ -75,7 +74,7 @@ export default defineConfig({
     ['link', { rel: 'icon', href: '/favicon.ico', sizes: '32x32' }],
     ['link', { rel: 'icon', type: 'image/svg+xml', href: '/favicon.svg' }],
     ['link', { rel: 'apple-touch-icon', href: '/apple-touch-icon.png' }],
-    ['meta', { name: 'theme-color', content: '#1a7fc4' }],
+    ['meta', { name: 'theme-color', content: '#f7df1e' }],
     ['meta', { property: 'og:type', content: 'website' }],
     ['meta', { property: 'og:site_name', content: 'LIVR for JavaScript' }],
     ['meta', { property: 'og:image', content: `${SITE_URL}/og-image.png` }],
@@ -113,7 +112,7 @@ export default defineConfig({
 
   themeConfig: {
     logo: { light: '/logo.svg', dark: '/logo-dark.svg', alt: 'LIVR' },
-    siteTitle: 'for JavaScript',
+    siteTitle: 'for <span class="js-badge">JavaScript</span>',
 
     nav: [
       {
@@ -131,11 +130,12 @@ export default defineConfig({
       { text: 'Guide', link: '/guide/getting-started', activeMatch: '^/(guide/|rules)' },
       { text: 'TypeScript', link: '/typescript' },
       { text: 'API', link: '/api' },
-      { text: 'Specification', link: SPEC_URL },
+      { text: 'All rules', link: RULES_URL },
       {
         text: `v${pkg.version}`,
         items: [
           { text: 'Changelog', link: '/changelog' },
+          { text: 'LIVR specification', link: SPEC_URL },
           { text: 'npm', link: 'https://www.npmjs.com/package/livr' },
           { text: 'livr-extra-rules', link: 'https://www.npmjs.com/package/livr-extra-rules' },
           { text: 'Playground', link: `${SPEC_URL}/playground.html` },
@@ -143,10 +143,7 @@ export default defineConfig({
       },
     ],
 
-    sidebar: {
-      '/why/': whySidebar,
-      '/': docsSidebar,
-    },
+    sidebar,
 
     socialLinks: [{ icon: 'github', link: REPO_URL }],
 

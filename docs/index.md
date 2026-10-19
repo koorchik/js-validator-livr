@@ -12,11 +12,11 @@ hero:
       text: Get started
       link: /guide/getting-started
     - theme: alt
+      text: All validation rules ↗︎
+      link: https://livr-spec.org/validation-rules.html
+    - theme: alt
       text: Why LIVR
       link: /why/schemas-are-data
-    - theme: alt
-      text: GitHub
-      link: https://github.com/koorchik/js-validator-livr
 
 features:
   - icon: 📄
@@ -158,7 +158,7 @@ const user = validator.validate(input); // User | false
 </div>
 </div>
 
-<p class="home-more"><a href="/why/type-inference">How type inference works →</a> &nbsp;·&nbsp; <a href="https://www.typescriptlang.org/play/?#code/JYWwDg9gTgLgBAGQJIDUBKcBmUIjgcgBtgA3KfAbgChRJY4YBPMAUzgG84kA7TFqAGI4QAZQDGACxYgAhnAC+WYQWJkA9E1YBnSlSpq1cAIKJUGLZOlzgWuGEIzg3OABMZMGQDo4AAxm2xCG4tGB84QhYYWwAVZhZxKGAweCc+KCVcOGAYKkDg+AspWTgAXg4qODgrYEIALjgAbXwoFgBHAFdgFpd8ABoCasJ8AF1eirgcCPrOIJYAfQhMeqaZFxAnPoJ2rX4RhTHK1ZcWrS1p8cruFhCWFwWAIwArFjEYc8qPuDFsxmXmts63U2+BCiW4AHMRgdPnAAF5Jer4SBabKkeZOGAscG7aGVeTQ-HjDzgs4ccI2GALJYEUFOSH7KiKfxfIIhaj6QwACQgJH4cAAqjt0jAIHAdmwYFIsrx+N0GHEqJo2IK+WUeGkhLhxEUZAAeJWLMWWWQAPnZeRCcBIMmIbhF6TKVwA7qZ0J4UDbgHboLqVVATQAKQpWACU1At8G2qqtnu9UE81tt7hYAc4g0RMm43AAAiwAB4ycARTyBECbSYsDNrDb9YmkpqPHTDBRhvTATBwANRqAh8qVbueI4nLQAfhLPwocAMYpgYPBcAAPnB2twXCxME5boyqoQdn2WcEIMXCBBwQHE173NBPNiYABRKA4KBaAMh1vyKhAA">Try it in the TypeScript Playground ↗</a></p>
+<p class="home-more"><a href="/why/type-inference">How type inference works →</a> &nbsp;·&nbsp; <a href="https://www.typescriptlang.org/play/?#code/JYWwDg9gTgLgBAGQJIDUBKcBmUIjgcgBtgA3KfAbgChRJY4YBPMAUzgG84kA7TFqAGI4QAZQDGACxYgAhnAC+WYQWJkA9E1YBnSlSpq1cAIKJUGLZOlzgWuGEIzg3OABMZMGQDo4AAxm2xCG4tGB84QhYYWwAVZhZxKGAweCc+KCVcOGAYKkDg+AspWTgAXg4qODgrYEIALjgAbXwoFgBHAFdgFpd8ABoCasJ8AF1eirgcCPrOIJYAfQhMeqaZFxAnPoJ2rX4RhTHK1ZcWrS1p8cruFhCWFwWAIwArFjEYc8qPuDFsxmXmts63U2+BCiW4AHMRgdPnAAF5Jer4SBabKkeZOGAscG7aGVeTQ-HjDzgs4ccI2GALJYEUFOSH7KiKfxfIIhaj6QwACQgJH4cAAqjt0jAIHAdmwYFIsrx+N0GHEqJo2IK+WUeGkhLhxEUZAAeJWLMWWWQAPnZeRCcBIMmIbhF6TKVwA7qZ0J4UDbgHboLqVVATQAKQpWACU1At8G2qqtnu9UE81tt7hYAc4g0RMm43AAAiwAB4ycARTyBECbSYsDNrDb9YmkpqPHTDBRhvTATBwANRqAh8qVbueI4nLQAfhLPwocAMYpgYPBcAAPnB2twXCxME5boyqoQdn2WcEIMXCBBwQHE173NBPNiYABRKA4KBaAMh1vyKhAA">Try it in the TypeScript Playground ↗︎</a></p>
 
 </div>
 
@@ -239,6 +239,8 @@ const validator = new LIVR.Validator<User>(schema);
 const user = validator.validate(input); // User, or false with validator.getErrors()
 ```
 
-<p class="home-more"><a href="/guide/getting-started">Read the guide →</a> &nbsp;·&nbsp; <a href="https://www.typescriptlang.org/play/?#code/JYWwDg9gTgLgBAGQJIDUBKcBmUIjgcgBtgA3KfAbgChRJY4YBPMAUzgG84kA7TFqAGI4QAZQDGACxYgAhnAC+WYQWJkA9E1YBnSlSpq1cAIKJUGLZOlzgWuGEIzg3OABMZMGQDo4AAxm2xCG4tGB84QhYYWwAVZhZxKGAweCc+KCVcOGAYKkDg+AspWTgAXg4qODgrYEIALjgAbXwoFgBHAFdgFpd8ABoCasJ8AF1eirgcCPrOIJYAfQhMeqaZFxAnPoJ2rX4RhTHK1ZcWrS1p8cruFhCWFwWAIwArFjEYc8qPuDFsxmXmts63U2+BCiW4AHMRgdPnAAF5Jer4SBabKkeZOGAscG7aGVeTQ-HjDzgs4ccI2GALJYEUFOSH7KiKfxfIIhaj6QwACQgJH4cAAqjt0jAIHAdmwYFIsrx+N0GHEqJo2IK+WUeGkhLhxEUZAAeJWLMWWWQAPnZeRCcBIMmIbhF6TKVwA7qZ0J4UDbgHboLqVVATQAKQpWACU1At8G2qqtnu9UE81tt7hYAc4g0RMm43AAAiwAB4ycARTyBECbSYsDNrDb9YmkpqPHTDBRhvTATBwANRqAh8qVbueI4nLQAfhLPwocAMYpgYPBcAAPnB2twXCxME5boyqoQdn2WcEIMXCBBwQHE173NBPNiYABRKA4KBaAMh1vyKhAA">Try type inference in the TypeScript Playground ↗</a></p>
+<RulesCard wide />
+
+<p class="home-more"><a href="/guide/getting-started">Read the guide →</a> &nbsp;·&nbsp; <a href="https://www.typescriptlang.org/play/?#code/JYWwDg9gTgLgBAGQJIDUBKcBmUIjgcgBtgA3KfAbgChRJY4YBPMAUzgG84kA7TFqAGI4QAZQDGACxYgAhnAC+WYQWJkA9E1YBnSlSpq1cAIKJUGLZOlzgWuGEIzg3OABMZMGQDo4AAxm2xCG4tGB84QhYYWwAVZhZxKGAweCc+KCVcOGAYKkDg+AspWTgAXg4qODgrYEIALjgAbXwoFgBHAFdgFpd8ABoCasJ8AF1eirgcCPrOIJYAfQhMeqaZFxAnPoJ2rX4RhTHK1ZcWrS1p8cruFhCWFwWAIwArFjEYc8qPuDFsxmXmts63U2+BCiW4AHMRgdPnAAF5Jer4SBabKkeZOGAscG7aGVeTQ-HjDzgs4ccI2GALJYEUFOSH7KiKfxfIIhaj6QwACQgJH4cAAqjt0jAIHAdmwYFIsrx+N0GHEqJo2IK+WUeGkhLhxEUZAAeJWLMWWWQAPnZeRCcBIMmIbhF6TKVwA7qZ0J4UDbgHboLqVVATQAKQpWACU1At8G2qqtnu9UE81tt7hYAc4g0RMm43AAAiwAB4ycARTyBECbSYsDNrDb9YmkpqPHTDBRhvTATBwANRqAh8qVbueI4nLQAfhLPwocAMYpgYPBcAAPnB2twXCxME5boyqoQdn2WcEIMXCBBwQHE173NBPNiYABRKA4KBaAMh1vyKhAA">Try type inference in the TypeScript Playground ↗︎</a></p>
 
 </div>

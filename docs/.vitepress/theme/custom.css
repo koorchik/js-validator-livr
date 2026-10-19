@@ -1,14 +1,32 @@
-/* Brand: the blue of the LIVR logo, as on livr-spec.org, tuned for WCAG AA contrast */
+/* Brand: JavaScript yellow, so this site does not look like livr-spec.org (blue).
+   Yellow is too light for text on white, so light-theme links use a dark amber (AA contrast) */
 :root {
-  --vp-c-brand-1: #1a70ad;
-  --vp-c-brand-2: #1769a3;
-  --vp-c-brand-3: #1d7bbd;
-  --vp-c-brand-soft: rgba(33, 138, 204, 0.14);
+  --js-yellow: #f7df1e;
+  --js-yellow-hover: #ffe94d;
+  --js-yellow-active: #e6cf00;
+
+  --vp-c-brand-1: #8a6100;
+  --vp-c-brand-2: #735100;
+  --vp-c-brand-3: #f7df1e;
+  --vp-c-brand-soft: rgba(247, 223, 30, 0.24);
+
+  --vp-c-bg-alt: #faf8f0;
+  --vp-c-bg-soft: #f6f3e7;
+
+  --vp-button-brand-border: transparent;
+  --vp-button-brand-text: #1b1b1f;
+  --vp-button-brand-bg: var(--js-yellow);
+  --vp-button-brand-hover-border: transparent;
+  --vp-button-brand-hover-text: #1b1b1f;
+  --vp-button-brand-hover-bg: var(--js-yellow-hover);
+  --vp-button-brand-active-border: transparent;
+  --vp-button-brand-active-text: #1b1b1f;
+  --vp-button-brand-active-bg: var(--js-yellow-active);
 
   --vp-home-hero-name-color: transparent;
-  --vp-home-hero-name-background: linear-gradient(120deg, #1d7bbd 20%, #20a39e);
-  --vp-home-hero-image-background-image: linear-gradient(-45deg, #218acc 40%, #2ec4b6 60%);
-  --vp-home-hero-image-filter: blur(56px);
+  --vp-home-hero-name-background: linear-gradient(120deg, #c28e00 20%, #e8590c);
+  --vp-home-hero-image-background-image: linear-gradient(-45deg, #f7df1e 40%, #ffb703 60%);
+  --vp-home-hero-image-filter: blur(64px);
 
   --livr-t-key: #6f42c1;
   --livr-t-string: #032f62;
@@ -18,18 +36,120 @@
 }
 
 .dark {
-  --vp-c-brand-1: #6cb8ec;
-  --vp-c-brand-2: #4aa3e0;
-  --vp-c-brand-3: #1d7bbd;
-  --vp-c-brand-soft: rgba(33, 138, 204, 0.2);
+  --vp-c-brand-1: #f7df1e;
+  --vp-c-brand-2: #ffe94d;
+  --vp-c-brand-3: #f7df1e;
+  --vp-c-brand-soft: rgba(247, 223, 30, 0.16);
 
-  --vp-home-hero-name-background: linear-gradient(120deg, #6cb8ec 20%, #5fe0d2);
-  --vp-home-hero-image-filter: blur(72px);
+  /* A warm dark background instead of the blue-grey of the default theme */
+  --vp-c-bg: #1c1b16;
+  --vp-c-bg-alt: #171612;
+  --vp-c-bg-elv: #23221c;
+  --vp-c-bg-soft: #25241d;
+
+  --vp-home-hero-name-background: linear-gradient(120deg, #f7df1e 20%, #ffa94d);
+  --vp-home-hero-image-filter: blur(80px);
 
   --livr-t-key: #b392f0;
   --livr-t-string: #9ecbff;
   --livr-t-number: #79b8ff;
   --livr-t-comment: #8b949e;
+}
+
+/* A yellow stripe on top of every page */
+.VPNav::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 100;
+  height: 3px;
+  background: var(--js-yellow);
+}
+
+/* "LIVR for JavaScript", with JavaScript in a yellow badge */
+.VPNavBarTitle .js-badge {
+  display: inline-block;
+  margin-left: 2px;
+  border-radius: 6px;
+  padding: 1px 8px;
+  font-weight: 700;
+  color: #1b1b1f;
+  background: var(--js-yellow);
+}
+
+/* The rules reference of the specification: a button in the nav */
+.VPNavBarMenu .VPNavBarMenuLink[href='https://livr-spec.org/validation-rules.html'] {
+  align-self: center;
+  height: 32px;
+  margin-left: 8px;
+  border-radius: 999px;
+  padding: 0 14px;
+  line-height: 32px;
+  font-weight: 600;
+  color: #1b1b1f;
+  background: var(--js-yellow);
+  transition: background-color 0.2s;
+}
+
+.VPNavBarMenu .VPNavBarMenuLink[href='https://livr-spec.org/validation-rules.html']:hover {
+  color: #1b1b1f;
+  background: var(--js-yellow-hover);
+}
+
+/* The same link as a card at the top of the sidebar and on some pages */
+.rules-card {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin: 16px 0 8px;
+  border: 1px solid var(--js-yellow-active);
+  border-radius: 12px;
+  padding: 12px 14px;
+  background: var(--vp-c-brand-soft);
+  text-decoration: none !important;
+  transition:
+    border-color 0.2s,
+    background-color 0.2s;
+}
+
+.rules-card:hover {
+  border-color: var(--vp-c-brand-1);
+}
+
+.rules-card__title {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--vp-c-text-1);
+}
+
+.rules-card__text {
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--vp-c-text-2);
+}
+
+.rules-card--wide {
+  margin: 24px 0;
+  padding: 16px 20px;
+}
+
+.rules-card--wide .rules-card__title {
+  font-size: 18px;
+}
+
+.rules-card--wide .rules-card__text {
+  font-size: 14px;
+}
+
+/* A warm yellow glow behind the home page hero */
+.VPHome {
+  background: radial-gradient(1200px 520px at 70% 0, rgba(247, 223, 30, 0.22), transparent 70%);
+}
+
+.dark .VPHome {
+  background: radial-gradient(1200px 520px at 70% 0, rgba(247, 223, 30, 0.1), transparent 70%);
 }
 
 .VPNavBarTitle .logo {

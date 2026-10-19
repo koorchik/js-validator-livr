@@ -107,6 +107,8 @@ BENCHMARK_RESULTS=../../livr-benchmark/results npm run dev
 - The site leads with four pillars: rules are just data, performance (also for rules built at runtime, the benchmark with a validator created per call), type inference, zero dependencies, plus trust (since 2013, the spec and its shared test suite). Pages in `docs/why/` explain them
 - Benchmark charts and numbers are not stored here: `docs/scripts/fetch-benchmark.mjs` downloads `results/latest*.{json,svg}` of validators-benchmarks into `docs/public/benchmark/` (gitignored) before every build
 - The home page example is validated at build time by `lib/` (`docs/.vitepress/data/hero.data.ts`), so its output is always real
+- The site uses JavaScript yellow (`--js-yellow` in `custom.css`), so it is not confused with the blue livr-spec.org. Light-theme links use dark amber for contrast
+- The rules reference lives on livr-spec.org and is linked everywhere: the "All rules" nav button, `RulesCard` at the top of the sidebar and on the home, getting started and rules pages, and a hero button
 
 ## Code Style
 

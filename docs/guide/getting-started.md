@@ -48,6 +48,8 @@ A schema maps field names to rules. A field can have one rule (`'required'`), a 
 
 Rule names work in both `snake_case` and `camelCase`: `one_of` and `oneOf`, `min_length` and `minLength` are the same rule. The [LIVR specification](https://livr-spec.org) uses `snake_case`, so schemas written that way also work in the other implementations.
 
+<RulesCard wide />
+
 `validate()` returns the validated data, or `false` if the data is invalid. `getErrors()` then returns error codes shaped like the input. Empty values (`undefined`, `null` and `''`) pass every rule except `required`, so optional fields need no special handling.
 
 ## With TypeScript

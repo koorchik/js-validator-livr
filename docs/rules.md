@@ -1,6 +1,10 @@
 # Built-in rules
 
-Every rule of the [LIVR specification](https://livr-spec.org/validation-rules.html) is built in. Rule names link to the specification, which has the arguments, error codes and examples of every rule. The last column shows the TypeScript type that [`InferFromSchema`](/typescript) gives a field with this rule.
+Every rule of the [LIVR specification](https://livr-spec.org/validation-rules.html) is built in. This page is a short list with the TypeScript type of every rule. The full reference, with the arguments, error codes and examples of every rule, is on the specification site:
+
+<RulesCard wide />
+
+Rule names below link to their pages in the specification. The last column shows the TypeScript type that [`InferFromSchema`](/typescript) gives a field with this rule.
 
 Rule names work in `snake_case` and in `camelCase`: `min_length` and `minLength` are the same rule.
 
