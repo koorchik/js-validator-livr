@@ -1,6 +1,6 @@
 # LIVR Validator
 
-> Lightweight, very fast, and language-independent validation for JavaScript & TypeScript
+> Validation rules that are just data. The fastest JavaScript validator in the benchmarks, with zero dependencies and TypeScript types inferred from the schema.
 
 [![npm version](https://badge.fury.io/js/livr.svg)](https://badge.fury.io/js/livr)
 [![npm downloads](https://img.shields.io/npm/dm/livr.svg)](https://www.npmjs.com/package/livr)
@@ -8,11 +8,76 @@
 [![Bundle Size](https://img.shields.io/bundlephobia/minzip/livr)](https://bundlephobia.com/package/livr)
 [![Known Vulnerabilities](https://snyk.io/test/github/koorchik/js-validator-livr/badge.svg?targetFile=package.json)](https://snyk.io/test/github/koorchik/js-validator-livr?targetFile=package.json)
 
+**Documentation: [js.livr-spec.org](https://js.livr-spec.org)** · [Getting started](https://js.livr-spec.org/guide/getting-started) · [TypeScript](https://js.livr-spec.org/typescript) · [API](https://js.livr-spec.org/api) · [LIVR specification](https://livr-spec.org)
+
 ---
 
-**[LIVR Specification](http://livr-spec.org)** - Full documentation of all validation rules
+## Why LIVR
 
-**[Design Decisions](./docs/DESIGN.md)** - Why LIVR works the way it does: schemas as data, security, error codes, and more
+**Rules are just data.** A schema is a plain JSON structure, not code. Store it in a database, send it over the wire, share it with services written in other languages, and load it safely even from untrusted sources: LIVR never turns a schema into code. [Why schemas as data →](https://js.livr-spec.org/why/schemas-are-data)
+
+**Incredible performance.** The fastest in the benchmarks against Valibot, Zod, fastest-validator, Ajv and Joi, both with a validator created once and with a validator created per call, and without code generation. [Benchmarks →](https://js.livr-spec.org/why/performance)
+
+[![Benchmark: validator created once, operations per second](https://js.livr-spec.org/benchmark/latest-static.svg)](https://js.livr-spec.org/why/performance)
+
+**Zero dependencies.** Nothing to audit but LIVR itself. About 2 KB for the core and 5 KB with every built-in rule, min+gzip, and it runs in Node.js, browsers and edge runtimes. [Why zero dependencies →](https://js.livr-spec.org/why/zero-dependencies)
+
+**Proven.** Maintained since 2013 and built on the [LIVR specification](https://livr-spec.org), whose shared test suite collects edge cases found in implementations in 11 languages. [More →](https://js.livr-spec.org/why/proven)
+
+Also: [type inference](https://js.livr-spec.org/typescript) with `InferFromSchema`, error codes shaped like your data, validation and transformation in one pass, [aliases and custom rules](https://js.livr-spec.org/guide/custom-rules), and a sync and an async validator. The [design decisions](https://js.livr-spec.org/why/design-decisions) explain why LIVR works the way it does.
+
+---
+
+## Installation
+
+```bash
+npm install livr
+```
+
+Works in Node.js and, through any bundler or an ESM CDN like `https://esm.sh/livr`, in browsers.
+
+## Quick Start
+
+```javascript
+import LIVR from 'livr';
+
+const validator = new LIVR.Validator({
+  name: 'required',
+  email: ['required', 'email'],
+  age: 'positive_integer',
+  password: ['required', { min_length: 8 }],
+  password2: { equal_to_field: 'password' },
+});
+
+const validData = validator.validate(userData);
+
+if (validData) {
+  saveUser(validData); // validated data, fields without rules removed
+} else {
+  console.log(validator.getErrors());
+  // { email: 'WRONG_EMAIL', password: 'TOO_SHORT' }
+}
+```
+
+With TypeScript, the type comes from the schema:
+
+```typescript
+import LIVR from 'livr';
+import type { InferFromSchema } from 'livr/types';
+
+const schema = {
+  name: ['required', 'string'],
+  age: 'positive_integer',
+  role: { one_of: ['admin', 'user'] },
+} as const;
+
+type User = InferFromSchema<typeof schema>;
+// { name: string; age?: number; role?: 'admin' | 'user' }
+
+const validator = new LIVR.Validator<User>(schema);
+```
+
+Next: [usage guide](https://js.livr-spec.org/guide/usage) (modifiers, async validation, smaller bundles), [custom rules](https://js.livr-spec.org/guide/custom-rules), [API reference](https://js.livr-spec.org/api).
 
 ---
 
@@ -31,547 +96,9 @@
 
 ---
 
-## Features
-
-### Why LIVR?
-
-- **Very fast** - Faster than Valibot, Zod, fastest-validator, Ajv and Joi in [benchmarks](#performance), without code generation
-- **Zero dependencies** - No external runtime dependencies
-- **Tiny footprint** - Validator core < 1KB, with all rules ~3KB (min+gzip)
-- **TypeScript support** - Full type inference from validation schemas
-- **Isomorphic** - Works in Node.js and browsers
-- **Sync & async** - Both synchronous and asynchronous validation
-- **Extensible** - Easy to add custom rules and aliases
-
-### Validation Capabilities
-
-- **Declarative schemas** - Rules are language-independent JSON structures
-- **Multiple rules per field** - Chain any number of validators
-- **Aggregated errors** - Returns all errors at once, not just the first
-- **Data sanitization** - Output contains only validated fields
-- **Hierarchical validation** - Validate nested objects and arrays
-- **Readable error codes** - Returns codes like `REQUIRED`, `TOO_SHORT` (not messages)
-- **Output transformation** - Rules can modify output (`trim`, `default`, etc.)
-
----
-
-## Quick Start
-
-```javascript
-import LIVR from 'livr';
-
-const validator = new LIVR.Validator({
-  name:      'required',
-  email:     ['required', 'email'],
-  age:       'positive_integer',
-  password:  ['required', { min_length: 8 }],
-  password2: { equal_to_field: 'password' }
-});
-
-const validData = validator.validate(userData);
-
-if (validData) {
-  // Use validated & sanitized data
-  saveUser(validData);
-} else {
-  // Handle validation errors
-  console.log(validator.getErrors());
-  // { email: 'WRONG_EMAIL', password: 'TOO_SHORT' }
-}
-```
-
----
-
-## Table of Contents
-
-- [Built-in Rules](#built-in-rules)
-- [Features](#features)
-- [Installation](#installation)
-- [Usage Guide](#usage-guide)
-  - [Basic Validation](#basic-validation)
-  - [TypeScript with Type Inference](#typescript-with-type-inference)
-  - [Async Validation](#async-validation)
-  - [Using Modifiers](#using-modifiers)
-  - [Custom Rules](#custom-rules)
-- [API Reference](#api-reference)
-  - [Static Methods](#static-methods)
-  - [Instance Methods](#instance-methods)
-- [TypeScript Type Inference](#typescript-type-inference)
-- [Performance](#performance)
-- [Additional Resources](#additional-resources)
-- [Contributing](#contributing)
-- [License](#license)
-
----
-
-## Installation
-
-```bash
-npm install livr
-```
-
-### Browser
-
-LIVR has no dependencies and works in browsers through any bundler (Vite, esbuild, Rollup, webpack). Without a build step, load it from an ESM CDN:
-
-```html
-<script type="module">
-  import LIVR from 'https://esm.sh/livr';
-
-  const validator = new LIVR.Validator({ name: 'required' });
-</script>
-```
-
----
-
-## Usage Guide
-
-### Basic Validation
-
-```javascript
-import LIVR from 'livr';
-
-// Enable auto-trim globally (optional)
-LIVR.Validator.defaultAutoTrim(true);
-
-const validator = new LIVR.Validator({
-  name:     'required',
-  email:    ['required', 'email'],
-  gender:   { one_of: ['male', 'female'] },
-  phone:    { max_length: 10 },
-  password: ['required', { min_length: 10 }],
-  password2: { equal_to_field: 'password' }
-});
-
-const validData = validator.validate(userData);
-
-if (validData) {
-  saveUser(validData);
-} else {
-  console.log(validator.getErrors());
-}
-```
-
-> **Note:** Rule names support both `snake_case` and `camelCase`. Use `one_of` or `oneOf`, `min_length` or `minLength` - they're equivalent.
-
-### TypeScript with Type Inference
-
-LIVR can automatically infer TypeScript types from your validation schema:
-
-```typescript
-import LIVR from 'livr';
-import type { InferFromSchema } from 'livr/types';
-
-const userSchema = {
-  name: ['required', 'string'],
-  email: ['required', 'email'],
-  age: 'positive_integer',
-  role: { one_of: ['admin', 'user'] as const },
-} as const;
-
-// Automatically infer type from schema
-type User = InferFromSchema<typeof userSchema>;
-// Result: { name: string; email: string; age?: number; role?: 'admin' | 'user' }
-
-const validator = new LIVR.Validator<User>(userSchema);
-
-// Validate data from external source (API request, form submission, etc.)
-const input = getUserInput();
-const validData = validator.validate(input);
-
-if (validData) {
-  // validData is typed as User
-  console.log(validData.name);  // string
-  console.log(validData.age);   // number | undefined
-}
-```
-
-> **Important:** Use `as const` after your schema to enable proper type inference.
-
-For comprehensive TypeScript documentation including nested objects, lists, unions, and custom rule types, see **[TypeScript Type Inference Guide](./docs/TYPESCRIPT.md)**.
-
-### Async Validation
-
-For rules that require async operations (database lookups, API calls):
-
-```javascript
-import LIVR from 'livr/async';
-
-const validator = new LIVR.AsyncValidator({
-  username: ['required', 'unique_username'], // custom async rule
-  email:    ['required', 'email'],
-});
-
-try {
-  const validData = await validator.validate(userData);
-  saveUser(validData);
-} catch (errors) {
-  console.log(errors);
-}
-```
-
-**Key differences from sync validator:**
-- Import from `'livr/async'`
-- Use `AsyncValidator` instead of `Validator`
-- `validate()` returns a Promise - use `await` or `.then()`
-- On error, rejects with errors object (no `getErrors()` method)
-- Fields validate in parallel; rules per field run sequentially
-
-### Using Modifiers
-
-Modifiers transform data during validation:
-
-```javascript
-const validator = new LIVR.Validator({
-  email: ['required', 'trim', 'email', 'to_lc'],  // trim, validate, lowercase
-  age:   ['positive_integer', { default: 18 }],   // default value if empty
-});
-```
-
-Available modifiers: `trim`, `to_lc`, `to_uc`, `default`, `remove`, `leave_only`
-
-### Custom Rules
-
-#### Using Aliases (Recommended)
-
-Create reusable rules by combining existing ones:
-
-```javascript
-const validator = new LIVR.Validator({
-  password: ['required', 'strong_password'],
-  age:      ['required', 'adult_age'],
-});
-
-validator.registerAliasedRule({
-  name: 'strong_password',
-  rules: { min_length: 8 },
-  error: 'WEAK_PASSWORD'
-});
-
-validator.registerAliasedRule({
-  name: 'adult_age',
-  rules: ['positive_integer', { min_number: 18 }],
-  error: 'MUST_BE_ADULT'
-});
-```
-
-#### Writing Custom Rule Functions
-
-For complex validation logic:
-
-```javascript
-const validator = new LIVR.Validator({
-  password: ['required', 'strong_password'],
-});
-
-validator.registerRules({
-  strong_password() {
-    return (value) => {
-      // Empty values are handled by 'required' rule
-      if (value === undefined || value === null || value === '') return;
-
-      if (!/[A-Z]/.test(value)) return 'MISSING_UPPERCASE';
-      if (!/[a-z]/.test(value)) return 'MISSING_LOWERCASE';
-      if (!/[0-9]/.test(value)) return 'MISSING_DIGIT';
-      if (value.length < 8) return 'TOO_SHORT';
-    };
-  }
-});
-```
-
-#### Async Custom Rules
-
-```javascript
-import LIVR from 'livr/async';
-
-const validator = new LIVR.AsyncValidator({
-  username: ['required', 'unique_username'],
-});
-
-validator.registerRules({
-  unique_username() {
-    return async (value) => {
-      if (value === undefined || value === null || value === '') return;
-
-      const exists = await db.users.exists({ username: value });
-      if (exists) return 'USERNAME_TAKEN';
-    };
-  }
-});
-```
-
-#### Registering Rules Globally
-
-```javascript
-// Register for all future validator instances
-LIVR.Validator.registerDefaultRules({
-  my_rule(arg1, arg2) {
-    return (value, allValues, outputArr) => {
-      // Return error code on failure, undefined on success
-      if (invalid) return 'ERROR_CODE';
-    };
-  }
-});
-
-LIVR.Validator.registerAliasedDefaultRule({
-  name: 'valid_address',
-  rules: { nested_object: { country: 'required', city: 'required' }}
-});
-```
-
-### Tree-Shaking (Reduce Bundle Size)
-
-Import only the rules you need:
-
-```javascript
-import Validator from 'livr/lib/Validator';
-
-Validator.registerDefaultRules({
-  required:       require('livr/lib/rules/common/required'),
-  email:          require('livr/lib/rules/special/email'),
-  min_length:     require('livr/lib/rules/string/min_length'),
-  max_length:     require('livr/lib/rules/string/max_length'),
-  equal_to_field: require('livr/lib/rules/special/equal_to_field'),
-});
-
-const validator = new Validator({ /* schema */ });
-```
-
----
-
-## API Reference
-
-### Static Methods
-
-#### `new LIVR.Validator(schema, options?)`
-
-Creates a new validator instance.
-
-```javascript
-const validator = new LIVR.Validator(schema, { autoTrim: true });
-```
-
-| Option | Default | Description |
-|--------|---------|-------------|
-| `autoTrim` | `false` | Trim all string values before validation |
-
-#### `Validator.defaultAutoTrim(boolean)`
-
-Enable/disable auto-trim globally for all new instances.
-
-```javascript
-LIVR.Validator.defaultAutoTrim(true);
-```
-
-#### `Validator.registerDefaultRules(rules)`
-
-Register custom rules globally.
-
-```javascript
-LIVR.Validator.registerDefaultRules({
-  my_rule(arg) {
-    return (value) => { /* ... */ };
-  }
-});
-```
-
-#### `Validator.registerAliasedDefaultRule(alias)`
-
-Register a rule alias globally.
-
-```javascript
-LIVR.Validator.registerAliasedDefaultRule({
-  name: 'adult_age',
-  rules: ['positive_integer', { min_number: 18 }],
-  error: 'MUST_BE_ADULT'  // optional custom error
-});
-```
-
-#### `Validator.getDefaultRules()`
-
-Returns a new object with all default rules: the built-in rules of the validator class and the rules registered with `registerDefaultRules()` and `registerAliasedDefaultRule()`.
-
-### Instance Methods
-
-#### `validator.validate(data)`
-
-Validates input data against the schema.
-
-**Sync Validator:**
-```javascript
-const result = validator.validate(data);
-if (result) {
-  // result contains validated data
-} else {
-  const errors = validator.getErrors();
-}
-```
-
-**Async Validator:**
-```javascript
-try {
-  const result = await validator.validate(data);
-} catch (errors) {
-  // errors object
-}
-```
-
-#### `validator.getErrors()`
-
-Returns the errors object from the last validation (sync only).
-
-```javascript
-// Example output:
-{
-  email: 'WRONG_EMAIL',
-  password: 'TOO_SHORT',
-  address: { zip: 'NOT_POSITIVE_INTEGER' }
-}
-```
-
-#### `validator.prepare()`
-
-Pre-compiles validation rules. Called automatically on first `validate()`, but can be called manually for warmup.
-
-```javascript
-const validator = new LIVR.Validator(schema).prepare();
-```
-
-#### `validator.getFieldRule(fieldName)`
-
-Returns all rules of a schema field as one rule function `(value, allValues, outputArr) => errorCode`, prepared once. It runs the rules like `validate()` does for that field: in order, each rule gets the output of the previous one. On success it returns `undefined`. Like any rule, it pushes the output value to `outputArr` only when the rules change the value, so a missing value stays missing. With `AsyncValidator` it returns a promise only when some rule returns a promise. With `autoTrim` the value is trimmed before the rules run; `allValues` are passed to the rules as given.
-
-Use it in custom meta rules that validate many values with the same rules: it skips the result and errors objects that `validate()` builds for every call. Built-in `list_of` and `or` work this way.
-
-```javascript
-function list_of_tags(itemRules, ruleBuilders) {
-  const validateItem = new LIVR.Validator({ item: itemRules })
-    .registerRules(ruleBuilders)
-    .getFieldRule('item');
-
-  return (values, params, outputArr) => {
-    if (!Array.isArray(values)) return 'FORMAT_ERROR';
-
-    const output = [];
-    for (const value of values) {
-      const itemOutput = [];
-      const errorCode = validateItem(value, params, itemOutput);
-      if (errorCode) return errorCode;
-
-      // The value as is, unless the rules changed it
-      output.push(itemOutput.length ? itemOutput[0] : value);
-    }
-
-    outputArr.push(output);
-  };
-}
-```
-
-#### `validator.registerRules(rules)`
-
-Register rules for this instance only.
-
-```javascript
-validator.registerRules({
-  custom_rule() { return (value) => { /* ... */ }; }
-});
-```
-
-#### `validator.registerAliasedRule(alias)`
-
-Register a rule alias for this instance only.
-
-```javascript
-validator.registerAliasedRule({
-  name: 'strong_password',
-  rules: { min_length: 8 },
-  error: 'WEAK_PASSWORD'
-});
-```
-
-#### `validator.getRules()`
-
-Returns all rules registered for this instance.
-
----
-
-## TypeScript Type Inference
-
-LIVR automatically infers TypeScript types from your validation schemas:
-
-```typescript
-import LIVR from 'livr';
-import type { InferFromSchema } from 'livr/types';
-
-const schema = {
-  name: ['required', 'string'],
-  age: 'positive_integer',
-  role: { one_of: ['admin', 'user'] as const },
-} as const;
-
-type User = InferFromSchema<typeof schema>;
-// { name: string; age?: number; role?: 'admin' | 'user' }
-```
-
-For complete documentation on type inference including:
-- Required vs optional fields
-- Nested objects and arrays
-- Discriminated unions
-- Custom rule type definitions
-
-See the **[TypeScript Type Inference Guide](./docs/TYPESCRIPT.md)**.
-
----
-
-## Performance
-
-LIVR is one of the fastest JavaScript validators: it leads both when a validator is created once and reused, and when a validator is created for every validation (for example, for schemas built at runtime).
-
-| Validator         | Precompiled, simple form | Precompiled, nested object | Created per call, simple form | Created per call, nested object |
-| ----------------- | ------------------------ | -------------------------- | ----------------------------- | ------------------------------- |
-| **LIVR**          | **3.46M**                | **1.76M**                  | **1.36M**                     | **634K**                        |
-| Valibot           | 2.88M                    | 1.54M                      | 921K                          | 534K                            |
-| fastest-validator | 2.86M                    | 1.17M                      | 10.7K                         | 5.9K                            |
-| Zod               | 2.79M                    | 1.25M                      | 15.7K                         | 8.6K                            |
-| Ajv               | 2.51M                    | 1.27M                      | 1.4K                          | 0.8K                            |
-| Joi               | 313K                     | 176K                       | 41K                           | 23K                             |
-
-Operations per second, more is better. Node.js 26, AMD Ryzen 9 5950X. All validators get equivalent schemas and strip unknown fields; absolute numbers depend on the hardware, so compare the ratios. fastest-validator and Ajv compile schemas to JavaScript code. LIVR gets its speed without code generation, so schemas stay plain data and are safe to load from untrusted sources. Details and methodology: [Design Decisions](docs/DESIGN.md#performance-summary), benchmark code: [validators-benchmarks](https://github.com/koorchik/validators-benchmarks).
-
-Tips:
-
-- **Reuse validators** - Construct once, validate many times. `validator.validate()` is extremely fast.
-- **Lazy compilation** - Rules are compiled on first validation (or call `prepare()` for warmup).
-- **Faster than alternatives** - For precompiled schemas 1.15-1.5x faster than Valibot, fastest-validator and Zod, 10x faster than Joi. When a validator is created per validation: 1.2-1.5x faster than Valibot, 27-33x faster than Joi, 70-130x faster than Zod and fastest-validator, over 750x faster than Ajv. See [benchmarks](docs/DESIGN.md#performance-summary).
-
-```javascript
-// Good: Create once, use many times
-const validator = new LIVR.Validator(schema);
-
-for (const item of items) {
-  const result = validator.validate(item);
-}
-
-// Avoid: Creating validator for each validation
-for (const item of items) {
-  const validator = new LIVR.Validator(schema);  // Slower
-  const result = validator.validate(item);
-}
-```
-
----
-
-## Additional Resources
-
-- **[LIVR Specification](http://livr-spec.org)** - Full specification and rule documentation
-- **[livr-extra-rules](https://www.npmjs.com/package/livr-extra-rules)** - Additional validation rules
-- **[TypeScript Guide](./docs/TYPESCRIPT.md)** - Comprehensive TypeScript documentation
-
----
-
 ## Contributing
 
-Found a bug or have a feature request? Please open an issue on [GitHub](https://github.com/koorchik/js-validator-livr/issues).
+Found a bug or have a feature request? Please open an issue on [GitHub](https://github.com/koorchik/js-validator-livr/issues). The documentation site is built from [`docs/`](docs).
 
 ---
 

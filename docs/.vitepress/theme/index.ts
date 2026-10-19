@@ -1,0 +1,25 @@
+import DefaultTheme from 'vitepress/theme';
+import type { Theme } from 'vitepress';
+import { h } from 'vue';
+
+import HeroDemo from './components/HeroDemo.vue';
+import BenchmarkChart from './components/BenchmarkChart.vue';
+import BenchmarkHighlights from './components/BenchmarkHighlights.vue';
+import BenchmarkTable from './components/BenchmarkTable.vue';
+import TrustStrip from './components/TrustStrip.vue';
+import './custom.css';
+
+export default {
+  extends: DefaultTheme,
+  Layout() {
+    return h(DefaultTheme.Layout, null, {
+      'home-hero-image': () => h(HeroDemo),
+      'home-hero-after': () => h(TrustStrip),
+    });
+  },
+  enhanceApp({ app }) {
+    app.component('BenchmarkChart', BenchmarkChart);
+    app.component('BenchmarkHighlights', BenchmarkHighlights);
+    app.component('BenchmarkTable', BenchmarkTable);
+  },
+} satisfies Theme;

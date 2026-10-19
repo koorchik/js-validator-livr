@@ -89,6 +89,25 @@ Helper functions: `isPrimitiveValue`, `looksLikeNumber`, `isObject`, `isEmptyObj
 - Sync validator returns `false` on failure; async validator throws/rejects with errors object
 - Use `import LIVR from 'livr'` for sync, `import LIVR from 'livr/async'` for async
 
+## Documentation Site
+
+`docs/` is the source of [js.livr-spec.org](https://js.livr-spec.org), a VitePress site with its own `docs/package.json`, so the library keeps TypeScript as its only dev dependency. `.github/workflows/docs.yml` builds it and deploys it to GitHub Pages on pushes to master and weekly.
+
+```bash
+cd docs && npm ci
+npm run dev     # local server
+npm run build   # also fails on dead links
+
+# Benchmark charts from a local validators-benchmarks checkout instead of GitHub
+BENCHMARK_RESULTS=../../livr-benchmark/results npm run dev
+```
+
+- The README is short: pitch, install, quick start, rules table. Guides, API, TypeScript and design go to the site
+- `docs/DESIGN.md` and `docs/TYPESCRIPT.md` keep their names (old links) and are mapped to `/why/design-decisions` and `/typescript` by `rewrites` in `docs/.vitepress/config.mts`. Anchors are GitHub-style, so links work on GitHub and on the site
+- The site leads with three pillars: rules are just data, performance, zero dependencies, plus trust (since 2013, the spec and its shared test suite). Pages in `docs/why/` explain them
+- Benchmark charts and numbers are not stored here: `docs/scripts/fetch-benchmark.mjs` downloads `results/latest*.{json,svg}` of validators-benchmarks into `docs/public/benchmark/` (gitignored) before every build
+- The home page example is validated at build time by `lib/` (`docs/.vitepress/data/hero.data.ts`), so its output is always real
+
 ## Code Style
 
 Prettier config is in `.prettierrc.json`: 2 spaces, single quotes, 100 columns, ES5 trailing commas, no parentheses around a single arrow function parameter. `t/test_suite` is a copy of the LIVR spec test suite and is not formatted.

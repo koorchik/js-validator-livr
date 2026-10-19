@@ -1,0 +1,71 @@
+name: Docs
+
+on:
+  push:
+    branches: [master]
+    paths:
+      - 'docs/**'
+      - 'lib/**'
+      - 'types/**'
+      - 'CHANGELOG.md'
+      - 'package.json'
+      - '.github/workflows/docs.yml'
+  pull_request:
+    paths:
+      - 'docs/**'
+      - 'lib/**'
+      - 'types/**'
+      - 'CHANGELOG.md'
+      - 'package.json'
+      - '.github/workflows/docs.yml'
+  schedule:
+    # Weekly rebuild: picks up new results of validators-benchmarks
+    - cron: '0 6 * * 1'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: docs-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: docs
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0 # "Last updated" dates come from git history
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 24
+          cache: npm
+          cache-dependency-path: docs/package-lock.json
+
+      - run: npm ci
+
+      - name: Build
+        run: npm run build
+
+      - uses: actions/upload-pages-artifact@v5
+        with:
+          path: docs/.vitepress/dist
+
+  deploy:
+    if: github.event_name != 'pull_request' && github.ref == 'refs/heads/master'
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v5

@@ -2,7 +2,7 @@
   "name": "livr",
   "version": "2.11.0",
   "description": "Lightweight validator supporting Language Independent Validation Rules Specification",
-  "homepage": "https://github.com/koorchik/js-validator-livr",
+  "homepage": "https://js.livr-spec.org",
   "author": {
     "name": "koorchik",
     "url": "https://github.com/koorchik"

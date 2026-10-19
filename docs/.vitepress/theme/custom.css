@@ -1,0 +1,358 @@
+/* Brand: the blue of the LIVR logo, as on livr-spec.org, tuned for WCAG AA contrast */
+:root {
+  --vp-c-brand-1: #1a70ad;
+  --vp-c-brand-2: #1769a3;
+  --vp-c-brand-3: #1d7bbd;
+  --vp-c-brand-soft: rgba(33, 138, 204, 0.14);
+
+  --vp-home-hero-name-color: transparent;
+  --vp-home-hero-name-background: linear-gradient(120deg, #1d7bbd 20%, #20a39e);
+  --vp-home-hero-image-background-image: linear-gradient(-45deg, #218acc 40%, #2ec4b6 60%);
+  --vp-home-hero-image-filter: blur(56px);
+
+  --livr-t-key: #6f42c1;
+  --livr-t-string: #032f62;
+  --livr-t-number: #005cc5;
+  --livr-t-comment: #6a737d;
+  --livr-t-punct: var(--vp-c-text-2);
+}
+
+.dark {
+  --vp-c-brand-1: #6cb8ec;
+  --vp-c-brand-2: #4aa3e0;
+  --vp-c-brand-3: #1d7bbd;
+  --vp-c-brand-soft: rgba(33, 138, 204, 0.2);
+
+  --vp-home-hero-name-background: linear-gradient(120deg, #6cb8ec 20%, #5fe0d2);
+  --vp-home-hero-image-filter: blur(72px);
+
+  --livr-t-key: #b392f0;
+  --livr-t-string: #9ecbff;
+  --livr-t-number: #79b8ff;
+  --livr-t-comment: #8b949e;
+}
+
+.VPNavBarTitle .logo {
+  height: 28px;
+}
+
+.t-k {
+  color: var(--livr-t-key);
+}
+.t-s {
+  color: var(--livr-t-string);
+}
+.t-n,
+.t-b {
+  color: var(--livr-t-number);
+}
+.t-c {
+  color: var(--livr-t-comment);
+  font-style: italic;
+}
+.t-p {
+  color: var(--livr-t-punct);
+}
+
+/* ---------- Home: hero ---------- */
+
+.VPHome .VPHero .image-container {
+  transform: none;
+}
+
+@media (max-width: 959px) {
+  /* Show the title first and the example below it */
+  .VPHome .VPHero .image {
+    order: 3;
+    margin: 32px 0 0;
+  }
+  .VPHome .VPHero .image-container {
+    width: auto;
+    height: auto;
+  }
+}
+
+.hero-demo {
+  position: relative;
+  width: 100%;
+  max-width: 440px;
+  margin: 0 auto;
+  text-align: left;
+}
+
+.hero-demo__window {
+  border: 1px solid var(--vp-c-divider);
+  border-radius: 14px;
+  background: var(--vp-c-bg);
+  box-shadow: var(--vp-shadow-3);
+  padding: 12px 18px 16px;
+  font-family: var(--vp-font-family-mono);
+  font-size: 12.5px;
+  line-height: 1.6;
+}
+
+.hero-demo__dots {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 6px;
+}
+
+.hero-demo__dots span {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--vp-c-default-3);
+}
+
+.hero-demo section + section {
+  border-top: 1px dashed var(--vp-c-divider);
+  margin-top: 8px;
+  padding-top: 8px;
+}
+
+.hero-demo h4 {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0 0 2px;
+  font-family: var(--vp-font-family-base);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--vp-c-text-3);
+}
+
+.hero-demo h4 code {
+  font-family: var(--vp-font-family-mono);
+  font-size: 11.5px;
+  font-weight: 500;
+  letter-spacing: 0;
+  text-transform: none;
+}
+
+.hero-demo pre {
+  margin: 0;
+  white-space: pre-wrap;
+  word-break: break-word;
+  color: var(--vp-c-text-1);
+}
+
+.livr-badge {
+  display: inline-flex;
+  align-items: center;
+  border-radius: 999px;
+  padding: 0 8px;
+  font-family: var(--vp-font-family-base);
+  font-size: 11.5px;
+  font-weight: 600;
+  line-height: 20px;
+  white-space: nowrap;
+  letter-spacing: 0;
+  text-transform: none;
+}
+
+.livr-badge--ok {
+  color: var(--vp-c-green-1);
+  background: var(--vp-c-green-soft);
+}
+
+.livr-badge--brand {
+  color: var(--vp-c-brand-1);
+  background: var(--vp-c-brand-soft);
+}
+
+/* ---------- Home: trust strip under the hero ---------- */
+
+.trust-strip {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 8px 12px;
+  max-width: 1152px;
+  margin: 0 auto;
+  padding: 8px 24px 40px;
+  list-style: none;
+}
+
+@media (min-width: 640px) {
+  .trust-strip {
+    padding: 8px 48px 48px;
+  }
+}
+
+.trust-strip a {
+  display: inline-block;
+  border: 1px solid var(--vp-c-divider);
+  border-radius: 999px;
+  padding: 4px 14px;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--vp-c-text-2);
+  background: var(--vp-c-bg-soft);
+  transition:
+    border-color 0.2s,
+    color 0.2s;
+}
+
+.trust-strip a:hover {
+  border-color: var(--vp-c-brand-1);
+  color: var(--vp-c-brand-1);
+}
+
+/* ---------- Home: sections ---------- */
+
+.home-section {
+  max-width: 1152px;
+  margin: 0 auto;
+  padding-top: 56px;
+}
+
+@media (min-width: 960px) {
+  .home-section {
+    padding-top: 72px;
+  }
+}
+
+.vp-doc .home-section h2 {
+  margin: 0 0 8px;
+  border: 0;
+  padding: 0;
+  font-size: 26px;
+  font-weight: 700;
+  line-height: 1.3;
+  letter-spacing: -0.01em;
+}
+
+.home-section > p {
+  max-width: 760px;
+  color: var(--vp-c-text-2);
+}
+
+.home-section .home-more {
+  margin-top: 20px;
+  font-weight: 500;
+}
+
+.vp-doc .home-more a {
+  text-decoration: none;
+}
+
+.vp-doc .home-more a:hover {
+  text-decoration: underline;
+}
+
+.home-pillar__eyebrow {
+  margin: 0 0 4px;
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--vp-c-brand-1);
+}
+
+/* Two code blocks side by side on wide screens */
+.home-columns {
+  display: grid;
+  gap: 16px;
+}
+
+@media (min-width: 960px) {
+  .home-columns {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+.home-columns > * {
+  min-width: 0;
+}
+
+.vp-doc .home-columns div[class*='language-'] {
+  margin: 0;
+}
+
+.vp-doc .home-columns p.home-file {
+  margin: 0 0 6px;
+  font-family: var(--vp-font-family-mono);
+  font-size: 13px;
+  color: var(--vp-c-text-3);
+}
+
+/* ---------- Stat tiles ---------- */
+
+.stat-tiles {
+  display: grid;
+  gap: 16px;
+  margin: 24px 0;
+}
+
+@media (min-width: 640px) {
+  .stat-tiles {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+.stat-tile {
+  border: 1px solid var(--vp-c-divider);
+  border-radius: 12px;
+  padding: 16px 20px;
+  background: var(--vp-c-bg-soft);
+}
+
+.stat-tile__value {
+  font-size: 32px;
+  font-weight: 700;
+  line-height: 1.2;
+  letter-spacing: -0.02em;
+  color: var(--vp-c-brand-1);
+  font-variant-numeric: tabular-nums;
+}
+
+.stat-tile__label {
+  margin-top: 4px;
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--vp-c-text-2);
+}
+
+/* ---------- Benchmark charts (SVG from validators-benchmarks) ---------- */
+
+.benchmark-chart {
+  margin: 24px 0;
+}
+
+.benchmark-chart img {
+  display: block;
+  width: 100%;
+  max-width: 780px;
+  height: auto;
+  border-radius: 14px;
+}
+
+.benchmark-chart figcaption {
+  margin-top: 8px;
+  font-size: 13px;
+  color: var(--vp-c-text-3);
+}
+
+.vp-doc table.benchmark-table {
+  display: table;
+  width: 100%;
+  font-variant-numeric: tabular-nums;
+}
+
+.vp-doc .benchmark-table th {
+  text-align: left;
+}
+
+.vp-doc .benchmark-table__livr td {
+  font-weight: 600;
+  background: var(--vp-c-brand-soft);
+}
+
+@media (max-width: 639px) {
+  .vp-doc table.benchmark-table {
+    display: block;
+    overflow-x: auto;
+  }
+}

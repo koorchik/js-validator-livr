@@ -1,0 +1,20 @@
+{
+  "name": "livr-js-site",
+  "private": true,
+  "description": "Website of the LIVR JavaScript implementation (js.livr-spec.org)",
+  "type": "module",
+  "scripts": {
+    "benchmark": "node scripts/fetch-benchmark.mjs",
+    "dev": "npm run benchmark && vitepress dev",
+    "build": "npm run benchmark && vitepress build",
+    "preview": "vitepress preview"
+  },
+  "license": "MIT",
+  "devDependencies": {
+    "vitepress": "^1.6.4",
+    "vue": "^3.5.44"
+  },
+  "overrides": {
+    "vite": "^6.4.4"
+  }
+}

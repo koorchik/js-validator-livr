@@ -3,6 +3,8 @@
 Unreleased
 -   The npm package contains only `lib`, `async.js`, `types`, README, LICENSE and CHANGELOG (89 files instead of 341): tests, editor and CI configs are no longer published
 -   Code examples in README and docs use 2-space indentation, like the code
+-   Docs: new documentation site [js.livr-spec.org](https://js.livr-spec.org), built from `docs/` and deployed to GitHub Pages. The README is short now, with links to the site
+-   Docs: `docs/DESIGN.md` starts with the decisions behind the main benefits (schemas as data, no code generation, performance, zero dependencies, the specification). Sizes are re-measured: about 2 KB min+gzip for the core and 5 KB with all rules (the README said < 1 KB and ~3 KB). The code-injection example shows the actual result, and the list of implementations matches livr-spec.org
 
 v2.11.0
 -   Fix: `livr/async`, `livr/lib/*` (tree-shaking) and `livr/types` were not importable since 2.9.2 (`ERR_PACKAGE_PATH_NOT_EXPORTED`), as the `exports` field listed only `.` and `./types/inference`

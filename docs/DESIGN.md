@@ -59,7 +59,7 @@ const validator = new LIVR.Validator(schema);
 
 ### Share Rules Across Languages
 
-The same schema works in JavaScript, Python, Java, Ruby, and 6 more languages:
+The same schema works in JavaScript, Python, Java, Ruby, and 7 more languages:
 
 ```json
 { "email": ["required", "email"], "age": ["positiveInteger"] }
@@ -135,15 +135,15 @@ const validator = new LIVR.Validator(schema); // No code execution risk
 4. [Design Decisions](#design-decisions)
     - [#1: Schemas as Data vs Schemas as Code](#design-decision-1-schemas-as-data-vs-schemas-as-code)
     - [#2: No Code Generation (Security)](#design-decision-2-no-code-generation-security)
-    - [#3: Error Codes with Mirrored Structure](#design-decision-3-error-codes-with-mirrored-structure)
-    - [#4: Rules Aliasing with Custom Error Codes](#design-decision-4-rules-aliasing-with-custom-error-codes)
-    - [#5: Optimized for Both Dynamic AND Static Validation](#design-decision-5-optimized-for-both-dynamic-and-static-validation)
-    - [#6: Rules as Transformers](#design-decision-6-rules-as-transformers-not-just-validators)
-    - [#7: "Everything is a Rule" Architecture](#design-decision-7-everything-is-a-rule-architecture)
-    - [#8: Input Immutability](#design-decision-8-input-immutability)
-    - [#9: Unknown Fields Stripped by Default](#design-decision-9-unknown-fields-stripped-by-default)
-    - [#10: Formal Specification with Shared Test Suite](#design-decision-10-formal-specification-with-shared-test-suite)
-    - [#11: Zero Dependencies](#design-decision-11-zero-dependencies)
+    - [#3: Optimized for Both Dynamic AND Static Validation](#design-decision-3-optimized-for-both-dynamic-and-static-validation)
+    - [#4: Zero Dependencies](#design-decision-4-zero-dependencies)
+    - [#5: Formal Specification with Shared Test Suite](#design-decision-5-formal-specification-with-shared-test-suite)
+    - [#6: Error Codes with Mirrored Structure](#design-decision-6-error-codes-with-mirrored-structure)
+    - [#7: Rules Aliasing with Custom Error Codes](#design-decision-7-rules-aliasing-with-custom-error-codes)
+    - [#8: Rules as Transformers](#design-decision-8-rules-as-transformers-not-just-validators)
+    - [#9: "Everything is a Rule" Architecture](#design-decision-9-everything-is-a-rule-architecture)
+    - [#10: Input Immutability](#design-decision-10-input-immutability)
+    - [#11: Unknown Fields Stripped by Default](#design-decision-11-unknown-fields-stripped-by-default)
 5. [TypeScript Integration](#typescript-integration)
 6. [Performance Summary](#performance-summary)
 
@@ -160,15 +160,17 @@ Before diving into design decisions, here's a comprehensive comparison of LIVR a
 | **Custom Rules**                | ✅ Very Easy               | ✅ `.refine()`    | ✅ `.custom()` | ✅ Yes            | ✅ `v.custom()`    |
 | **Rules Aliasing**              | ✅ `registerAliasedRule()` | ❌ No             | ❌ No          | ⚠️ Partial        | ❌ No              |
 | **Schema Serializable**         | ✅ Pure JSON               | ❌ Code           | ❌ Code        | ⚠️ Partial        | ❌ Code            |
-| **Multi-Language Support**      | ✅ 10+ languages           | ❌ JS/TS only     | ❌ JS only     | ❌ JS only        | ❌ JS/TS only      |
+| **Multi-Language Support**      | ✅ 11 languages            | ❌ JS/TS only     | ❌ JS only     | ❌ JS only        | ❌ JS/TS only      |
 | **Error Format**                | Codes (i18n-ready)         | Messages          | Messages       | Messages          | Messages           |
 | **Error Structure**             | Mirrors input              | Flat array        | Flat array     | Flat array        | Flat array         |
 | **Type Coercion**               | ✅ Automatic               | Manual            | ✅ Via options | ✅ Yes            | Manual             |
 | **Unknown Fields**              | Strip (default)            | Strip (default)   | Pass through   | Pass through      | Strip (default)    |
 | **Input Immutability**          | ✅ Always                  | ✅ Always         | ✅ Always      | ⚠️ Mutates        | ✅ Always          |
-| **Bundle Size (gzip)**          | 4.5 KB                     | 14 KB             | 55 KB          | 12.4 KB           | 1.8 KB             |
+| **Whole Package (min+gzip)**    | 5 KB                       | 92 KB             | 55 KB          | 12.4 KB           | 15 KB              |
 | **Zero Dependencies**           | ✅ Yes                     | ✅ Yes            | ❌ No          | ✅ Yes            | ✅ Yes             |
 | **Safe with Untrusted Schemas** | ✅ Yes                     | N/A               | N/A            | ❌ RCE risk       | N/A                |
+
+Whole package sizes include everything a package exports; Valibot and Zod are built for tree-shaking, and so is LIVR. See [Zero Dependencies](#design-decision-4-zero-dependencies) for how they were measured.
 
 ---
 
@@ -405,13 +407,13 @@ const LIVR = require('livr');
 
 // Even with malicious input, no code execution
 const schema = {
-  id: ['required', { maxNumber: 'console.log(process.env)' }],
+  id: ['required', { maxNumber: 'console.log(process.env) || 999' }],
 };
 
 const validator = new LIVR.Validator(schema);
 validator.validate({ id: 123 });
-// Result: Validation error (not a valid number parameter)
-// No code execution - the string is treated as a malformed number
+// Result: { id: 123 }
+// No code execution - the argument is only compared with the value, as a number
 ```
 
 #### When This Matters
@@ -423,7 +425,189 @@ validator.validate({ id: 123 });
 
 ---
 
-### Design Decision #3: Error Codes with Mirrored Structure
+### Design Decision #3: Optimized for Both Dynamic AND Static Validation
+
+> **Balanced performance** is a priority →
+> We choose **lightweight JSON parsing + efficient rule execution** →
+> Accepting **no extra speed from code generation (LIVR is still the fastest in the benchmarks below)**
+
+#### Dynamic Validation Performance
+
+Dynamic validation measures schema creation + validation—critical for runtime-generated schemas.
+
+| Validator         | Simple (ops/sec) | Nested (ops/sec) | vs LIVR             |
+| ----------------- | ---------------- | ---------------- | ------------------- |
+| **LIVR**          | **1,364,823**    | **634,178**      | baseline            |
+| Valibot           | 921,293          | 534,161          | 1.2-1.5x slower     |
+| Joi               | 41,255           | 23,150           | 27-33x slower       |
+| Zod               | 15,650           | 8,649            | 73-87x slower       |
+| fastest-validator | 10,697           | 5,946            | 107-128x slower     |
+| Ajv               | 1,442            | 804              | **788-946x slower** |
+
+LIVR leads dynamic validation, Valibot is 1.2-1.5x slower. LIVR schemas are plain JSON data, so creating a validator only builds a closure per rule. fastest-validator and Ajv generate and compile JavaScript code for every schema, which is the slowest option here.
+
+#### Static Validation Performance
+
+Static validation measures pre-compiled validator speed—typical production usage.
+
+| Validator         | Simple (ops/sec) | Nested (ops/sec) | Note                |
+| ----------------- | ---------------- | ---------------- | ------------------- |
+| **LIVR**          | **3,457,657**    | **1,764,838**    | Data interpretation |
+| Valibot           | 2,876,819        | 1,535,356        |                     |
+| fastest-validator | 2,857,396        | 1,173,430        | Code generation     |
+| Zod               | 2,794,647        | 1,248,719        |                     |
+| Ajv               | 2,513,133        | 1,270,083        | Code generation     |
+| Joi               | 313,462          | 175,847          |                     |
+
+LIVR is the fastest: Valibot, fastest-validator and Zod are 1.15-1.5x slower, Ajv is about 1.4x slower, Joi about 10x.
+
+#### The Key Insight
+
+**3.4 million ops/sec is already far beyond any real-world need.**
+
+To put this in perspective:
+
+-   3.4M ops/sec = validating every request for a service handling 300 billion requests/day
+-   Most applications handle thousands, not millions, of validations per second
+-   Network latency, database queries, and business logic dominate actual response times
+
+LIVR is the fastest in both dynamic and static validation here, without generating code.
+
+#### How These Numbers Were Measured
+
+Measured with the separate [validators-benchmarks](https://github.com/koorchik/validators-benchmarks) repository (`npm run bench -- --runs 2`, with `LIVR_DIR` pointing to this repository). Node.js 26, AMD Ryzen 9 5950X; Zod 4.6, Valibot 1.5, Joi 18.3, fastest-validator 1.19, Ajv 8.20. Average of two runs, the runs differ by up to 6%.
+
+-   **Simple**: a 5-field form (required strings, email, positive integer, enum, min length)
+-   **Nested**: an object with two levels of nested objects and a list of strings
+-   Schemas are equivalent across validators (the benchmark checks that all of them accept and reject the same data), and unknown fields are stripped
+-   A new input object is created for every validation (fastest-validator and Ajv mutate their input), for all validators
+
+Absolute numbers depend on hardware; compare the ratios.
+
+#### When Dynamic Performance Matters
+
+-   **Form builders**: Schemas constructed at runtime based on configuration
+-   **Multi-tenant validation**: Different rules per customer, loaded dynamically
+-   **A/B testing**: Different validation strictness across variants
+-   **API gateways**: Route-specific validation loaded from config
+
+---
+
+### Design Decision #4: Zero Dependencies
+
+> **Supply chain security & lightweight deployment** is a priority →
+> We choose **zero runtime dependencies** →
+> Accepting **implementing each rule without reusing existing libraries**
+
+#### Comparison
+
+| Validator         | Zero Deps | Runtime Deps                  | Whole Package (min+gzip) |
+| ----------------- | --------- | ----------------------------- | ------------------------ |
+| **LIVR**          | Yes       | 0                             | 5 KB (core: 2 KB)        |
+| Valibot           | Yes       | 0                             | 15 KB                    |
+| Zod               | Yes       | 0                             | 92 KB                    |
+| fastest-validator | Yes       | 0                             | 12.4 KB                  |
+| Ajv               | No        | 4                             | 38 KB                    |
+| Joi               | No        | 7 (six @hapi/\* packages)     | 55 KB                    |
+
+Sizes are of everything a package exports, bundled with esbuild (`--minify`) and gzipped: LIVR 2.11.0, Valibot 1.5, Zod 4.6, fastest-validator 1.19, Ajv 8.20, Joi 18.3. Valibot and Zod are built for tree-shaking, so a typical schema needs only part of them. LIVR can be tree-shaken too: import the core (`livr/lib/Validator`) and only the rules you use.
+
+#### Why Zero Dependencies Matters
+
+**Supply chain security:**
+
+-   Every dependency is a potential attack vector
+-   Transitive dependencies multiply risk exponentially
+-   Notable incidents: [event-stream](https://blog.npmjs.org/post/180565383195/details-about-the-event-stream-incident) (bitcoin theft), [colors.js](https://www.bleepingcomputer.com/news/security/dev-corrupts-npm-libs-colors-and-faker-breaking-thousands-of-apps/) (intentional corruption), [ua-parser-js](https://github.com/faisalman/ua-parser-js/issues/536) (cryptominer injection)
+-   Joi's 7 dependencies (six of them @hapi/\* packages) and Ajv's 4 each represent audit surface
+
+**Audit complexity:**
+
+-   Zero dependencies = only your code to audit
+-   No transitive dependency trees to review
+-   Simpler security compliance (SOC2, HIPAA, etc.)
+
+**Stability:**
+
+-   No breaking changes from upstream packages
+-   No version conflicts in dependency resolution
+-   No abandoned dependency risk
+
+#### Additional Benefits: Minimal Bundle Size
+
+**Serverless/Edge computing:**
+
+-   Cold start time directly affected by bundle size
+-   Edge functions have strict size limits (Cloudflare Workers: 1MB)
+-   Smaller bundles = faster deployments
+
+**Frontend applications:**
+
+-   Every KB affects page load time
+-   Validation often needed client-side for UX
+-   5 KB vs 55 KB is significant for mobile users
+
+**Embedded systems:**
+
+-   IoT devices have limited memory
+-   Validation needed at the edge
+
+---
+
+### Design Decision #5: Formal Specification with Shared Test Suite
+
+> **Cross-platform consistency** is a priority →
+> We choose **formal spec (livr-spec.org) with JSON test suite** →
+> Accepting **specification maintenance overhead**
+
+#### Comparison
+
+| Validator         | Has Specification                         | Shared Test Suite | Language Implementations |
+| ----------------- | ----------------------------------------- | ----------------- | ------------------------ |
+| **LIVR**          | ✅ [livr-spec.org](https://livr-spec.org) | ✅ JSON files     | 11 languages             |
+| Zod               | ❌ No                                     | ❌ No             | JS/TS only               |
+| Joi               | ❌ No                                     | ❌ No             | JS only                  |
+| fastest-validator | ❌ No                                     | ❌ No             | JS only                  |
+| Valibot           | ❌ No                                     | ❌ No             | JS/TS only               |
+
+#### Why a Formal Specification is Possible
+
+Because LIVR schemas are data (JSON), not code:
+
+-   The specification is language-agnostic
+-   Test cases are JSON files any implementation can run
+-   No need to port JavaScript code to other languages
+
+#### Available Implementations
+
+The same schema works identically across all implementations:
+
+| Language              | Package                                                                                    |
+| --------------------- | ------------------------------------------------------------------------------------------ |
+| JavaScript/TypeScript | [livr](https://www.npmjs.com/package/livr)                                                 |
+| Perl                  | [Validator::LIVR](https://metacpan.org/pod/Validator::LIVR)                                |
+| PHP                   | [validator/livr](https://packagist.org/packages/validator/livr)                            |
+| Python                | [LIVR](https://pypi.org/project/LIVR/)                                                     |
+| Go                    | [go-livr](https://pkg.go.dev/github.com/k33nice/go-livr)                                   |
+| Java                  | [validator-livr](https://central.sonatype.com/artifact/io.github.vlbaluk/validator-livr)   |
+| Ruby                  | [ruby-livr](https://rubygems.org/gems/ruby-livr)                                           |
+| Erlang                | [liver](https://hex.pm/packages/liver), [olifer](https://github.com/Prots/olifer)          |
+| Lua                   | [lua-livr](https://luarocks.org/modules/fperrad/lua-livr)                                  |
+| Raku                  | [LIVR](https://raku.land/cpan:KOORCHIK/LIVR)                                               |
+| Swift                 | [Livr](https://cocoapods.org/pods/Livr)                                                    |
+
+The [implementations page](https://livr-spec.org/introduction/implementations.html) of the specification shows how many test suite cases each of them passes.
+
+#### Benefits
+
+1. **Polyglot microservices**: Share validation logic across services in different languages
+2. **Frontend/backend consistency**: Same rules in browser (JS) and server (Python/Java/etc.)
+3. **Mobile validation**: Identical rules in iOS, Android, and web
+4. **Community growth**: Anyone can create a new implementation with confidence
+
+---
+
+### Design Decision #6: Error Codes with Mirrored Structure
 
 > **i18n & Domain clarity** is a priority →
 > We choose **error codes in a structure mirroring input** →
@@ -567,7 +751,7 @@ Benefits:
 
 ---
 
-### Design Decision #4: Rules Aliasing with Custom Error Codes
+### Design Decision #7: Rules Aliasing with Custom Error Codes
 
 > **Domain-driven validation** is a priority →
 > We choose **rule aliasing with custom error code override** →
@@ -718,75 +902,7 @@ This enables:
 
 ---
 
-### Design Decision #5: Optimized for Both Dynamic AND Static Validation
-
-> **Balanced performance** is a priority →
-> We choose **lightweight JSON parsing + efficient rule execution** →
-> Accepting **no extra speed from code generation (LIVR is still the fastest in the benchmarks below)**
-
-#### Dynamic Validation Performance
-
-Dynamic validation measures schema creation + validation—critical for runtime-generated schemas.
-
-| Validator         | Simple (ops/sec) | Nested (ops/sec) | vs LIVR             |
-| ----------------- | ---------------- | ---------------- | ------------------- |
-| **LIVR**          | **1,364,823**    | **634,178**      | baseline            |
-| Valibot           | 921,293          | 534,161          | 1.2-1.5x slower     |
-| Joi               | 41,255           | 23,150           | 27-33x slower       |
-| Zod               | 15,650           | 8,649            | 73-87x slower       |
-| fastest-validator | 10,697           | 5,946            | 107-128x slower     |
-| Ajv               | 1,442            | 804              | **788-946x slower** |
-
-LIVR leads dynamic validation, Valibot is 1.2-1.5x slower. LIVR schemas are plain JSON data, so creating a validator only builds a closure per rule. fastest-validator and Ajv generate and compile JavaScript code for every schema, which is the slowest option here.
-
-#### Static Validation Performance
-
-Static validation measures pre-compiled validator speed—typical production usage.
-
-| Validator         | Simple (ops/sec) | Nested (ops/sec) | Note                |
-| ----------------- | ---------------- | ---------------- | ------------------- |
-| **LIVR**          | **3,457,657**    | **1,764,838**    | Data interpretation |
-| Valibot           | 2,876,819        | 1,535,356        |                     |
-| fastest-validator | 2,857,396        | 1,173,430        | Code generation     |
-| Zod               | 2,794,647        | 1,248,719        |                     |
-| Ajv               | 2,513,133        | 1,270,083        | Code generation     |
-| Joi               | 313,462          | 175,847          |                     |
-
-LIVR is the fastest: Valibot, fastest-validator and Zod are 1.15-1.5x slower, Ajv is about 1.4x slower, Joi about 10x.
-
-#### The Key Insight
-
-**3.4 million ops/sec is already far beyond any real-world need.**
-
-To put this in perspective:
-
--   3.4M ops/sec = validating every request for a service handling 300 billion requests/day
--   Most applications handle thousands, not millions, of validations per second
--   Network latency, database queries, and business logic dominate actual response times
-
-LIVR is the fastest in both dynamic and static validation here, without generating code.
-
-#### How These Numbers Were Measured
-
-Measured with the separate [validators-benchmarks](https://github.com/koorchik/validators-benchmarks) repository (`npm run bench -- --runs 2`, with `LIVR_DIR` pointing to this repository). Node.js 26, AMD Ryzen 9 5950X; Zod 4.6, Valibot 1.5, Joi 18.3, fastest-validator 1.19, Ajv 8.20. Average of two runs, the runs differ by up to 6%.
-
--   **Simple**: a 5-field form (required strings, email, positive integer, enum, min length)
--   **Nested**: an object with two levels of nested objects and a list of strings
--   Schemas are equivalent across validators (the benchmark checks that all of them accept and reject the same data), and unknown fields are stripped
--   A new input object is created for every validation (fastest-validator and Ajv mutate their input), for all validators
-
-Absolute numbers depend on hardware; compare the ratios.
-
-#### When Dynamic Performance Matters
-
--   **Form builders**: Schemas constructed at runtime based on configuration
--   **Multi-tenant validation**: Different rules per customer, loaded dynamically
--   **A/B testing**: Different validation strictness across variants
--   **API gateways**: Route-specific validation loaded from config
-
----
-
-### Design Decision #6: Rules as Transformers (Not Just Validators)
+### Design Decision #8: Rules as Transformers (Not Just Validators)
 
 > **Single-pass processing & web form compatibility** is a priority →
 > We choose **rules that validate AND transform in one pass** →
@@ -879,7 +995,7 @@ Valibot [removed implicit coercion](https://valibot.dev/blog/valibot-v1.2-releas
 
 ---
 
-### Design Decision #7: "Everything is a Rule" Architecture
+### Design Decision #9: "Everything is a Rule" Architecture
 
 > **Extensibility & Consistency** is a priority →
 > We choose **minimal core where built-in and custom rules use identical API** →
@@ -1016,7 +1132,7 @@ This enables secure multi-tenant validation where each tenant can have custom ru
 
 ---
 
-### Design Decision #8: Input Immutability
+### Design Decision #10: Input Immutability
 
 > **Predictability & Functional style** is a priority →
 > We choose **always return new object, never mutate input** →
@@ -1076,7 +1192,7 @@ console.log(input.extraField); // undefined - gone!
 
 ---
 
-### Design Decision #9: Unknown Fields Stripped by Default
+### Design Decision #11: Unknown Fields Stripped by Default
 
 > **Security by default** is a priority →
 > We choose **always strip unknown fields** →
@@ -1131,114 +1247,6 @@ LIVR's design choices consistently favor security:
 | Invalid rules           | Rejected at compile time | Fail-fast, no silent failures  |
 | Rule isolation          | Supported per-instance   | Multi-tenant security          |
 | Schema parameters       | Data, never code         | No code injection possible     |
-
----
-
-### Design Decision #10: Formal Specification with Shared Test Suite
-
-> **Cross-platform consistency** is a priority →
-> We choose **formal spec (livr-spec.org) with JSON test suite** →
-> Accepting **specification maintenance overhead**
-
-#### Comparison
-
-| Validator         | Has Specification                         | Shared Test Suite | Language Implementations |
-| ----------------- | ----------------------------------------- | ----------------- | ------------------------ |
-| **LIVR**          | ✅ [livr-spec.org](https://livr-spec.org) | ✅ JSON files     | 10+                      |
-| Zod               | ❌ No                                     | ❌ No             | JS/TS only               |
-| Joi               | ❌ No                                     | ❌ No             | JS only                  |
-| fastest-validator | ❌ No                                     | ❌ No             | JS only                  |
-| Valibot           | ❌ No                                     | ❌ No             | JS/TS only               |
-
-#### Why a Formal Specification is Possible
-
-Because LIVR schemas are data (JSON), not code:
-
--   The specification is language-agnostic
--   Test cases are JSON files any implementation can run
--   No need to port JavaScript code to other languages
-
-#### Available Implementations
-
-The same schema works identically across all implementations:
-
-| Language              | Package                                                          |
-| --------------------- | ---------------------------------------------------------------- |
-| JavaScript/TypeScript | [livr](https://www.npmjs.com/package/livr)                       |
-| Perl                  | [Validator::LIVR](https://metacpan.org/pod/Validator::LIVR)      |
-| PHP                   | [validator-livr](https://packagist.org/packages/validator/livr)  |
-| Python                | [livr](https://pypi.org/project/livr/)                           |
-| Ruby                  | [livr](https://rubygems.org/gems/livr)                           |
-| Java                  | [livr-validator](https://github.com/vlbaluk/java-validator-livr) |
-| Erlang                | [livr](https://github.com/koorchik/erlang-validator-livr)        |
-| Lua                   | [livr](https://github.com/nicoster/lua-validator-livr)           |
-| Rust                  | [livr](https://crates.io/crates/livr)                            |
-| C++                   | [livr](https://github.com/nicoster/cpp-validator-livr)           |
-
-#### Benefits
-
-1. **Polyglot microservices**: Share validation logic across services in different languages
-2. **Frontend/backend consistency**: Same rules in browser (JS) and server (Python/Java/etc.)
-3. **Mobile validation**: Identical rules in iOS, Android, and web
-4. **Community growth**: Anyone can create a new implementation with confidence
-
----
-
-### Design Decision #11: Zero Dependencies
-
-> **Supply chain security & lightweight deployment** is a priority →
-> We choose **zero runtime dependencies** →
-> Accepting **implementing each rule without reusing existing libraries**
-
-#### Comparison
-
-| Validator         | Zero Deps | Transitive Deps | Gzipped |
-| ----------------- | --------- | --------------- | ------- |
-| **LIVR**          | Yes       | 0               | 4.5 KB  |
-| Valibot           | Yes       | 0               | 1.8 KB  |
-| Zod               | Yes       | 0               | 14 KB   |
-| fastest-validator | Yes       | 0               | 12.4 KB |
-| Joi               | No        | 6+ (@hapi/\*)   | 55 KB   |
-
-#### Why Zero Dependencies Matters
-
-**Supply chain security:**
-
--   Every dependency is a potential attack vector
--   Transitive dependencies multiply risk exponentially
--   Notable incidents: [event-stream](https://blog.npmjs.org/post/180565383195/details-about-the-event-stream-incident) (bitcoin theft), [colors.js](https://www.bleepingcomputer.com/news/security/dev-corrupts-npm-libs-colors-and-faker-breaking-thousands-of-apps/) (intentional corruption), [ua-parser-js](https://github.com/nicebyte/ua-parser-js/issues/536) (cryptominer injection)
--   Joi's 6+ @hapi/\* dependencies each represent audit surface
-
-**Audit complexity:**
-
--   Zero dependencies = only your code to audit
--   No transitive dependency trees to review
--   Simpler security compliance (SOC2, HIPAA, etc.)
-
-**Stability:**
-
--   No breaking changes from upstream packages
--   No version conflicts in dependency resolution
--   No abandoned dependency risk
-
-#### Additional Benefits: Minimal Bundle Size
-
-**Serverless/Edge computing:**
-
--   Cold start time directly affected by bundle size
--   Edge functions have strict size limits (Cloudflare Workers: 1MB)
--   Smaller bundles = faster deployments
-
-**Frontend applications:**
-
--   Every KB affects page load time
--   Validation often needed client-side for UX
--   4.5KB vs 55KB is significant for mobile users
-
-**Embedded systems:**
-
--   IoT devices have limited memory
--   Validation needed at the edge
 
 ---
 
