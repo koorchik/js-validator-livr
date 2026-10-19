@@ -4,7 +4,7 @@ Every rule of the [LIVR specification](https://livr-spec.org/validation-rules.ht
 
 <RulesCard wide />
 
-Rule names below link to their pages in the specification. The last column shows the TypeScript type that [`InferFromSchema`](/typescript) gives a field with this rule.
+Rule names below link to their pages in the specification. The last column shows the TypeScript type that [`InferFromSchema`](/typescript) gives a field with this rule. Rules that check a value keep a more precise type of earlier rules: `[{ one_of: ['a', 'b'] }, { max_length: 1 }]` is `'a' | 'b'`, not `string`.
 
 Rule names work in `snake_case` and in `camelCase`: `min_length` and `minLength` are the same rule.
 
@@ -12,9 +12,9 @@ Rule names work in `snake_case` and in `camelCase`: `min_length` and `minLength`
 
 | Rule | Checks | Type |
 | --- | --- | --- |
-| [`required`](https://livr-spec.org/validation-rules/required.html) | The value is present: not missing, not `null` and not an empty string. `0` and `false` are valid | makes the field required |
-| [`not_empty`](https://livr-spec.org/validation-rules/not_empty.html) | The value is not an empty string, if the field is passed at all | `string` |
-| [`not_empty_list`](https://livr-spec.org/validation-rules/not_empty_list.html) | The value is a list with at least one element | `unknown[]` |
+| [`required`](https://livr-spec.org/validation-rules/required.html) | The value is present: not missing, not `null` and not an empty string. `0` and `false` are valid | the type of earlier rules, field becomes required |
+| [`not_empty`](https://livr-spec.org/validation-rules/not_empty.html) | The value is not an empty string, if the field is passed at all | `string`, or the type of earlier rules |
+| [`not_empty_list`](https://livr-spec.org/validation-rules/not_empty_list.html) | The value is a list with at least one element | `unknown[]`, or the list type of earlier rules, field becomes required |
 | [`any_object`](https://livr-spec.org/validation-rules/any_object.html) | The value is a plain object, its content is not validated | `Record<string, unknown>` |
 
 ## String rules
@@ -51,7 +51,7 @@ Numeric rules accept strings that look like numbers, such as `'42'` from a form,
 | [`email`](https://livr-spec.org/validation-rules/email.html) | The value is an email address | `string` |
 | [`url`](https://livr-spec.org/validation-rules/url.html) | The value is an `http` or `https` URL | `string` |
 | [`iso_date`](https://livr-spec.org/validation-rules/iso_date.html) | The value is an ISO 8601 date without time, like `2014-08-14` | `string` |
-| [`equal_to_field`](https://livr-spec.org/validation-rules/equal_to_field.html) | The value equals another field, like a password confirmation | `string` |
+| [`equal_to_field`](https://livr-spec.org/validation-rules/equal_to_field.html) | The value equals another field, like a password confirmation | `string`, or the type of earlier rules |
 
 ## Metarules
 
@@ -73,8 +73,8 @@ Modifiers change the output and never return errors.
 | Rule | Does | Type |
 | --- | --- | --- |
 | [`trim`](https://livr-spec.org/validation-rules/trim.html) | Removes leading and trailing whitespace | `string` |
-| [`to_lc`](https://livr-spec.org/validation-rules/to_lc.html) | Converts to lower case | `string` |
-| [`to_uc`](https://livr-spec.org/validation-rules/to_uc.html) | Converts to upper case | `string` |
+| [`to_lc`](https://livr-spec.org/validation-rules/to_lc.html) | Converts to lower case | `string`, literal types in lower case |
+| [`to_uc`](https://livr-spec.org/validation-rules/to_uc.html) | Converts to upper case | `string`, literal types in upper case |
 | [`remove`](https://livr-spec.org/validation-rules/remove.html) | Removes the given characters | `string` |
 | [`leave_only`](https://livr-spec.org/validation-rules/leave_only.html) | Removes all characters except the given ones | `string` |
 | [`default`](https://livr-spec.org/validation-rules/default.html) | Sets a value when the value is empty | the type of the default, field becomes required |

@@ -51,21 +51,22 @@ The same object is the validation rules at runtime and the source of the type at
 - **The type of every rule.** `email`, `string` and `like` give `string`, numeric rules give `number`, `list_of` gives an array, `nested_object` an object, `or` and `variable_object` a union.
 - **Literal types.** `one_of: ['admin', 'user']` gives `'admin' | 'user'`, `eq: 'active'` gives `'active'`.
 - **Defaults.** `{ default: 0 }` makes the field required and gives `number`.
-- **Aliases and your own rules,** once their output type is declared.
+- **Types through the rule list.** Rules that check a value keep the type of earlier rules: `[{ one_of: ['admin', 'user'] }, { max_length: 10 }]` stays `'admin' | 'user'`.
+- **Aliases and your own rules,** once their type is declared, also when they replace a built-in rule.
 
 The [built-in rules page](/rules) lists the type of every rule, and the [TypeScript guide](/typescript) has all the details.
 
 ## Your own rules are typed too
 
-A custom rule declares its output type once, by module augmentation, and every schema that uses it gets the right type:
+A custom rule declares its type once, by module augmentation, and every schema that uses it gets the right type:
 
 ```ts
-import type { RuleTypeDef } from 'livr/types/inference';
+import type { As } from 'livr/types/inference';
 
 declare module 'livr/types/inference' {
-  interface RuleTypeRegistry {
-    to_date: RuleTypeDef<Date, false, false>;
-    uuid: RuleTypeDef<string, false, false>;
+  interface RuleTypes {
+    to_date: Date; // converts the value to a Date
+    uuid: As<string>; // checks a string
   }
 }
 
@@ -77,7 +78,7 @@ const schema = {
 type Entity = InferFromSchema<typeof schema>; // { id: string; created_at: Date }
 ```
 
-Rules whose output depends on their arguments, and rule packages like [livr-extra-rules](https://www.npmjs.com/package/livr-extra-rules), work the same way. See [Custom rules type inference](/typescript#custom-rules-type-inference).
+Rules whose type depends on their arguments, aliases, meta rules and rule packages like [livr-extra-rules](https://www.npmjs.com/package/livr-extra-rules) work the same way, and any number of packages can add their rules. See [Custom rules type inference](/typescript#custom-rules-type-inference).
 
 ## Data and types together
 

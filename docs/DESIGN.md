@@ -1265,7 +1265,7 @@ const userSchema = {
   settings: {
     nestedObject: {
       theme: { oneOf: ['light', 'dark'] as const },
-      notifications: 'boolean',
+      fontSize: 'positive_integer',
     },
   },
 } as const; // 'as const' required for literal type inference
@@ -1278,7 +1278,7 @@ type User = InferFromSchema<typeof userSchema>;
 //   role?: 'admin' | 'user' | 'guest';
 //   settings?: {
 //     theme?: 'light' | 'dark';
-//     notifications?: boolean;
+//     fontSize?: number;
 //   }
 // }
 
@@ -1299,13 +1299,13 @@ Register custom rule types via module augmentation:
 ```typescript
 import LIVR from 'livr';
 import type { InferFromSchema } from 'livr/types';
-import type { RuleTypeDef } from 'livr/types/inference';
+import type { As } from 'livr/types/inference';
 
 // Declare custom rule types via module augmentation
 declare module 'livr/types/inference' {
-  interface RuleTypeRegistry {
-    toDate: RuleTypeDef<Date, false, false>;
-    uuid: RuleTypeDef<string, false, false>;
+  interface RuleTypes {
+    toDate: Date; // converts the value to a Date
+    uuid: As<string>; // checks a string
   }
 }
 

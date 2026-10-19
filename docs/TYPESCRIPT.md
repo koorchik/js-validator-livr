@@ -9,18 +9,25 @@ Try it without installing anything: [open an example in the TypeScript Playgroun
 - [Basic Usage](#basic-usage)
 - [How Types Are Inferred](#how-types-are-inferred)
   - [Required vs Optional Fields](#required-vs-optional-fields)
-  - [Primitive Type Rules](#primitive-type-rules)
+  - [Types of the Built-in Rules](#types-of-the-built-in-rules)
   - [Literal Types](#literal-types-with-one_of-and-eq)
+  - [Rules Keep Literal Types](#rules-keep-literal-types)
+  - [Type Widening with `default`](#type-widening-with-default)
 - [Complex Schemas](#complex-schemas)
   - [Nested Objects](#nested-objects)
   - [Lists](#lists)
   - [Discriminated Unions](#discriminated-unions)
   - [Union Types](#union-types-with-or)
 - [Custom Rules Type Inference](#custom-rules-type-inference)
-  - [Creating Type Definitions](#step-1-create-the-rule-implementation)
-  - [Parameterized Output Types](#advanced-rules-with-parameterized-output-types)
-  - [RuleTypeDef Parameters](#ruletypedef-parameters)
-  - [External Rule Packages](#type-inference-for-external-rule-packages)
+  - [Rules with a Fixed Type](#rules-with-a-fixed-type)
+  - [Rules That Make the Field Required](#rules-that-make-the-field-required)
+  - [Types from Arguments and Earlier Rules](#types-from-arguments-and-earlier-rules)
+  - [Meta Rules](#meta-rules)
+  - [Aliases](#aliases)
+  - [Replacing Built-in Rules](#replacing-built-in-rules)
+  - [Rule Packages](#rule-packages)
+- [Migrating from RuleTypeDef](#migrating-from-ruletypedef)
+- [Limitations](#limitations)
 - [Available Type Exports](#available-type-exports)
 
 ---
@@ -61,60 +68,97 @@ if (result) {
 
 ## How Types Are Inferred
 
+Every rule of a field has a type: the type of the value after the rule. The rules run in order, and each one gets the value of the previous one, so the type of the field is the type after its last rule.
+
 ### Required vs Optional Fields
 
-By default, all fields are **optional**. Use the `required` rule to make a field mandatory:
+By default, all fields are **optional**. Use the `required` rule to make a field mandatory. Its place in the list does not matter:
 
 ```typescript
 const schema = {
   requiredField: ['required', 'string'],  // string (required)
-  optionalField: 'string',                 // string | undefined (optional)
+  alsoRequired: ['string', 'required'],   // string (required)
+  optionalField: 'string',                // string | undefined (optional)
 } as const;
 
 type Data = InferFromSchema<typeof schema>;
-// { requiredField: string; optionalField?: string }
+// { requiredField: string; alsoRequired: string; optionalField?: string }
 ```
 
-The `default` rule also makes fields non-optional since they always have a value:
+The `default` rule also makes fields non-optional since they always have a value, and so does `not_empty_list`, which returns an error for a missing list:
 
 ```typescript
 const schema = {
   count: [{ default: 0 }, 'integer'],     // number (has default)
   enabled: { default: true },              // boolean (has default, widened)
+  tags: ['not_empty_list', { list_of: 'string' }], // string[] (required)
 } as const;
 
 type Config = InferFromSchema<typeof schema>;
-// { count: number; enabled: boolean }
+// { count: number; enabled: boolean; tags: string[] }
 ```
 
-### Primitive Type Rules
+### Types of the Built-in Rules
 
 | Rule | Inferred Type |
 |------|---------------|
 | `string` | `string` |
 | `integer`, `positive_integer` | `number` |
 | `decimal`, `positive_decimal` | `number` |
+| `max_number`, `min_number`, `number_between` | `number` |
+| `max_length`, `min_length`, `length_equal`, `length_between`, `like` | `string` |
 | `email`, `url`, `iso_date` | `string` |
-| `trim`, `to_lc`, `to_uc` | `string` |
-| `max_length`, `min_length`, etc. | `string` |
-| `max_number`, `min_number`, etc. | `number` |
+| `trim`, `remove`, `leave_only` | `string` |
+| `to_lc`, `to_uc` | `string`, literal types in lower or upper case |
+| `any_object` | `Record<string, unknown>` |
+| `not_empty`, `equal_to_field` | the type of earlier rules, `string` as the first rule |
+| `not_empty_list` | the list type of earlier rules or `unknown[]`, the field is required |
+| `required` | the type of earlier rules, the field is required |
+| `eq`, `one_of` | the literal types of the allowed values |
+| `default` | the type of the default value, the field is required |
+
+Numeric rules accept strings like `'42'` and return numbers, and string rules return numbers as strings, so `['integer', { max_length: 3 }]` is a `string`. The [built-in rules page](/rules) has the whole list.
 
 ### Literal Types with `one_of` and `eq`
 
-To get literal union types, use `as const` on the values array:
+To get literal union types, use `as const` on the schema (or on the values array):
 
 ```typescript
 const schema = {
   // Without as const: string
   // With as const: 'admin' | 'user' | 'guest'
-  role: { one_of: ['admin', 'user', 'guest'] as const },
+  role: { one_of: ['admin', 'user', 'guest'] },
+
+  // The values can also be in an array, the way the LIVR specification writes them
+  plan: { one_of: [['free', 'pro']] },
 
   // Literal type: 'active'
-  status: { eq: 'active' as const },
+  status: { eq: 'active' },
 } as const;
 
 type Data = InferFromSchema<typeof schema>;
-// { role?: 'admin' | 'user' | 'guest'; status?: 'active' }
+// { role?: 'admin' | 'user' | 'guest'; plan?: 'free' | 'pro'; status?: 'active' }
+```
+
+### Rules Keep Literal Types
+
+Rules that only check a value, or convert it to their type, keep a more precise type of earlier rules. A literal union stays a literal union after length checks, `string`, `email` and other string rules, and number literals stay after numeric rules:
+
+```typescript
+const schema = {
+  role: ['required', { one_of: ['admin', 'user'] }, { max_length: 10 }],
+  level: [{ one_of: [1, 2, 3] }, 'positive_integer'],
+  code: [{ one_of: ['USD', 'EUR'] }, 'to_lc'],
+  name: [{ one_of: [' a', 'b '] }, 'trim'],
+} as const;
+
+type Data = InferFromSchema<typeof schema>;
+// {
+//     role: 'admin' | 'user';
+//     level?: 1 | 2 | 3;
+//     code?: 'usd' | 'eur';
+//     name?: string; // trim makes a new string
+// }
 ```
 
 ### Type Widening with `default`
@@ -130,6 +174,9 @@ const schema = {
 
   // Use type assertions with unions to preserve specific types
   status: { default: 'ACTIVE' as 'ACTIVE' | 'PENDING' },  // 'ACTIVE' | 'PENDING'
+
+  // After other rules, the type of the rules and of the default value
+  role: [{ one_of: ['admin', 'user'] }, { default: 'user' }], // 'admin' | 'user'
 } as const;
 
 type Config = InferFromSchema<typeof schema>;
@@ -138,6 +185,7 @@ type Config = InferFromSchema<typeof schema>;
 //     name: string;
 //     active: boolean;
 //     status: 'ACTIVE' | 'PENDING';
+//     role: 'admin' | 'user';
 // }
 ```
 
@@ -221,13 +269,13 @@ const schema = {
       'type',  // Discriminator field
       {
         click: {
-          type: { eq: 'click' as const },
+          type: { eq: 'click' },
           x: ['required', 'integer'],
           y: ['required', 'integer'],
         },
         scroll: {
-          type: { eq: 'scroll' as const },
-          direction: { one_of: ['up', 'down'] as const },
+          type: { eq: 'scroll' },
+          direction: { one_of: ['up', 'down'] },
         },
       },
     ],
@@ -243,322 +291,372 @@ type Data = InferFromSchema<typeof schema>;
 // }
 ```
 
+`variable_object` works the same way for a single object. The output has only the fields of the schema of the selector value, so list the discriminator field in each schema (`type: 'required'` is enough) to have it in the output and in the type.
+
 ### Union Types with `or`
 
 ```typescript
 const schema = {
   // Can be either a string or a number
   value: { or: ['string', 'integer'] },
+
+  // Required when every set of rules has required
+  id: { or: [['required', 'positive_integer'], ['required', { like: '^[a-z]+$' }]] },
 } as const;
 
 type Data = InferFromSchema<typeof schema>;
-// { value?: string | number }
+// { value?: string | number; id: number | string }
 ```
 
 ---
 
 ## Custom Rules Type Inference
 
-When you create custom validation rules, you can also define their type inference behavior.
+Types of your rules, aliases and rule packages go to the `RuleTypes` interface of `livr/types/inference`, by declaration merging. Every package adds its own rules, so any number of packages can be used together. camelCase names are found automatically: `my_rule` is also typed as `myRule`, the way the validator registers it.
 
-### Step 1: Create the Rule Implementation
+The type of a rule is the type of the value after the rule. The built-in rules are declared the same way, each next to its code in `lib/rules` of the package: `lib/rules/string/max_length.js` and `lib/rules/string/max_length.d.ts`.
 
-```typescript
-// my-rules/phone_number.js
-module.exports = function phoneNumber(countryCode) {
-  return (value) => {
-    if (value === undefined || value === null || value === '') return;
-
-    // Your validation logic here
-    const phoneRegex = /^\+?[\d\s-]{10,}$/;
-    if (!phoneRegex.test(value)) {
-      return 'INVALID_PHONE_NUMBER';
-    }
-  };
-};
-```
-
-### Step 2: Create Type Definition File
-
-Create a `.d.ts` file alongside your rule (or in your types directory):
+### Rules with a Fixed Type
 
 ```typescript
-// my-rules/phone_number.d.ts
-import type { RuleTypeDef } from 'livr/types/inference';
+// my-rules.d.ts, or any .ts file of your project
+import type { As } from 'livr/types/inference';
 
 declare module 'livr/types/inference' {
-  interface RuleTypeRegistry {
-    // Simple rule that outputs string
-    phone_number: RuleTypeDef<string, false, false>;
-
-    // Also register camelCase version
-    phoneNumber: RuleTypeRegistry['phone_number'];
+  interface RuleTypes {
+    uuid: As<string>; // checks a string
+    to_date: Date;    // converts the value to a Date
   }
 }
 ```
-
-### Step 3: Use the Rule with Type Inference
 
 ```typescript
 import LIVR from 'livr';
 import type { InferFromSchema } from 'livr/types';
-import phoneNumber from './my-rules/phone_number';
 
-// Register the rule
-LIVR.Validator.registerDefaultRules({ phone_number: phoneNumber });
-
-const schema = {
-  name: ['required', 'string'],
-  phone: ['required', 'phone_number'],
-} as const;
-
-type Contact = InferFromSchema<typeof schema>;
-// { name: string; phone: string }
-
-// Pass the inferred type as a generic parameter
-const validator = new LIVR.Validator<Contact>(schema);
-
-// Validate data from external source
-const input = getContactInput();
-const result = validator.validate(input);
-// result is typed as Contact | false
-```
-
-### Advanced: Rules with Parameterized Output Types
-
-For rules where the output type depends on the arguments, use `ParameterizedRuleRegistry` with templates.
-
-#### Using Built-in Templates
-
-LIVR provides several built-in templates for common patterns:
-
-| Template | Description | Example Usage |
-|----------|-------------|---------------|
-| `literal` | Output equals the argument type | `eq` |
-| `array_element` | Output is element type of array argument | `one_of` |
-| `infer_schema` | Output is inferred from schema argument | `nested_object` |
-| `infer_schema_array` | Output is array of inferred schema type | `list_of_objects` |
-| `infer_rule_array` | Output is array of inferred rule type | `list_of` |
-
-```typescript
-// my-rules/allowed_status.d.ts
-import type { ParameterizedRuleDef } from 'livr/types/inference';
-
-declare module 'livr/types/inference' {
-  interface ParameterizedRuleRegistry {
-    // Uses 'array_element' template: output is union of array elements
-    allowed_status: ParameterizedRuleDef<'array_element', false, false>;
-  }
-}
-```
-
-```typescript
-// Usage
-const schema = {
-  status: { allowed_status: ['pending', 'active', 'closed'] as const },
-} as const;
-
-type Data = InferFromSchema<typeof schema>;
-// { status?: 'pending' | 'active' | 'closed' }
-```
-
-#### Creating Custom Templates
-
-For rules that need custom type transformations, you can extend `TemplateOutputRegistry`:
-
-```typescript
-// my-rules/instance_of.d.ts
-import type { ParameterizedRuleDef } from 'livr/types/inference';
-
-declare module 'livr/types/inference' {
-  // Step 1: Define custom template computation
-  interface TemplateOutputRegistry<Args> {
-    // Extract instance type from constructor argument
-    my_instance: Args extends abstract new (...args: any) => any
-      ? InstanceType<Args>
-      : unknown;
-  }
-
-  // Step 2: Register rule using the template
-  interface ParameterizedRuleRegistry {
-    my_instance_of: ParameterizedRuleDef<'my_instance', false, false>;
-  }
-}
-```
-
-```typescript
-// Usage
-import { Temporal } from '@js-temporal/polyfill';
-
-const schema = {
-  createdAt: { my_instance_of: Temporal.Instant },
-} as const;
-
-type Data = InferFromSchema<typeof schema>;
-// { createdAt?: Temporal.Instant }
-```
-
-#### ParameterizedRuleDef Parameters
-
-```typescript
-ParameterizedRuleDef<TTemplate, TRequiredEffect, TDefaultEffect>
-```
-
-| Parameter | Type | Description |
-|-----------|------|-------------|
-| `TTemplate` | `string` | Template name from `TemplateOutputRegistry` |
-| `TRequiredEffect` | `boolean` | Set to `true` if this rule makes the field required |
-| `TDefaultEffect` | `boolean` | Set to `true` if this rule provides a default value |
-
-#### Alternative Approaches
-
-**Option 1: Use existing rules as building blocks**
-
-```typescript
-// Use one_of which already has proper type inference
-const schema = {
-  status: { one_of: ['pending', 'active', 'closed'] as const },
-} as const;
-```
-
-**Option 2: Create an aliased rule**
-
-```typescript
-// Register as aliased rule - types will flow through
-LIVR.Validator.registerAliasedDefaultRule({
-  name: 'status_enum',
-  rules: { one_of: ['pending', 'active', 'closed'] },
-});
-```
-
----
-
-## RuleTypeDef Parameters
-
-When defining custom rule types:
-
-```typescript
-RuleTypeDef<TOutput, TRequiredEffect, TDefaultEffect>
-```
-
-| Parameter | Type | Description |
-|-----------|------|-------------|
-| `TOutput` | `any` | The TypeScript type this rule produces |
-| `TRequiredEffect` | `boolean` | Set to `true` if this rule makes the field required |
-| `TDefaultEffect` | `boolean` | Set to `true` if this rule provides a default value |
-
-### Examples
-
-```typescript
-// Simple string output
-RuleTypeDef<string, false, false>
-
-// Makes field required (like 'required' rule)
-RuleTypeDef<unknown, true, false>
-
-// Provides default value (like 'default' rule)
-RuleTypeDef<unknown, false, true>
-
-// Number output
-RuleTypeDef<number, false, false>
-
-// Object output
-RuleTypeDef<{ id: number; name: string }, false, false>
-```
-
----
-
-## Type Inference for External Rule Packages
-
-If you're publishing a package with LIVR rules, include type definitions.
-
-### Simple Rules (Fixed Output Types)
-
-For rules that always output the same type:
-
-```typescript
-// my-livr-rules/types.d.ts
-import type { RuleTypeDef } from 'livr/types/inference';
-
-declare module 'livr/types/inference' {
-  interface RuleTypeRegistry {
-    // Your custom rules
-    uuid: RuleTypeDef<string, false, false>;
-    iso_timestamp: RuleTypeDef<string, false, false>;
-    json_string: RuleTypeDef<object, false, false>;
-
-    // CamelCase aliases
-    isoTimestamp: RuleTypeRegistry['iso_timestamp'];
-    jsonString: RuleTypeRegistry['json_string'];
-  }
-}
-```
-
-### Parameterized Rules (Output Depends on Arguments)
-
-For rules where output type depends on arguments, use `ParameterizedRuleRegistry`:
-
-```typescript
-// my-livr-rules/types.d.ts
-import type { RuleTypeDef, ParameterizedRuleDef } from 'livr/types/inference';
-
-declare module 'livr/types/inference' {
-  // Simple rules
-  interface RuleTypeRegistry {
-    uuid: RuleTypeDef<string, false, false>;
-  }
-
-  // Parameterized rules using built-in templates
-  interface ParameterizedRuleRegistry {
-    // Uses 'literal' template: output equals the argument
-    is: ParameterizedRuleDef<'literal', true, false>;
-    // Uses 'array_element' template: output is union of array elements
-    allowed_values: ParameterizedRuleDef<'array_element', false, false>;
-  }
-}
-```
-
-### Custom Templates
-
-For rules that need custom type transformations, extend `TemplateOutputRegistry`:
-
-```typescript
-// my-livr-rules/types.d.ts
-import type { ParameterizedRuleDef } from 'livr/types/inference';
-
-declare module 'livr/types/inference' {
-  // Define custom template computation
-  interface TemplateOutputRegistry<Args> {
-    instance_of: Args extends abstract new (...args: any) => any
-      ? InstanceType<Args>
-      : unknown;
-  }
-
-  // Register rules using the custom template
-  interface ParameterizedRuleRegistry {
-    instanceOf: ParameterizedRuleDef<'instance_of', false, false>;
-    instance_of: ParameterizedRuleDef<'instance_of', false, false>;
-  }
-}
-```
-
-### Using External Rule Packages
-
-Users of your package will automatically get type inference when they import it:
-
-```typescript
-import LIVR from 'livr';
-import type { InferFromSchema } from 'livr/types';
-import 'my-livr-rules'; // Imports rules and type augmentations
+LIVR.Validator.registerDefaultRules({ uuid, to_date });
 
 const schema = {
   id: ['required', 'uuid'],
-  createdAt: 'iso_timestamp',
+  createdAt: ['required', 'toDate'],
 } as const;
 
-type Record = InferFromSchema<typeof schema>;
-// { id: string; createdAt?: string }
+type Entity = InferFromSchema<typeof schema>;
+// { id: string; createdAt: Date }
 ```
+
+Use `As<T>` for a rule that checks a value or converts it to `T`: it keeps a more precise `T` of earlier rules. Use the type itself for a rule that makes a new value:
+
+| Type of the rule | For | Type of `[{ one_of: ['a', 'b'] }, 'my_rule']` |
+| --- | --- | --- |
+| `As<string>` | rules that check a string, or convert a value to a string | `'a' \| 'b'` |
+| `string` | rules that make a new string, like `trim` | `string` |
+| `As<unknown>` | rules that check a value of any type | `'a' \| 'b'` |
+| `As<unknown[]>` | rules that check a list | the list type of earlier rules, or `unknown[]` |
+
+### Rules That Make the Field Required
+
+When the field is always in the output after the rule, like with `required` and `default`, the field is not optional. Use `Present<T>` for a rule that always gives `T`, or set `present: true` in an interface that extends `RuleType` (see [the next section](#types-from-arguments-and-earlier-rules)):
+
+```typescript
+import type { Present, RuleType } from 'livr/types/inference';
+
+// Like `required`, also for a whitespace-only value: the type of earlier rules is kept
+interface NotBlankType extends RuleType {
+  output: this['input'];
+  present: true;
+}
+
+declare module 'livr/types/inference' {
+  interface RuleTypes {
+    default_now: Present<Date>; // sets the current date when the value is empty
+    not_blank: NotBlankType;
+  }
+}
+
+const schema = {
+  updatedAt: 'default_now',
+  title: ['string', 'not_blank'],
+} as const;
+
+type Data = InferFromSchema<typeof schema>; // { updatedAt: Date; title: string }
+```
+
+`present` is a flag next to `output`, and not a part of it, so that types of nested objects are computed only when they are used. That keeps deeply nested schemas within the limits of TypeScript.
+
+### Types from Arguments and Earlier Rules
+
+When the type depends on the rule arguments or on the type before the rule, declare an interface that extends `RuleType`, and compute its `output` from:
+
+- `this['args']`: the arguments, as the rule function gets them;
+- `this['input']`: the type before the rule, `unknown` for the first rule.
+
+Set `present: true` when the rule makes the field always present, or compute it from the arguments, like `present: this['args'][0] extends true ? true : false`.
+
+| Rule in a schema | The rule function gets | `this['args']` |
+| --- | --- | --- |
+| `'my_rule'` | `my_rule(ruleBuilders)` | `[]` |
+| `{ my_rule: 'a' }` | `my_rule('a', ruleBuilders)` | `['a']` |
+| `{ my_rule: [1, 10] }` | `my_rule(1, 10, ruleBuilders)` | `[1, 10]` |
+| `{ my_rule: [['a', 'b']] }` | `my_rule(['a', 'b'], ruleBuilders)` | `[['a', 'b']]` |
+
+```typescript
+import type { RuleType } from 'livr/types/inference';
+
+// { currency: ['USD', 'EUR'] } -> 'USD' | 'EUR'
+interface CurrencyType extends RuleType {
+  output: this['args'][number];
+}
+
+// { instance_of: Date } -> Date
+interface InstanceOfType extends RuleType {
+  output: this['args'][0] extends abstract new (...args: any) => infer T ? T : unknown;
+}
+
+// 'to_list': a list of the value, or the list itself
+interface ToListType extends RuleType {
+  output: this['input'] extends readonly unknown[] ? this['input'] : Array<this['input']>;
+}
+
+declare module 'livr/types/inference' {
+  interface RuleTypes {
+    currency: CurrencyType;
+    instance_of: InstanceOfType;
+    to_list: ToListType;
+  }
+}
+
+const schema = {
+  price: ['required', { currency: ['USD', 'EUR'] }],
+  createdAt: { instance_of: Date },
+  ids: ['positive_integer', 'to_list'],
+} as const;
+
+type Data = InferFromSchema<typeof schema>;
+// { price: 'USD' | 'EUR'; createdAt?: Date; ids?: number[] }
+```
+
+Two things to know when you write such types:
+
+- Read the arguments by index, `this['args'][0]` or `this['args'][number]`. Inside the interface they are an intersection with `readonly unknown[]`, so `this['args'] extends [infer First, ...infer Rest]` gives wrong types.
+- `this` is not allowed in an object type literal: instead of `output: { currency: this['args'][0] }`, declare `interface Money<C> { amount: number; currency: C }` and set `output: Money<this['args'][0]>`.
+
+### Meta Rules
+
+Meta rules validate their value with other rules, and their types are built from the types of those rules:
+
+- `InferFromSchema<Schema>`: the type of an object validated by a schema, like `nested_object`;
+- `InferRuleType<Rules>`: the type of a value after a rule or a list of rules, like the items of `list_of`. `InferRuleType<Rules, this['input']>` applies the rules to the value of your rule, like a set of rules of `or`;
+- `MakesPresent<Rules, Input>`: `true` when the rules make the field present, for `present` of such a rule.
+
+```typescript
+import type { RuleType, InferRuleType } from 'livr/types/inference';
+
+// { dict_of: 'positive_integer' } or { dict_of: ['required', 'string'] }
+//   -> Record<string, number>, Record<string, string>
+interface DictOfType extends RuleType {
+  output: Record<string, InferRuleType<this['args']>>;
+}
+
+declare module 'livr/types/inference' {
+  interface RuleTypes {
+    dict_of: DictOfType;
+  }
+}
+```
+
+The built-in meta rules are written this way, see `lib/rules/meta/*.d.ts` in the package.
+
+### Aliases
+
+The type of an alias is the type of its rules written in place, `AliasType<typeof rules>`. Keep the rules in a constant with `as const`, and pass it both to the validator and to the type:
+
+```typescript
+import type { AliasType } from 'livr/types/inference';
+
+const phoneRules = ['string', { like: '^\\+?[0-9]{10,15}$' }] as const;
+const requiredPhoneRules = ['required', 'phone'] as const;
+
+LIVR.Validator.registerAliasedDefaultRule({ name: 'phone', rules: phoneRules, error: 'WRONG_PHONE' });
+LIVR.Validator.registerAliasedDefaultRule({ name: 'required_phone', rules: requiredPhoneRules });
+
+declare module 'livr/types/inference' {
+  interface RuleTypes {
+    phone: AliasType<typeof phoneRules>;
+    required_phone: AliasType<typeof requiredPhoneRules>;
+  }
+}
+
+const schema = {
+  phone: 'phone',
+  backupPhone: 'requiredPhone',
+} as const;
+
+type Contact = InferFromSchema<typeof schema>;
+// { phone?: string; backupPhone: string }
+```
+
+An alias gets the type of earlier rules, like its rules would, and `required` in an alias makes the field required. Aliases of one validator (`validator.registerAliasedRule()`) and its own rules (`validator.registerRules()`) are typed the same way: rule types are global.
+
+### Replacing Built-in Rules
+
+`registerDefaultRules()` and `registerAliasedDefaultRule()` can replace a built-in rule. A type in `RuleTypes` replaces the type of the built-in rule with the same name in the same way:
+
+```typescript
+// Prices stay strings with two decimals
+const priceRules = ['string', { like: '^\\d+\\.\\d{2}$' }] as const;
+LIVR.Validator.registerAliasedDefaultRule({ name: 'decimal', rules: priceRules });
+
+declare module 'livr/types/inference' {
+  interface RuleTypes {
+    decimal: AliasType<typeof priceRules>; // string instead of number
+  }
+}
+```
+
+The types of the built-in rules are in `BuiltInRuleTypes`. Reuse them for your rules, like `my_enum: BuiltInRuleTypes['one_of']`.
+
+### Rule Packages
+
+A package with LIVR rules declares their types the same way, in a `.d.ts` file that its types entry loads, so the types come with `import 'my-livr-rules'`. Put the type of each rule next to its code (`rules/uuid.js` and `rules/uuid.d.ts`), or all of them in one file:
+
+```typescript
+// my-livr-rules/types/index.d.ts
+import type { As, RuleType } from 'livr/types/inference';
+
+// { is: 'active' } -> 'active', the field is required
+interface IsType extends RuleType {
+  output: this['args'][0];
+  present: true;
+}
+
+declare module 'livr/types/inference' {
+  interface RuleTypes {
+    uuid: As<string>;
+    boolean: boolean;
+    list_length: As<unknown[]>;
+    is: IsType;
+  }
+}
+
+type RuleFactory = (
+  ...args: Array<any>
+) => (value: any, params: any, outputArr: Array<any>) => string | undefined;
+
+declare const rules: Record<string, RuleFactory>;
+// At the top level: inside `declare module 'my-livr-rules'` in this file it would be
+// a module augmentation, where exports are not allowed (TS2666 without skipLibCheck)
+export = rules;
+```
+
+- List `livr` in `peerDependencies`, so that the package and the application use the same `livr/types/inference`.
+- Rule names are global. Two packages may declare the same rule with the same type. With different types, TypeScript reports TS2717 (`Subsequent property declarations must have the same type`); with `skipLibCheck` the error in a package is hidden and the first declaration wins.
+- Check the package in a project that installs it (`npm pack`), with and without `skipLibCheck`.
+
+```typescript
+import LIVR from 'livr';
+import type { InferFromSchema } from 'livr/types';
+import myRules from 'my-livr-rules'; // the rules and their types
+
+LIVR.Validator.registerDefaultRules(myRules);
+
+const schema = {
+  id: ['required', 'uuid'],
+  status: { is: 'active' },
+} as const;
+
+type Item = InferFromSchema<typeof schema>;
+// { id: string; status: 'active' }
+```
+
+---
+
+## Migrating from RuleTypeDef
+
+Earlier versions declared rule types with `RuleTypeDef` in `RuleTypeRegistry` and with templates in `ParameterizedRuleRegistry`. These declarations still work, so packages and projects can move to `RuleTypes` when they like. They are deprecated (editors show them struck through) and will be removed in the next major version.
+
+| Before | After |
+| --- | --- |
+| `interface RuleTypeRegistry { ... }` | `interface RuleTypes { ... }` |
+| `my_rule: RuleTypeDef<string, false, false>` | `my_rule: As<string>` when the rule checks or converts to a string, `my_rule: string` when it makes a new string |
+| `myRule: RuleTypeRegistry['my_rule']` | remove: camelCase names are found automatically |
+| `RuleTypeDef<T, true, false>`, `DefaultRule<T>`, `RuleTypeDef<T, false, true>` | `Present<T>` |
+| `RequiredRule` | an interface with `output: this['input']` and `present: true` |
+| `RuleTypeDef<unknown, false, false>` for a rule that only checks the value | `As<unknown>`, or `As<unknown[]>` for a list. The field keeps its type now: before, it became `unknown` |
+| `ParameterizedRuleDef<'literal'>` | an interface with `output: this['args'][0]` |
+| `ParameterizedRuleDef<'array_element'>` | `BuiltInRuleTypes['one_of']` |
+| `ParameterizedRuleDef<'infer_schema'>` | an interface with `output: InferFromSchema<this['args'][0]>` |
+| `ParameterizedRuleDef<'infer_schema_array'>` | an interface with `output: Array<InferFromSchema<this['args'][0]>>` |
+| `ParameterizedRuleDef<'infer_rule_array'>` | `BuiltInRuleTypes['list_of']` |
+| A template in `TemplateOutputRegistry<Args>` | an interface with the template as `output`, `this['args'][0]` instead of `Args` |
+| `RuleTypeRegistry['email']` (types of built-in rules) | `BuiltInRuleTypes['email']` |
+
+Templates got the arguments as they are written in the schema, `this['args']` has them as the rule function gets them. They differ only for an array: `{ my_rule: ['a'] }` gave `['a']` to a template, and `this['args'][0]` is `'a'`, like the first argument of the rule function.
+
+A package with both registries, before and after:
+
+```typescript
+// Before
+import type { RuleTypeDef, ParameterizedRuleDef } from 'livr/types/inference';
+
+declare module 'livr/types/inference' {
+  interface TemplateOutputRegistry<Args> {
+    instance_of: Args extends abstract new (...args: any) => any ? InstanceType<Args> : unknown;
+  }
+
+  interface RuleTypeRegistry {
+    uuid: RuleTypeDef<string, false, false>;
+    credit_card: RuleTypeDef<string, false, false>;
+    creditCard: RuleTypeRegistry['credit_card'];
+    boolean: RuleTypeDef<boolean, false, false>;
+    list_length: RuleTypeDef<unknown, false, false>;
+    listLength: RuleTypeRegistry['list_length'];
+  }
+
+  interface ParameterizedRuleRegistry {
+    is: ParameterizedRuleDef<'literal', true, false>;
+    instance_of: ParameterizedRuleDef<'instance_of', false, false>;
+    instanceOf: ParameterizedRuleDef<'instance_of', false, false>;
+  }
+}
+```
+
+```typescript
+// After
+import type { As, RuleType } from 'livr/types/inference';
+
+interface IsType extends RuleType {
+  output: this['args'][0];
+  present: true;
+}
+
+interface InstanceOfType extends RuleType {
+  output: this['args'][0] extends abstract new (...args: any) => infer T ? T : unknown;
+}
+
+declare module 'livr/types/inference' {
+  interface RuleTypes {
+    uuid: As<string>;
+    credit_card: As<string>;
+    boolean: boolean;
+    list_length: As<unknown[]>;
+    is: IsType;
+    instance_of: InstanceOfType;
+  }
+}
+```
+
+Types of the built-in rules changed in the same version. They follow the runtime more closely, so some fields get more precise types, see the [changelog](/changelog).
+
+---
+
+## Limitations
+
+- **`as const` is needed.** Without it, a list of rules is a `string[]`, and its type is `unknown`.
+- **Rule names are not checked.** A misspelled rule, or a rule without a declared type, gives `unknown`, as the type of a value after it is not known.
+- **Empty values.** Rules skip empty values (`null` and `''`) of optional fields, and the value stays in the output as it is: `{ age: 'integer' }` with the input `{ age: '' }` gives `{ age: '' }`, but the type is `{ age?: number }`. The same holds for items of `list_of` without `required`. Use `required` or `default` where the type must hold for such input.
+- **Schemas built at runtime** have no compile-time type. Declare the type of the output where you load the schema, and pass it to `new LIVR.Validator<Type>(schema)`.
+- **TypeScript 5.0 or newer.**
 
 ---
 
@@ -572,27 +670,25 @@ import type {
   // Infer type from a single rule (useful for list elements)
   InferRuleType,
 
+  // true when rules make the field present, for meta rules
+  MakesPresent,
+
   // Schema and rule definition types
   LIVRSchema,
   LIVRRuleDefinition,
   LIVRPrimitive,
 
-  // For defining custom rule types (fixed output)
-  RuleTypeDef,
-  RuleTypeRegistry,
-
-  // For defining parameterized rules (output depends on arguments)
-  ParameterizedRuleDef,
-  ParameterizedRuleRegistry,
-
-  // For defining custom output templates
-  TemplateOutputRegistry,
+  // Types of rules: add yours to RuleTypes in 'livr/types/inference'
+  RuleTypes,
+  BuiltInRuleTypes,
+  RuleType,
+  As,
+  Present,
+  AliasType,
 
   // Utility types
   Simplify,
-  SimpleRule,
-  RequiredRule,
-  ParameterizedRule,
-  DefaultRule,
 } from 'livr/types';
 ```
+
+`livr/types/inference` exports the same types, and it is the module to add rule types to. The deprecated `RuleTypeDef`, `RuleTypeRegistry`, `ParameterizedRuleDef`, `ParameterizedRuleRegistry`, `SimpleRule`, `RequiredRule`, `ParameterizedRule` and `DefaultRule` are still exported, see [Migrating from RuleTypeDef](#migrating-from-ruletypedef).

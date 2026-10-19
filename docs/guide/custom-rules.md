@@ -111,7 +111,24 @@ LIVR.Validator.registerAliasedDefaultRule({
 
 ## Types of custom rules
 
-To get type inference for your own rules, register their output types. See [Custom rules type inference](/typescript#custom-rules-type-inference).
+To get type inference for your own rules and aliases, declare their types in `RuleTypes`, once for both `snake_case` and `camelCase` names:
+
+```ts
+import type { As, AliasType } from 'livr/types/inference';
+
+const phoneRules = ['string', { like: '^\\+?[0-9]{10,15}$' }] as const;
+LIVR.Validator.registerAliasedDefaultRule({ name: 'phone', rules: phoneRules });
+
+declare module 'livr/types/inference' {
+  interface RuleTypes {
+    my_rule: As<string>; // checks a string
+    to_date: Date; // converts the value to a Date
+    phone: AliasType<typeof phoneRules>;
+  }
+}
+```
+
+Rules with arguments, meta rules, replaced built-in rules and rule packages are covered in [Custom rules type inference](/typescript#custom-rules-type-inference).
 
 ## More rules
 
