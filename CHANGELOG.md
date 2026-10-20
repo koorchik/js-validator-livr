@@ -1,7 +1,7 @@
 ## CHANGELOG
 
 Unreleased
--   The npm package contains only `lib`, `async.js`, `types`, README, LICENSE and CHANGELOG (89 files instead of 341): tests, editor and CI configs are no longer published
+-   The npm package contains only `lib`, `async.js`, `async.d.ts`, `types`, README, LICENSE and CHANGELOG (92 files instead of 341): tests, editor and CI configs are no longer published
 -   Code examples in README and docs use 2-space indentation, like the code
 -   Docs: new documentation site [js.livr-spec.org](https://js.livr-spec.org), built from `docs/` and deployed to GitHub Pages. The README is short now, with links to the site
 -   Docs: `docs/DESIGN.md` starts with the decisions behind the main benefits (schemas as data, no code generation, performance, zero dependencies, the specification). Sizes are re-measured: about 2 KB min+gzip for the core and 5 KB with all rules (the README said < 1 KB and ~3 KB). The code-injection example shows the actual result, and the list of implementations matches livr-spec.org
@@ -17,6 +17,8 @@ Unreleased
     -   `or` makes the field required when every set of rules does (`{ or: [['required', 'string'], ['required', 'integer']] }`), and its sets of rules get the type of earlier rules
     -   `variable_object` and `list_of_different_objects`: the selector field is in the type only when the schema of the selector value has it, as the output has only the fields of that schema
 -   Types: `registerAliasedRule()` and `registerAliasedDefaultRule()` accept a rule name as `rules` (`rules: 'required'`), like at runtime
+-   Types of `livr/async`: `AsyncValidator` with the same schemas and type inference as `Validator`, `validate()` returns a promise of the type, rules may return promises. `livr/async` had no types before, `import LIVR from 'livr/async'` failed to compile with `strict`
+-   Types: the `options` argument of the constructor (`{ autoTrim: true }` or a boolean), `validator.getRules()` and `LIVR.util` were missing. `validator.getAliasedRule()` and `LIVR.ValidatorError` are deprecated: they do not exist at runtime
 -   Types: strict mode, `strictRules: true` in `TypeOptions` of `livr/types/inference`: a rule without a type is a compile error, instead of the `unknown` type. It catches misspelled rules and forgotten types of custom rules and aliases, in schemas of validators (also inside meta rules), with `satisfies LIVRSchema`, in aliases and in the names of registered rules. Meta rules declare their arguments with `params`, custom meta rules can too. Off by default, see the [TypeScript guide](https://js.livr-spec.org/typescript#strict-mode). `RuleName` is the union of the names of the rules with a type
 -   Type checks of the package check its declaration files too (`skipLibCheck` is off), and cover every built-in rule, custom rules, aliases, the deprecated registries, an application with several rule packages, strict mode and a program with only `livr/types/inference` (`npm run test:types`)
 -   Docs: the TypeScript guide covers types of rules with arguments, meta rules, aliases, replaced built-in rules, rule packages, strict mode, the migration from `RuleTypeDef` and the limitations. A TypeScript example on the design decisions page used `'boolean'`, a rule of livr-extra-rules, as a built-in rule

@@ -25,27 +25,14 @@ import {
   ParameterizedRule as _ParameterizedRule,
   DefaultRule as _DefaultRule,
 } from './inference';
-
-type RuleFactory = (
-  ...args: Array<any>
-) => (value: any, params: any, outputArr: Array<any>) => string | undefined;
-
-// Strict mode (`strictRules: true` in TypeOptions): only rules with a type, see TypeOptions
-type IsStrictRules = _TypeOptions extends { readonly strictRules: true } ? true : false;
-
-type Schema = IsStrictRules extends true ? _LIVRSchema : Record<string, any>;
-
-interface Alias {
-  name: IsStrictRules extends true ? _RuleName : string;
-  rules: IsStrictRules extends true
-    ? _LIVRRuleDefinition
-    : _LIVRRuleDefinition | Record<string, any>;
-  error?: string;
-}
-
-type RuleFactories = IsStrictRules extends true
-  ? { readonly [Name in _RuleName]?: RuleFactory }
-  : Record<string, RuleFactory>;
+import type {
+  Alias,
+  RuleFactory,
+  RuleFactories,
+  Util,
+  ValidatorOptions,
+  ValidatorSchema,
+} from './common';
 
 declare namespace LIVR {
   /**
@@ -56,8 +43,9 @@ declare namespace LIVR {
      * Constructs a new validator with a given rules object.
      *
      * @param rules An object describing the validation rules.
+     * @param options `{ autoTrim: true }` trims all strings of the data, or `autoTrim` as a boolean.
      */
-    constructor(rules: Schema);
+    constructor(rules: ValidatorSchema, options?: ValidatorOptions);
 
     /**
      * Prepares the validator (compiles rules, etc.).
@@ -94,7 +82,7 @@ declare namespace LIVR {
     /**
      * Register custom rules locally (for a single Validator instance).
      */
-    registerRules(rules: RuleFactories): this;
+    registerRules(rules: RuleFactories<RuleFactory>): this;
 
     /**
      * Register aliased rule locally (for a single Validator instance).
@@ -102,7 +90,12 @@ declare namespace LIVR {
     registerAliasedRule(alias: Alias): this;
 
     /**
-     * Retrieve the map of all locally registered rules.
+     * The rules registered for this validator with registerRules() and registerAliasedRule().
+     */
+    getRules(): Record<string, RuleFactory>;
+
+    /**
+     * @deprecated Not a method of the validator, calling it throws: use getRules()
      */
     getAliasedRule(): Record<string, any>;
 
@@ -118,7 +111,7 @@ declare namespace LIVR {
     /**
      * Register custom rules as default rules.
      */
-    static registerDefaultRules(rules: RuleFactories): void;
+    static registerDefaultRules(rules: RuleFactories<RuleFactory>): void;
 
     /**
      * Register multiple "aliased" default rules (commonly used for advanced or compound rules).
@@ -132,7 +125,8 @@ declare namespace LIVR {
   }
 
   /**
-   * A specialized Error object thrown or used by the validator to store errors.
+   * @deprecated Not exported by livr: validate() returns false and getErrors() returns the errors,
+   * AsyncValidator rejects with the errors object
    */
   class ValidatorError extends Error {
     constructor(errors: Record<string, any>);
@@ -183,7 +177,11 @@ declare namespace LIVR {
   /** @deprecated `my_rule: Present<T>` in RuleTypes */
   export type DefaultRule<T> = _DefaultRule<T>;
 
+  /** The built-in rules */
   export const rules: Record<string, RuleFactory>;
+
+  /** Helpers for rules */
+  export const util: Util;
 }
 
 export = LIVR;

@@ -13,6 +13,7 @@
   "files": [
     "lib",
     "async.js",
+    "async.d.ts",
     "types",
     "CHANGELOG.md"
   ],
@@ -22,8 +23,16 @@
       "require": "./lib/LIVR.js",
       "import": "./lib/LIVR.js"
     },
-    "./async": "./async.js",
-    "./async.js": "./async.js",
+    "./async": {
+      "types": "./types/async.d.ts",
+      "require": "./async.js",
+      "import": "./async.js"
+    },
+    "./async.js": {
+      "types": "./types/async.d.ts",
+      "require": "./async.js",
+      "import": "./async.js"
+    },
     "./types": {
       "types": "./types/index.d.ts"
     },

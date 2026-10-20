@@ -3,6 +3,7 @@
 // `npx tsc --noEmit -p t/tests-types/strict`. Strict mode is global, so it is a program of its own
 
 import LIVR from 'livr';
+import LIVRAsync from 'livr/async';
 import type { InferFromSchema, LIVRSchema, LIVRRuleDefinition, RuleName } from 'livr/types';
 import type { AliasType, As, InferRuleType, RuleType } from 'livr/types/inference';
 import extraRules from 'livr-extra-rules';
@@ -261,6 +262,17 @@ LIVR.Validator.registerAliasedDefaultRule({ name: 'phone', rules: ['required', '
 
 // @ts-expect-error A rule without a type
 LIVR.Validator.registerDefaultRules({ to_dat: () => () => undefined });
+
+// AsyncValidator is checked the same way
+new LIVRAsync.AsyncValidator<InferFromSchema<typeof schema>>(schema);
+LIVRAsync.AsyncValidator.registerAliasedDefaultRule({ name: 'phone', rules: phoneRules });
+LIVRAsync.AsyncValidator.registerDefaultRules({ to_date: () => async () => undefined });
+// @ts-expect-error A rule without a type in a schema
+new LIVRAsync.AsyncValidator(misspelled);
+// @ts-expect-error An alias without a type
+LIVRAsync.AsyncValidator.registerAliasedDefaultRule({ name: 'phone2', rules: phoneRules });
+// @ts-expect-error A rule without a type
+LIVRAsync.AsyncValidator.registerDefaultRules({ to_dat: () => async () => undefined });
 // @ts-expect-error A local rule without a type
 validator.registerRules({ dict: () => () => undefined });
 

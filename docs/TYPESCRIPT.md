@@ -7,6 +7,7 @@ Try it without installing anything: [open an example in the TypeScript Playgroun
 ## Table of Contents
 
 - [Basic Usage](#basic-usage)
+  - [Async Validator](#async-validator)
 - [How Types Are Inferred](#how-types-are-inferred)
   - [Required vs Optional Fields](#required-vs-optional-fields)
   - [Types of the Built-in Rules](#types-of-the-built-in-rules)
@@ -64,6 +65,31 @@ if (result) {
 ```
 
 > **Important:** Always use `as const` after your schema definition to preserve literal types and enable proper inference.
+
+### Async Validator
+
+`AsyncValidator` of `livr/async` takes the same schemas and types, `validate()` returns a promise of the type:
+
+```typescript
+import LIVR from 'livr/async';
+import type { InferFromSchema } from 'livr/types';
+
+const userSchema = {
+  username: ['required', 'string', 'unique_username'], // a custom async rule
+  age: 'positive_integer',
+} as const;
+
+type User = InferFromSchema<typeof userSchema>;
+const validator = new LIVR.AsyncValidator<User>(userSchema, { autoTrim: true });
+
+try {
+  const user = await validator.validate(input); // User
+} catch (errors) {
+  // The errors object, or 'FORMAT_ERROR' when the input is not an object
+}
+```
+
+A custom rule has a type in `RuleTypes`, the type of the value after the rule, whether it returns a promise or not: `unique_username: As<string>` (see [Custom Rules Type Inference](#custom-rules-type-inference)). Its function may return a promise of the error code.
 
 ---
 

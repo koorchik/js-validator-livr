@@ -9,6 +9,7 @@
     "paths": {
       "livr": ["../../../types/index.d.ts"],
       "livr/types": ["../../../types/index.d.ts"],
+      "livr/async": ["../../../types/async.d.ts"],
       "livr/types/inference": ["../../../types/inference.d.ts"],
       "livr-extra-rules": ["./livr-extra-rules.d.ts"],
       "livr-money-rules": ["./livr-money-rules.d.ts"],

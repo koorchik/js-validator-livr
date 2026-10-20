@@ -69,7 +69,7 @@ function ruleName(arg1, arg2, ruleBuilders) {
 - `t/test_suite/` - JSON-based test cases (positive, negative, aliases_positive, aliases_negative)
   - Each test case is a directory containing `rules.json`, `input.json`, and `output.json` (positive) or `errors.json` (negative)
   - Alias tests also include `aliases.json`
-- `t/tests-types/` - Compile-time type inference tests (`tsc --noEmit`): every built-in rule, custom rules and aliases, the deprecated registries. Rule types are global, so each file uses rule names of its own
+- `t/tests-types/` - Compile-time type inference tests (`tsc --noEmit`): every built-in rule, custom rules and aliases, the deprecated registries, the API of both validators. Rule types are global, so each file uses rule names of its own
 - `t/tests-types/packages/` - A separate program: an application with rule packages that add types to `livr/types/inference` (through `paths`), like installed ones. `livr-extra-rules.d.ts` is a copy of a published package with the deprecated registries
 - `t/tests-types/strict/` - A separate program with strict mode on (`strictRules: true` in `TypeOptions`, global like rule types): schemas with misspelled rules at every place, `@ts-expect-error` for the validator API
 - `t/tests-types/types-only/` - A separate program that imports only `livr/types/inference`, like a rule package: the built-in rule types must load with it
@@ -77,6 +77,7 @@ function ruleName(arg1, arg2, ruleBuilders) {
 ### TypeScript Types (types/)
 
 - `types/index.d.ts` - Main type declarations for Validator class and exports
+- `types/async.d.ts` - Types of `livr/async` (AsyncValidator), also loaded through `async.d.ts` next to `async.js` for module resolution without package exports. `types/common.d.ts` has the declarations both validators share (schema, options, aliases, rule functions, `util`): keep the two classes in sync through it
 - `types/inference.d.ts` - Type inference engine for `InferFromSchema<T>` functionality. It has no rule-specific code
 - Each rule in `lib/rules/` has a `.d.ts` file next to it with the whole type of the rule, meta rules included. `types/inference.d.ts` loads them with `/// <reference path>`. It adds the type to `BuiltInRuleTypes` (snake_case name only, camelCase is automatic): `As<T>` for rules that check or convert to `T`, a plain type for rules that make a new value, an interface extending `RuleType` (reading `this['args']` and `this['input']`) for the rest, with `present: true` when the field is always present
 - Users and rule packages add types to `RuleTypes`, which overrides `BuiltInRuleTypes`, like registered rules override built-in ones. The deprecated `RuleTypeRegistry` and `ParameterizedRuleRegistry` are still read, before the built-in types
