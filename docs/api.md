@@ -1,3 +1,7 @@
+---
+description: 'Validator and AsyncValidator: the constructor and its options, validate(), getErrors(), registering rules and aliases, and the exports of livr and livr/async.'
+---
+
 # API
 
 `Validator` (from `livr`) and `AsyncValidator` (from `livr/async`) have the same API, except that the async `validate()` returns a promise and there is no async `getErrors()`.

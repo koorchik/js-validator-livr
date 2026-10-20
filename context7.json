@@ -1,0 +1,25 @@
+{
+  "$schema": "https://context7.com/schema/context7.json",
+  "projectTitle": "LIVR for JavaScript",
+  "description": "Validator for JavaScript and TypeScript with rules that are just data (Language Independent Validation Rules): sync and async validators, custom rules and aliases, TypeScript types inferred from the schema, zero dependencies.",
+  "excludeFolders": [
+    "./t",
+    "./lib",
+    "./types",
+    "./examples",
+    "docs/why",
+    "docs/public",
+    "docs/scripts",
+    "docs/.vitepress",
+    "node_modules"
+  ],
+  "excludeFiles": ["CLAUDE.md", "DESIGN.md"],
+  "rules": [
+    "A schema is plain data: { field: rules }, where rules are a rule name ('required'), a rule with arguments ({ min_length: 8 }) or a list of them. Rule names work in snake_case and camelCase",
+    "import LIVR from 'livr': new LIVR.Validator(schema).validate(data) returns the validated data, or false and the errors in validator.getErrors(). import LIVR from 'livr/async': new LIVR.AsyncValidator(schema).validate(data) returns a promise that rejects with the errors",
+    "TypeScript: write the schema as const and get the type with InferFromSchema<typeof schema> from 'livr/types'",
+    "Prefer an alias (registerAliasedRule(), existing rules under a new name and error code) to a rule function when existing rules can do the check",
+    "A rule function (registerRules()) gets the rule arguments and returns (value, allValues, outputArr) => errorCode | undefined. It skips empty values (undefined, null, '') and pushes to outputArr to change the value. registerDefaultRules() and registerAliasedDefaultRule() register rules for all validators",
+    "Registering a rule does not give it a type. Declare the type of every custom rule and alias in RuleTypes with declare module 'livr/types/inference', in a .ts file with an import or an export: As<T>, a plain type, AliasType<typeof rules> or an interface that extends RuleType"
+  ]
+}

@@ -1,5 +1,6 @@
 import fs from 'node:fs';
 import { defineConfig, type DefaultTheme } from 'vitepress';
+import llmstxt from 'vitepress-plugin-llms';
 
 const pkg = JSON.parse(fs.readFileSync(new URL('../../package.json', import.meta.url), 'utf8'));
 
@@ -10,6 +11,16 @@ const SPEC_URL = 'https://livr-spec.org';
 const RULES_URL = `${SPEC_URL}/validation-rules.html`;
 const DESCRIPTION =
   'LIVR for JavaScript and TypeScript: validation rules that are just data, the fastest validator in the benchmarks, zero dependencies and type inference from the schema.';
+
+// The start of llms.txt: what an AI assistant needs to write code with livr. Keep it in sync
+// with the rules of context7.json
+const LLM_DETAILS = `Essentials:
+
+- A schema is plain data: \`{ field: rules }\`, where rules are a rule name (\`'required'\`), a rule with arguments (\`{ min_length: 8 }\`) or a list of them. Rule names work in snake_case and camelCase.
+- \`import LIVR from 'livr'\`: \`new LIVR.Validator(schema).validate(data)\` returns the validated data, or \`false\` and the errors in \`validator.getErrors()\`. \`import LIVR from 'livr/async'\`: \`new LIVR.AsyncValidator(schema).validate(data)\` returns a promise that rejects with the errors.
+- TypeScript: write the schema \`as const\` and get the type with \`InferFromSchema<typeof schema>\` from \`livr/types\`.
+- Custom rules: an alias (\`registerAliasedRule()\`) gives existing rules a name and an error code. A rule function (\`registerRules()\`) gets the rule arguments and returns \`(value, allValues, outputArr) => errorCode | undefined\`: it skips empty values (\`undefined\`, \`null\`, \`''\`) and pushes to \`outputArr\` to change the value. \`registerDefaultRules()\` and \`registerAliasedDefaultRule()\` register them for all validators.
+- Registering a rule does not give it a type. Declare the type of every custom rule and alias in \`RuleTypes\` with \`declare module 'livr/types/inference'\`: \`As<T>\`, a plain type, \`AliasType<typeof rules>\` or an interface that extends \`RuleType\`. See [Custom rules](${SITE_URL}/guide/custom-rules.md) and [TypeScript](${SITE_URL}/typescript.md).`;
 
 // Anchors like on GitHub (`one_of` keeps its underscore), so DESIGN.md and TYPESCRIPT.md links
 // work the same on the site and in the repository
@@ -108,6 +119,15 @@ export default defineConfig({
     define: {
       __LIVR_VERSION__: JSON.stringify(pkg.version),
     },
+    // llms.txt, llms-full.txt and a Markdown copy of every page, for AI assistants
+    plugins: [
+      llmstxt({
+        domain: SITE_URL,
+        title: 'LIVR for JavaScript and TypeScript',
+        description: DESCRIPTION,
+        details: LLM_DETAILS,
+      }),
+    ],
   },
 
   themeConfig: {

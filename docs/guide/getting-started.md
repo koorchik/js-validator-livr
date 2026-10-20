@@ -1,3 +1,7 @@
+---
+description: 'Install livr, create a validator, read the errors, and get the TypeScript type of the validated data from the schema.'
+---
+
 # Getting started
 
 ## Installation

@@ -1,3 +1,7 @@
+---
+description: 'The built-in rules of the LIVR specification with the TypeScript type of each rule.'
+---
+
 # Built-in rules
 
 Every rule of the [LIVR specification](https://livr-spec.org/validation-rules.html) is built in. This page is a short list with the TypeScript type of every rule. The full reference, with the arguments, error codes and examples of every rule, is on the specification site:

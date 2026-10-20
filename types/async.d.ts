@@ -1,5 +1,7 @@
 // types/async.d.ts
 // Types of 'livr/async': AsyncValidator, rules may return promises
+// Docs: https://js.livr-spec.org, for AI assistants: https://js.livr-spec.org/llms.txt
+// Custom rules and their types: https://js.livr-spec.org/guide/custom-rules
 
 import LIVR = require('./index');
 import type {
@@ -54,13 +56,18 @@ declare namespace LIVRAsync {
     validate(data: unknown): Promise<T>;
 
     /**
-     * Register custom rules locally (for a single validator). A rule function may return
-     * a promise of the error code.
+     * Register custom rules locally (for a single validator). A rule gets the rule arguments and
+     * returns a function `(value, allValues, outputArr)` that returns an error code, undefined
+     * when the value is valid, or a promise of it. Registering a rule does not give it a type:
+     * declare the type in RuleTypes of 'livr/types/inference'.
+     * https://js.livr-spec.org/guide/custom-rules
      */
     registerRules(rules: RuleFactories<AsyncRuleFactory>): this;
 
     /**
-     * Register aliased rule locally (for a single validator).
+     * Register aliased rule locally (for a single validator). Registering an alias does not give
+     * it a type: declare `name: AliasType<typeof rules>` in RuleTypes of 'livr/types/inference'.
+     * https://js.livr-spec.org/guide/custom-rules
      */
     registerAliasedRule(alias: Alias): this;
 
@@ -79,13 +86,17 @@ declare namespace LIVRAsync {
     static defaultAutoTrim(state: boolean): void;
 
     /**
-     * Register custom rules as default rules. They are shared with Validator of 'livr',
-     * rules that return promises work only in AsyncValidator.
+     * Register custom rules as default rules, for all validators. They are shared with Validator
+     * of 'livr', rules that return promises work only in AsyncValidator. Registering a rule does
+     * not give it a type: declare the type in RuleTypes of 'livr/types/inference'.
+     * https://js.livr-spec.org/guide/custom-rules
      */
     static registerDefaultRules(rules: RuleFactories<AsyncRuleFactory>): void;
 
     /**
-     * Register an alias as a default rule, shared with Validator of 'livr'.
+     * Register an alias as a default rule, shared with Validator of 'livr'. Registering an alias
+     * does not give it a type: declare `name: AliasType<typeof rules>` in RuleTypes of
+     * 'livr/types/inference'. https://js.livr-spec.org/guide/custom-rules
      */
     static registerAliasedDefaultRule(alias: Alias): void;
 

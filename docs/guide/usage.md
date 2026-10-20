@@ -1,3 +1,7 @@
+---
+description: 'Validating data, error codes, modifiers, auto-trim, async validation with AsyncValidator, smaller bundles and performance tips.'
+---
+
 # Usage
 
 ## Basic validation

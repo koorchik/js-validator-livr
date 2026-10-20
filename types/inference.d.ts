@@ -98,8 +98,9 @@ type IsStrictRules = TypeOptions extends { readonly strictRules: true } ? true :
 /**
  * Types of your rules by rule name: the type of the value after the rule.
  * Your rules, aliases and rule packages add their types here with declaration merging, so any
- * number of packages can add rules. A type here replaces the type of a built-in rule with the
- * same name, like registerDefaultRules() replaces the rule. camelCase names (`myRule` for
+ * number of packages can add rules. Registering a rule or an alias does not give it a type,
+ * a rule without a type gives `unknown`. A type here replaces the type of a built-in rule with
+ * the same name, like registerDefaultRules() replaces the rule. camelCase names (`myRule` for
  * `my_rule`) are found automatically, like the validator registers them.
  *
  * A member is one of:
@@ -130,6 +131,10 @@ type IsStrictRules = TypeOptions extends { readonly strictRules: true } ? true :
  *   }
  * }
  * ```
+ *
+ * The declaration can be in any .ts file with an import or an export. Guide:
+ * https://js.livr-spec.org/guide/custom-rules#types-of-custom-rules, all cases:
+ * https://js.livr-spec.org/typescript#custom-rules-type-inference
  */
 export interface RuleTypes {
   // Your rules, aliases and rule packages add their types here

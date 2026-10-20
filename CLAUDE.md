@@ -111,7 +111,8 @@ npm run build   # also fails on dead links
 BENCHMARK_RESULTS=../../livr-benchmark/results npm run dev
 ```
 
-- The README is short: pitch, install, quick start, rules table. Guides, API, TypeScript and design go to the site
+- The README is short: pitch, install, quick start, custom rules with their types, rules table. Guides, API, TypeScript and design go to the site
+- AI assistants in projects that use livr read the README and the declarations in `node_modules/livr` (the docs are not in the package), or the site. Both say how to write a custom rule and declare its type: the README example and the JSDoc of `registerRules()`, `registerAliasedRule()` and `RuleTypes`, with links to the guide. `vitepress-plugin-llms` generates `llms.txt`, `llms-full.txt` and a Markdown copy of every page. The start of `llms.txt` (`LLM_DETAILS` in `config.mts`) and the `rules` of `context7.json` are the essentials of the API: keep them in sync with each other and with the API. Pages have a `description` in the frontmatter for `llms.txt`, except `TYPESCRIPT.md` and `DESIGN.md`, which GitHub shows too
 - `docs/DESIGN.md` and `docs/TYPESCRIPT.md` keep their names (old links) and are mapped to `/why/design-decisions` and `/typescript` by `rewrites` in `docs/.vitepress/config.mts`. Anchors are GitHub-style, so links work on GitHub and on the site
 - The site leads with four pillars: rules are just data, performance (also for rules built at runtime, the benchmark with a validator created per call), type inference, zero dependencies, plus trust (since 2013, the spec and its shared test suite). Pages in `docs/why/` explain them
 - Benchmark charts and numbers are not stored here: `docs/scripts/fetch-benchmark.mjs` downloads `results/latest*.{json,svg}` of validators-benchmarks into `docs/public/benchmark/` (gitignored) before every build

@@ -8,7 +8,9 @@
 [![Bundle Size](https://img.shields.io/bundlephobia/minzip/livr)](https://bundlephobia.com/package/livr)
 [![Known Vulnerabilities](https://snyk.io/test/github/koorchik/js-validator-livr/badge.svg?targetFile=package.json)](https://snyk.io/test/github/koorchik/js-validator-livr?targetFile=package.json)
 
-**Documentation: [js.livr-spec.org](https://js.livr-spec.org)** · [Getting started](https://js.livr-spec.org/guide/getting-started) · [TypeScript](https://js.livr-spec.org/typescript) · [API](https://js.livr-spec.org/api) · [LIVR specification](https://livr-spec.org)
+**Documentation: [js.livr-spec.org](https://js.livr-spec.org)** · [Getting started](https://js.livr-spec.org/guide/getting-started) · [Custom rules](https://js.livr-spec.org/guide/custom-rules) · [TypeScript](https://js.livr-spec.org/typescript) · [API](https://js.livr-spec.org/api) · [LIVR specification](https://livr-spec.org)
+
+For AI assistants: [llms.txt](https://js.livr-spec.org/llms.txt), and the whole documentation in one file, [llms-full.txt](https://js.livr-spec.org/llms-full.txt).
 
 ---
 
@@ -83,6 +85,55 @@ const validator = new LIVR.Validator<User>(schema);
 ```
 
 Next: [usage guide](https://js.livr-spec.org/guide/usage) (modifiers, async validation, smaller bundles), [custom rules](https://js.livr-spec.org/guide/custom-rules), [API reference](https://js.livr-spec.org/api).
+
+## Custom Rules
+
+An alias gives a set of existing rules a name and an error code. A rule function gets the rule arguments and returns a function that checks one value: it returns an error code, or nothing when the value is valid. With TypeScript, declare the type of every custom rule and alias in `RuleTypes`, the type of the value after the rule: registering a rule does not give it a type.
+
+```typescript
+import LIVR from 'livr';
+import type { InferFromSchema } from 'livr/types';
+import type { As, AliasType } from 'livr/types/inference';
+
+// An alias: 'phone' in a schema runs 'string' and 'like', with an error code of its own
+const phoneRules = ['string', { like: '^\\+?[0-9]{10,15}$' }] as const;
+LIVR.Validator.registerAliasedDefaultRule({
+  name: 'phone',
+  rules: phoneRules,
+  error: 'WRONG_PHONE',
+});
+
+// A rule function: { starts_with: 'SKU-' } calls starts_with('SKU-') once, when a validator
+// compiles its rules, and the function it returns checks each value
+LIVR.Validator.registerDefaultRules({
+  starts_with(prefix: string) {
+    return (value: unknown) => {
+      if (LIVR.util.isNoValue(value)) return undefined; // empty values are the job of 'required'
+      if (typeof value !== 'string' || !value.startsWith(prefix)) return 'WRONG_PREFIX';
+      return undefined;
+    };
+  },
+});
+
+// The types, in any .ts file of the project with an import or an export
+declare module 'livr/types/inference' {
+  interface RuleTypes {
+    phone: AliasType<typeof phoneRules>;
+    starts_with: As<string>; // checks a string, `startsWith` gets the type too
+  }
+}
+
+const schema = {
+  phone: ['required', 'phone'],
+  sku: { starts_with: 'SKU-' },
+} as const;
+
+type Product = InferFromSchema<typeof schema>; // { phone: string; sku?: string }
+```
+
+The function a rule returns gets `(value, allValues, outputArr)`: push a value to `outputArr` to change the output. `validator.registerRules()` and `validator.registerAliasedRule()` register rules for one validator, and rules of `AsyncValidator` (`livr/async`) can return a promise.
+
+More: the [custom rules guide](https://js.livr-spec.org/guide/custom-rules), types of rules with arguments, meta rules and rule packages in the [TypeScript guide](https://js.livr-spec.org/typescript#custom-rules-type-inference), and [strict mode](https://js.livr-spec.org/typescript#strict-mode), which makes a misspelled rule or a rule without a type a compile error.
 
 ---
 
