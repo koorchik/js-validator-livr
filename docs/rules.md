@@ -8,7 +8,7 @@ Every rule of the [LIVR specification](https://livr-spec.org/validation-rules.ht
 
 <RulesCard wide />
 
-Rule names below link to their pages in the specification. The last column shows the TypeScript type that [`InferFromSchema`](/typescript) gives a field with this rule. Rules that check a value keep a more precise type of earlier rules: `[{ one_of: ['a', 'b'] }, { max_length: 1 }]` is `'a' | 'b'`, not `string`.
+Rule names below link to their pages in the specification. The last column shows the TypeScript type that [`InferFromSchema`](./TYPESCRIPT.md) gives a field with this rule. Rules that check a value keep a more precise type of earlier rules: `[{ one_of: ['a', 'b'] }, { max_length: 1 }]` is `'a' | 'b'`, not `string`.
 
 Rule names work in `snake_case` and in `camelCase`: `min_length` and `minLength` are the same rule.
 
@@ -85,4 +85,4 @@ Modifiers change the output and never return errors.
 
 ## More rules
 
-[livr-extra-rules](https://www.npmjs.com/package/livr-extra-rules) adds `boolean`, `ipv4`, `uuid`, `credit_card`, `iso_date` with ranges, `required_if`, `list_length` and more. You can also [write your own](/guide/custom-rules).
+[livr-extra-rules](https://www.npmjs.com/package/livr-extra-rules) adds `boolean`, `ipv4`, `uuid`, `credit_card`, `iso_date` with ranges, `required_if`, `list_length` and more. You can also [write your own](./guide/custom-rules.md).

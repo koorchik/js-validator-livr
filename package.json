@@ -15,7 +15,11 @@
     "async.js",
     "async.d.ts",
     "types",
-    "CHANGELOG.md"
+    "docs/guide",
+    "docs/api.md",
+    "docs/rules.md",
+    "docs/TYPESCRIPT.md",
+    "/CHANGELOG.md"
   ],
   "exports": {
     ".": {

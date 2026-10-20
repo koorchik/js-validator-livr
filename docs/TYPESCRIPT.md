@@ -144,7 +144,7 @@ type Config = InferFromSchema<typeof schema>;
 | `eq`, `one_of` | the literal types of the allowed values |
 | `default` | the type of the default value, the field is required |
 
-Numeric rules accept strings like `'42'` and return numbers, and string rules return numbers as strings, so `['integer', { max_length: 3 }]` is a `string`. The [built-in rules page](/rules) has the whole list.
+Numeric rules accept strings like `'42'` and return numbers, and string rules return numbers as strings, so `['integer', { max_length: 3 }]` is a `string`. The [built-in rules page](./rules.md) has the whole list.
 
 ### Literal Types with `one_of` and `eq`
 
@@ -730,7 +730,7 @@ declare module 'livr/types/inference' {
 }
 ```
 
-Types of the built-in rules changed in the same version. They follow the runtime more closely, so some fields get more precise types, see the [changelog](/changelog).
+Types of the built-in rules changed in the same version. They follow the runtime more closely, so some fields get more precise types, see the [changelog](https://js.livr-spec.org/changelog).
 
 ---
 

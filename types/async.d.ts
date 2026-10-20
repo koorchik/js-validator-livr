@@ -1,7 +1,8 @@
 // types/async.d.ts
 // Types of 'livr/async': AsyncValidator, rules may return promises
-// Docs: https://js.livr-spec.org, for AI assistants: https://js.livr-spec.org/llms.txt
-// Custom rules and their types: https://js.livr-spec.org/guide/custom-rules
+// Docs: https://js.livr-spec.org, also in docs/ of the package. For AI assistants:
+// https://js.livr-spec.org/llms.txt. Custom rules and their types:
+// https://js.livr-spec.org/guide/custom-rules, docs/guide/custom-rules.md of the package
 
 import LIVR = require('./index');
 import type {
@@ -61,6 +62,7 @@ declare namespace LIVRAsync {
      * when the value is valid, or a promise of it. Registering a rule does not give it a type:
      * declare the type in RuleTypes of 'livr/types/inference'.
      * https://js.livr-spec.org/guide/custom-rules
+     * (docs/guide/custom-rules.md of the package)
      */
     registerRules(rules: RuleFactories<AsyncRuleFactory>): this;
 
@@ -68,6 +70,7 @@ declare namespace LIVRAsync {
      * Register aliased rule locally (for a single validator). Registering an alias does not give
      * it a type: declare `name: AliasType<typeof rules>` in RuleTypes of 'livr/types/inference'.
      * https://js.livr-spec.org/guide/custom-rules
+     * (docs/guide/custom-rules.md of the package)
      */
     registerAliasedRule(alias: Alias): this;
 
@@ -90,6 +93,7 @@ declare namespace LIVRAsync {
      * of 'livr', rules that return promises work only in AsyncValidator. Registering a rule does
      * not give it a type: declare the type in RuleTypes of 'livr/types/inference'.
      * https://js.livr-spec.org/guide/custom-rules
+     * (docs/guide/custom-rules.md of the package)
      */
     static registerDefaultRules(rules: RuleFactories<AsyncRuleFactory>): void;
 
@@ -97,6 +101,7 @@ declare namespace LIVRAsync {
      * Register an alias as a default rule, shared with Validator of 'livr'. Registering an alias
      * does not give it a type: declare `name: AliasType<typeof rules>` in RuleTypes of
      * 'livr/types/inference'. https://js.livr-spec.org/guide/custom-rules
+     * (docs/guide/custom-rules.md of the package)
      */
     static registerAliasedDefaultRule(alias: Alias): void;
 

@@ -10,7 +10,7 @@
 
 **Documentation: [js.livr-spec.org](https://js.livr-spec.org)** · [Getting started](https://js.livr-spec.org/guide/getting-started) · [Custom rules](https://js.livr-spec.org/guide/custom-rules) · [TypeScript](https://js.livr-spec.org/typescript) · [API](https://js.livr-spec.org/api) · [LIVR specification](https://livr-spec.org)
 
-For AI assistants: [llms.txt](https://js.livr-spec.org/llms.txt), and the whole documentation in one file, [llms-full.txt](https://js.livr-spec.org/llms-full.txt).
+The guides, the API and the TypeScript guide are also in the package, in `node_modules/livr/docs`. For AI assistants: [llms.txt](https://js.livr-spec.org/llms.txt), and the whole documentation in one file, [llms-full.txt](https://js.livr-spec.org/llms-full.txt).
 
 ---
 
@@ -133,7 +133,7 @@ type Product = InferFromSchema<typeof schema>; // { phone: string; sku?: string 
 
 The function a rule returns gets `(value, allValues, outputArr)`: push a value to `outputArr` to change the output. `validator.registerRules()` and `validator.registerAliasedRule()` register rules for one validator, and rules of `AsyncValidator` (`livr/async`) can return a promise.
 
-More: the [custom rules guide](https://js.livr-spec.org/guide/custom-rules), types of rules with arguments, meta rules and rule packages in the [TypeScript guide](https://js.livr-spec.org/typescript#custom-rules-type-inference), and [strict mode](https://js.livr-spec.org/typescript#strict-mode), which makes a misspelled rule or a rule without a type a compile error.
+More: the [custom rules guide](https://js.livr-spec.org/guide/custom-rules), types of rules with arguments, meta rules and rule packages in the [TypeScript guide](https://js.livr-spec.org/typescript#custom-rules-type-inference), and [strict mode](https://js.livr-spec.org/typescript#strict-mode), which makes a misspelled rule or a rule without a type a compile error. In the package: `docs/guide/custom-rules.md` and `docs/TYPESCRIPT.md`.
 
 ---
 

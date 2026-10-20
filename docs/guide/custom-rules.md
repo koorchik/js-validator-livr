@@ -142,11 +142,11 @@ The type of a rule is one of:
 - `As<T>`: the rule checks that the value is a `T`, or converts it to `T`;
 - the type itself, when the rule makes a new value, like `to_date: Date`;
 - `AliasType<typeof rules>` for an alias, with its rules in a constant `as const`;
-- an interface that extends `RuleType`, when the type depends on the rule arguments or on earlier rules: `{ currency: ['USD', 'EUR'] }` gives `'USD' | 'EUR'`. See [Types from arguments and earlier rules](/typescript#types-from-arguments-and-earlier-rules).
+- an interface that extends `RuleType`, when the type depends on the rule arguments or on earlier rules: `{ currency: ['USD', 'EUR'] }` gives `'USD' | 'EUR'`. See [Types from arguments and earlier rules](../TYPESCRIPT.md#types-from-arguments-and-earlier-rules).
 
-Rules that make the field required, meta rules, replaced built-in rules and rule packages are covered in [Custom rules type inference](/typescript#custom-rules-type-inference).
+Rules that make the field required, meta rules, replaced built-in rules and rule packages are covered in [Custom rules type inference](../TYPESCRIPT.md#custom-rules-type-inference).
 
-A rule without a type gives `unknown`. To make it a compile error, for misspelled rules and forgotten types, turn on [strict mode](/typescript#strict-mode).
+A rule without a type gives `unknown`. To make it a compile error, for misspelled rules and forgotten types, turn on [strict mode](../TYPESCRIPT.md#strict-mode).
 
 ## More rules
 

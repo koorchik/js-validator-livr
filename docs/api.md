@@ -171,5 +171,5 @@ Returns all rules registered for this validator.
 | ------------------------------------------ | ---------------------------------------------------------------------- |
 | `import LIVR from 'livr'`                  | `{ Validator, rules, util }` with all built-in rules registered        |
 | `import LIVR from 'livr/async'`            | `{ AsyncValidator, rules, util }` with the async meta rules            |
-| `import Validator from 'livr/lib/Validator'` | the bare validator, no rules registered, for [smaller bundles](/guide/usage#smaller-bundles) |
-| `import type { ... } from 'livr/types'`    | `InferFromSchema` and the other [types](/typescript#available-type-exports) |
+| `import Validator from 'livr/lib/Validator'` | the bare validator, no rules registered, for [smaller bundles](./guide/usage.md#smaller-bundles) |
+| `import type { ... } from 'livr/types'`    | `InferFromSchema` and the other [types](./TYPESCRIPT.md#available-type-exports) |

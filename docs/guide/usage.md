@@ -114,7 +114,7 @@ const validator = new Validator({
 });
 ```
 
-The validator core is about 2 KB min+gzip. See [Zero dependencies](/why/zero-dependencies) for the sizes.
+The validator core is about 2 KB min+gzip. See [Zero dependencies](https://js.livr-spec.org/why/zero-dependencies) for the sizes.
 
 ## Performance tips
 
@@ -133,4 +133,4 @@ for (const item of items) {
 }
 ```
 
-Creating validators is cheap too: LIVR is the fastest in the benchmark that creates a validator for every call. Still, a reused validator is 2–3 times faster. See [Performance](/why/performance).
+Creating validators is cheap too: LIVR is the fastest in the benchmark that creates a validator for every call. Still, a reused validator is 2–3 times faster. See [Performance](https://js.livr-spec.org/why/performance).

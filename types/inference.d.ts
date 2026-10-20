@@ -134,7 +134,8 @@ type IsStrictRules = TypeOptions extends { readonly strictRules: true } ? true :
  *
  * The declaration can be in any .ts file with an import or an export. Guide:
  * https://js.livr-spec.org/guide/custom-rules#types-of-custom-rules, all cases:
- * https://js.livr-spec.org/typescript#custom-rules-type-inference
+ * https://js.livr-spec.org/typescript#custom-rules-type-inference. The same in the package:
+ * docs/guide/custom-rules.md and docs/TYPESCRIPT.md
  */
 export interface RuleTypes {
   // Your rules, aliases and rule packages add their types here

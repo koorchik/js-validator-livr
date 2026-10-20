@@ -82,11 +82,11 @@ if (validData) {
 }
 ```
 
-Nested objects, lists, unions and types of your own rules are covered in the [TypeScript guide](/typescript).
+Nested objects, lists, unions and types of your own rules are covered in the [TypeScript guide](../TYPESCRIPT.md).
 
 ## Next steps
 
-- [Usage](/guide/usage): modifiers, async validation, auto-trim and smaller bundles
-- [Custom rules](/guide/custom-rules): aliases and rules of your own
-- [Built-in rules](/rules): every rule with a link to its specification
+- [Usage](./usage.md): modifiers, async validation, auto-trim and smaller bundles
+- [Custom rules](./custom-rules.md): aliases and rules of your own
+- [Built-in rules](../rules.md): every rule with a link to its specification
 - [Playground](https://livr-spec.org/playground.html): try schemas in the browser

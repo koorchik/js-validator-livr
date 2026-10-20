@@ -1,5 +1,8 @@
 import fs from 'node:fs';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { defineConfig, type DefaultTheme } from 'vitepress';
+import type { Plugin } from 'vite';
 import llmstxt from 'vitepress-plugin-llms';
 
 const pkg = JSON.parse(fs.readFileSync(new URL('../../package.json', import.meta.url), 'utf8'));
@@ -21,6 +24,35 @@ const LLM_DETAILS = `Essentials:
 - TypeScript: write the schema \`as const\` and get the type with \`InferFromSchema<typeof schema>\` from \`livr/types\`.
 - Custom rules: an alias (\`registerAliasedRule()\`) gives existing rules a name and an error code. A rule function (\`registerRules()\`) gets the rule arguments and returns \`(value, allValues, outputArr) => errorCode | undefined\`: it skips empty values (\`undefined\`, \`null\`, \`''\`) and pushes to \`outputArr\` to change the value. \`registerDefaultRules()\` and \`registerAliasedDefaultRule()\` register them for all validators.
 - Registering a rule does not give it a type. Declare the type of every custom rule and alias in \`RuleTypes\` with \`declare module 'livr/types/inference'\`: \`As<T>\`, a plain type, \`AliasType<typeof rules>\` or an interface that extends \`RuleType\`. See [Custom rules](${SITE_URL}/guide/custom-rules.md) and [TypeScript](${SITE_URL}/typescript.md).`;
+
+const SRC_DIR = fileURLToPath(new URL('..', import.meta.url));
+
+// DESIGN.md and TYPESCRIPT.md keep their names, links to them on GitHub and npm keep working
+const REWRITES: Record<string, string> = {
+  'DESIGN.md': 'why/design-decisions.md',
+  'TYPESCRIPT.md': 'typescript.md',
+};
+
+// Pages link each other with relative .md links, which work on the site, on GitHub and in the
+// npm package. VitePress does not apply rewrites to links: links to a rewritten page get its
+// path on the site, before VitePress and llms.txt read the page
+function rewrittenPageLinks(): Plugin {
+  return {
+    name: 'livr:rewritten-page-links',
+    enforce: 'pre',
+    transform(code, id) {
+      if (!id.endsWith('.md')) return;
+      const dir = path.posix.dirname(path.relative(SRC_DIR, id).split(path.sep).join('/'));
+      return code.replace(
+        /\]\((\.{1,2}\/[^)#\s]+\.md)(#[^)\s]*)?\)/g,
+        (link, target, anchor = '') => {
+          const page = REWRITES[path.posix.normalize(path.posix.join(dir, target))];
+          return page ? `](/${page}${anchor})` : link;
+        }
+      );
+    },
+  };
+}
 
 // Anchors like on GitHub (`one_of` keeps its underscore), so DESIGN.md and TYPESCRIPT.md links
 // work the same on the site and in the repository
@@ -74,11 +106,7 @@ export default defineConfig({
   lastUpdated: true,
   sitemap: { hostname: SITE_URL },
 
-  // DESIGN.md and TYPESCRIPT.md keep their names, links to them on GitHub and npm keep working
-  rewrites: {
-    'DESIGN.md': 'why/design-decisions.md',
-    'TYPESCRIPT.md': 'typescript.md',
-  },
+  rewrites: REWRITES,
   srcExclude: ['scripts/**'],
 
   head: [
@@ -121,6 +149,7 @@ export default defineConfig({
     },
     // llms.txt, llms-full.txt and a Markdown copy of every page, for AI assistants
     plugins: [
+      rewrittenPageLinks(),
       llmstxt({
         domain: SITE_URL,
         title: 'LIVR for JavaScript and TypeScript',
