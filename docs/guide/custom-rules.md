@@ -130,6 +130,8 @@ declare module 'livr/types/inference' {
 
 Rules with arguments, meta rules, replaced built-in rules and rule packages are covered in [Custom rules type inference](/typescript#custom-rules-type-inference).
 
+A rule without a type gives `unknown`. To make it a compile error, for misspelled rules and forgotten types, turn on [strict mode](/typescript#strict-mode).
+
 ## More rules
 
 [livr-extra-rules](https://www.npmjs.com/package/livr-extra-rules) adds rules such as `ipv4`, `boolean`, `credit_card`, `uuid`, `md5` and `iso_date` with ranges.

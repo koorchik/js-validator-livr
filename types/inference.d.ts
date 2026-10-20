@@ -1,6 +1,43 @@
 // types/inference.d.ts
 // Core type inference engine for LIVR schemas
 
+// Types of the built-in rules: every rule adds its type to BuiltInRuleTypes
+/// <reference path="../lib/rules/common/required.d.ts" />
+/// <reference path="../lib/rules/common/not_empty.d.ts" />
+/// <reference path="../lib/rules/common/not_empty_list.d.ts" />
+/// <reference path="../lib/rules/common/any_object.d.ts" />
+/// <reference path="../lib/rules/string/string.d.ts" />
+/// <reference path="../lib/rules/string/eq.d.ts" />
+/// <reference path="../lib/rules/string/one_of.d.ts" />
+/// <reference path="../lib/rules/string/max_length.d.ts" />
+/// <reference path="../lib/rules/string/min_length.d.ts" />
+/// <reference path="../lib/rules/string/length_equal.d.ts" />
+/// <reference path="../lib/rules/string/length_between.d.ts" />
+/// <reference path="../lib/rules/string/like.d.ts" />
+/// <reference path="../lib/rules/numeric/integer.d.ts" />
+/// <reference path="../lib/rules/numeric/positive_integer.d.ts" />
+/// <reference path="../lib/rules/numeric/decimal.d.ts" />
+/// <reference path="../lib/rules/numeric/positive_decimal.d.ts" />
+/// <reference path="../lib/rules/numeric/max_number.d.ts" />
+/// <reference path="../lib/rules/numeric/min_number.d.ts" />
+/// <reference path="../lib/rules/numeric/number_between.d.ts" />
+/// <reference path="../lib/rules/modifiers/default.d.ts" />
+/// <reference path="../lib/rules/modifiers/trim.d.ts" />
+/// <reference path="../lib/rules/modifiers/to_lc.d.ts" />
+/// <reference path="../lib/rules/modifiers/to_uc.d.ts" />
+/// <reference path="../lib/rules/modifiers/remove.d.ts" />
+/// <reference path="../lib/rules/modifiers/leave_only.d.ts" />
+/// <reference path="../lib/rules/special/email.d.ts" />
+/// <reference path="../lib/rules/special/url.d.ts" />
+/// <reference path="../lib/rules/special/iso_date.d.ts" />
+/// <reference path="../lib/rules/special/equal_to_field.d.ts" />
+/// <reference path="../lib/rules/meta/nested_object.d.ts" />
+/// <reference path="../lib/rules/meta/list_of.d.ts" />
+/// <reference path="../lib/rules/meta/list_of_objects.d.ts" />
+/// <reference path="../lib/rules/meta/list_of_different_objects.d.ts" />
+/// <reference path="../lib/rules/meta/variable_object.d.ts" />
+/// <reference path="../lib/rules/meta/or.d.ts" />
+
 // ============================================================================
 // Base Types
 // ============================================================================
@@ -8,12 +45,51 @@
 /** Primitive types that LIVR deals with */
 export type LIVRPrimitive = string | number | boolean | null | undefined;
 
-/** A single rule definition - can be string, object with args, or array of rules */
-export type LIVRRuleDefinition =
-  string | { readonly [ruleName: string]: unknown } | readonly LIVRRuleDefinition[];
+/**
+ * Rules of a field: a rule or a list of rules. A rule is a name, or an object with the name
+ * and the arguments. In strict mode only rules with a type (RuleName)
+ */
+export type LIVRRuleDefinition = IsStrictRules extends true
+  ? StrictRuleDefinition
+  : AnyRuleDefinition;
 
-/** Schema is a record of field names to rule definitions */
-export type LIVRSchema = { readonly [field: string]: LIVRRuleDefinition };
+/** Schema is a record of field names to rule definitions. In strict mode only rules with a type */
+export type LIVRSchema = IsStrictRules extends true ? StrictSchema : AnySchema;
+
+/** Any rules, for the inference engine: it reads every schema, in strict mode too */
+type AnyRuleDefinition =
+  string | { readonly [ruleName: string]: unknown } | readonly AnyRuleDefinition[];
+
+type AnySchema = { readonly [field: string]: AnyRuleDefinition };
+
+// ============================================================================
+// Type Options (Set via Declaration Merging)
+// ============================================================================
+
+/**
+ * Options of the LIVR types, set by the application with declaration merging.
+ *
+ * `strictRules: true` is the strict mode: every rule in a schema must have a type, a rule
+ * without a type is a compile error. It catches a forgotten type of a custom rule or an alias
+ * and a misspelled rule name, which would give `unknown` otherwise. Checked in the schemas of
+ * validators, in aliases, in the names of registered rules and aliases, and with
+ * `satisfies LIVRSchema`. Rules inside the arguments of meta rules are checked too.
+ *
+ * @example
+ * ```typescript
+ * declare module 'livr/types/inference' {
+ *   interface TypeOptions {
+ *     strictRules: true;
+ *   }
+ * }
+ * ```
+ */
+export interface TypeOptions {
+  // strictRules: true
+}
+
+/** `strictRules: true` in TypeOptions */
+type IsStrictRules = TypeOptions extends { readonly strictRules: true } ? true : false;
 
 // ============================================================================
 // Rule Types (Extensible via Declaration Merging)
@@ -83,6 +159,11 @@ declare const ruleTypeBrand: unique symbol;
  * It is a flag, not a part of `output`: the field type is computed only when it is used,
  * so deeply nested schemas stay cheap.
  *
+ * Set `params` to the types of the arguments, as a tuple like `this['args']`, to check them in
+ * strict mode (TypeOptions). Meta rules set it, so that the rules in their arguments are checked
+ * too: `params: readonly [schema: LIVRSchema]`. A single argument can also be written without
+ * the array, like the validator takes it.
+ *
  * @example
  * ```typescript
  * // { instance_of: Date } -> Date
@@ -103,6 +184,7 @@ export interface RuleType {
   readonly input: unknown;
   readonly output: unknown;
   readonly present?: boolean;
+  readonly params?: readonly unknown[];
 }
 
 /**
@@ -193,6 +275,70 @@ type CamelCaseKeys<Registry> = {
   [K in keyof Registry as K extends string ? Camelize<K> : never]: Registry[K];
 };
 
+// ============================================================================
+// Strict Mode: Rules With a Type
+// ============================================================================
+
+/**
+ * Names of the rules with a type: RuleTypes, the deprecated registries and BuiltInRuleTypes,
+ * camelCase names too. In strict mode a schema can only have these rules
+ */
+export type RuleName = Extract<
+  | keyof RuleTypes
+  | keyof CamelCaseKeys<RuleTypes>
+  | keyof ParameterizedRuleRegistry
+  | keyof RuleTypeRegistry
+  | keyof BuiltInRuleTypes
+  | keyof CamelCaseKeys<BuiltInRuleTypes>,
+  string
+>;
+
+/** The type of a rule by its name, in the same order as GetRuleResult */
+type RuleTypeByName<Name> = Name extends keyof RuleTypes
+  ? RuleTypes[Name]
+  : Name extends keyof CamelCaseKeys<RuleTypes>
+    ? CamelCaseKeys<RuleTypes>[Name]
+    : Name extends keyof ParameterizedRuleRegistry | keyof RuleTypeRegistry
+      ? unknown
+      : Name extends keyof BuiltInRuleTypes
+        ? BuiltInRuleTypes[Name]
+        : Name extends keyof CamelCaseKeys<BuiltInRuleTypes>
+          ? CamelCaseKeys<BuiltInRuleTypes>[Name]
+          : unknown;
+
+/** Arguments of a rule as written: `params` of its type, also a single argument without the array */
+type RuleArgs<T> = 0 extends 1 & T
+  ? unknown
+  : T extends { readonly params: infer Params extends readonly unknown[] }
+    ? Params | SingleArg<Params>
+    : unknown;
+
+/** `{ rule: arg }` for `{ rule: [arg] }`, when the rule takes one argument or a list of them */
+type SingleArg<Params> = Params extends readonly unknown[]
+  ? number extends Params['length']
+    ? Exclude<Params[number], readonly unknown[]>
+    : Params extends readonly [infer Only]
+      ? Exclude<Only, readonly unknown[]>
+      : never
+  : never;
+
+/**
+ * A rule with arguments, `{ name: args }`, in strict mode. Without `length`: a string has
+ * methods like the rule `trim`, an array like `sort`, so they would be rule objects otherwise
+ */
+type StrictRuleObject = {
+  readonly [Name in RuleName | 'length']?: Name extends 'length'
+    ? never
+    : RuleArgs<RuleTypeByName<Name>>;
+};
+
+/** A single rule in strict mode */
+type StrictRule = RuleName | StrictRuleObject;
+
+type StrictRuleDefinition = StrictRule | readonly StrictRule[];
+
+type StrictSchema = { readonly [field: string]: StrictRuleDefinition };
+
 /** A rule without a type: the value after it is unknown */
 interface UnknownRuleResult {
   readonly output: unknown;
@@ -282,7 +428,7 @@ type ProcessRuleChain<Rules, State extends TypeState = InitialTypeState> = Rules
 // ============================================================================
 
 /** Process all fields in a schema to get their type states */
-type ProcessAllFields<S extends LIVRSchema> = {
+type ProcessAllFields<S extends AnySchema> = {
   [K in keyof S]: ProcessRuleChain<NormalizeRules<S[K]>>;
 };
 
@@ -324,7 +470,7 @@ export type Simplify<T> = { [K in keyof T]: T[K] } & {};
  * // { name: string; age?: number; role?: 'admin' | 'user' }
  * ```
  */
-export type InferFromSchema<S> = S extends LIVRSchema
+export type InferFromSchema<S> = S extends AnySchema
   ? Simplify<BuildObjectType<ProcessAllFields<S>>>
   : never;
 
@@ -380,9 +526,9 @@ export interface RuleTypeRegistry {
 export interface TemplateOutputRegistry<Args> {
   literal: Args;
   array_element: Args extends readonly (infer T)[] ? T : unknown;
-  infer_schema: Args extends LIVRSchema ? InferFromSchema<Args> : unknown;
-  infer_schema_array: Args extends LIVRSchema ? Array<InferFromSchema<Args>> : unknown;
-  infer_rule_array: Args extends LIVRRuleDefinition ? Array<InferRuleType<Args>> : unknown;
+  infer_schema: Args extends AnySchema ? InferFromSchema<Args> : unknown;
+  infer_schema_array: Args extends AnySchema ? Array<InferFromSchema<Args>> : unknown;
+  infer_rule_array: Args extends AnyRuleDefinition ? Array<InferRuleType<Args>> : unknown;
 }
 
 /** @deprecated Use RuleTypes with an interface that extends RuleType */

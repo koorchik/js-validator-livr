@@ -26,6 +26,7 @@ Try it without installing anything: [open an example in the TypeScript Playgroun
   - [Aliases](#aliases)
   - [Replacing Built-in Rules](#replacing-built-in-rules)
   - [Rule Packages](#rule-packages)
+- [Strict Mode](#strict-mode)
 - [Migrating from RuleTypeDef](#migrating-from-ruletypedef)
 - [Limitations](#limitations)
 - [Available Type Exports](#available-type-exports)
@@ -450,11 +451,12 @@ Meta rules validate their value with other rules, and their types are built from
 - `MakesPresent<Rules, Input>`: `true` when the rules make the field present, for `present` of such a rule.
 
 ```typescript
-import type { RuleType, InferRuleType } from 'livr/types/inference';
+import type { RuleType, InferRuleType, LIVRRuleDefinition } from 'livr/types/inference';
 
 // { dict_of: 'positive_integer' } or { dict_of: ['required', 'string'] }
 //   -> Record<string, number>, Record<string, string>
 interface DictOfType extends RuleType {
+  params: readonly LIVRRuleDefinition[];
   output: Record<string, InferRuleType<this['args']>>;
 }
 
@@ -464,6 +466,8 @@ declare module 'livr/types/inference' {
   }
 }
 ```
+
+`params` are the types of the arguments, a tuple like `this['args']`: [strict mode](#strict-mode) checks the rules in the arguments with it. A single argument can also be written without the array, like `{ dict_of: 'string' }`. Without `params`, the arguments are not checked.
 
 The built-in meta rules are written this way, see `lib/rules/meta/*.d.ts` in the package.
 
@@ -497,6 +501,8 @@ type Contact = InferFromSchema<typeof schema>;
 ```
 
 An alias gets the type of earlier rules, like its rules would, and `required` in an alias makes the field required. Aliases of one validator (`validator.registerAliasedRule()`) and its own rules (`validator.registerRules()`) are typed the same way: rule types are global.
+
+The type is not added by `registerAliasedDefaultRule()`: an alias without a type in `RuleTypes` gives `unknown`. [Strict mode](#strict-mode) makes it a compile error. The order of the call and the declaration does not matter, TypeScript reads all declarations first.
 
 ### Replacing Built-in Rules
 
@@ -568,6 +574,58 @@ const schema = {
 type Item = InferFromSchema<typeof schema>;
 // { id: string; status: 'active' }
 ```
+
+## Strict Mode
+
+A rule without a type gives `unknown`, with no error: a misspelled rule, or a custom rule or an alias whose type was forgotten. Strict mode makes it a compile error. Turn it on once in the application:
+
+```typescript
+// livr-options.d.ts, or any .ts file of your project. The file must be a module:
+// with an import or an export, else it declares a new module instead of adding to livr
+export {};
+
+declare module 'livr/types/inference' {
+  interface TypeOptions {
+    strictRules: true;
+  }
+}
+```
+
+Then every rule must have a type: a built-in rule, a type in `RuleTypes`, or a rule of a package with types. TypeScript checks:
+
+- schemas passed to `new LIVR.Validator()`, also the rules inside meta rules, like `nested_object`, `list_of` and `or`;
+- schemas with `satisfies LIVRSchema`;
+- the names and the rules of aliases, `registerAliasedDefaultRule()` and `registerAliasedRule()`;
+- the names of rules in `registerDefaultRules()` and `registerRules()`, when the object is written in place. Rules of a package typed as `Record<string, RuleFactory>` are not checked there, their types are.
+
+```typescript
+const schema = {
+  name: ['required', 'strng'],
+} as const;
+
+new LIVR.Validator(schema);
+// Type '"strng"' is not assignable to type 'StrictRule'. Did you mean '"string"'?
+
+LIVR.Validator.registerAliasedDefaultRule({ name: 'phone', rules: phoneRules });
+// Type '"phone"' is not assignable to type 'RuleName', until RuleTypes has `phone`
+```
+
+With `as const satisfies LIVRSchema` the error is shown at the rule, not at the validator:
+
+```typescript
+import type { LIVRSchema } from 'livr/types';
+
+const schema = {
+  name: ['required', 'strng'], // Did you mean '"string"'?
+} as const satisfies LIVRSchema;
+```
+
+Strict mode does not change the inferred types. It also checks the arguments of meta rules, `{ nested_object: 'string' }` is an error, by `params` of their types (see [Meta Rules](#meta-rules)). The arguments of other rules are not checked.
+
+- **A schema without `as const`** has `string` instead of the rule names, every rule is reported. Inference needs `as const` anyway.
+- **A schema from JSON or built at runtime** is not checked: `new LIVR.Validator<Type>(schema as LIVRSchema)`.
+- **Deep schemas.** TypeScript compares types to about 100 levels, so strict mode checks up to 16 levels of nested meta rules, like `nested_object` in `nested_object` (8 levels of `or` with `nested_object` in it). A deeper schema gets `Excessive stack depth comparing types`: pass it `as LIVRSchema`. Inference works deeper.
+- `RuleName` is the union of the names of the rules with a type.
 
 ---
 
@@ -653,7 +711,7 @@ Types of the built-in rules changed in the same version. They follow the runtime
 ## Limitations
 
 - **`as const` is needed.** Without it, a list of rules is a `string[]`, and its type is `unknown`.
-- **Rule names are not checked.** A misspelled rule, or a rule without a declared type, gives `unknown`, as the type of a value after it is not known.
+- **Rule names are checked only in [strict mode](#strict-mode).** Otherwise a misspelled rule, or a rule without a declared type, gives `unknown`, as the type of a value after it is not known.
 - **Empty values.** Rules skip empty values (`null` and `''`) of optional fields, and the value stays in the output as it is: `{ age: 'integer' }` with the input `{ age: '' }` gives `{ age: '' }`, but the type is `{ age?: number }`. The same holds for items of `list_of` without `required`. Use `required` or `default` where the type must hold for such input.
 - **Schemas built at runtime** have no compile-time type. Declare the type of the output where you load the schema, and pass it to `new LIVR.Validator<Type>(schema)`.
 - **TypeScript 5.0 or newer.**
@@ -681,6 +739,7 @@ import type {
   // Types of rules: add yours to RuleTypes in 'livr/types/inference'
   RuleTypes,
   BuiltInRuleTypes,
+  RuleName,
   RuleType,
   As,
   Present,
@@ -690,5 +749,7 @@ import type {
   Simplify,
 } from 'livr/types';
 ```
+
+`TypeOptions` turns on [strict mode](#strict-mode), add `strictRules: true` to it in `livr/types/inference`.
 
 `livr/types/inference` exports the same types, and it is the module to add rule types to. The deprecated `RuleTypeDef`, `RuleTypeRegistry`, `ParameterizedRuleDef`, `ParameterizedRuleRegistry`, `SimpleRule`, `RequiredRule`, `ParameterizedRule` and `DefaultRule` are still exported, see [Migrating from RuleTypeDef](#migrating-from-ruletypedef).

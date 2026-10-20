@@ -1,5 +1,10 @@
 // Type inference for 'or' rule
-import type { RuleType, InferRuleType, MakesPresent } from '../../../types/inference';
+import type {
+  RuleType,
+  InferRuleType,
+  MakesPresent,
+  LIVRRuleDefinition,
+} from '../../../types/inference';
 
 /** A union of the types of the rule sets, each applied to the value like an alias */
 type OrOutput<RuleSets, Input> = RuleSets extends unknown ? InferRuleType<RuleSets, Input> : never;
@@ -13,6 +18,7 @@ type OrPresent<RuleSets, Input> = [RuleSets] extends [never]
 
 /** { or: ['string', ['required', 'integer']] } -> string | number */
 interface OrType extends RuleType {
+  params: readonly LIVRRuleDefinition[];
   output: OrOutput<this['args'][number], this['input']>;
   present: OrPresent<this['args'][number], this['input']>;
 }

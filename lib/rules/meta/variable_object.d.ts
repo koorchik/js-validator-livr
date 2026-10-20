@@ -6,7 +6,7 @@ import type { RuleType, InferFromSchema, LIVRSchema, Simplify } from '../../../t
  * when the schema of the value has it, then it is the selector value
  */
 type BuildVariableObject<Selector, Schemas> = Selector extends string
-  ? Schemas extends Record<string, LIVRSchema>
+  ? Schemas extends Record<string, object>
     ? {
         [K in keyof Schemas]: Selector extends keyof Schemas[K]
           ? Simplify<InferFromSchema<Schemas[K]> & { [P in Selector]: K }>
@@ -17,6 +17,7 @@ type BuildVariableObject<Selector, Schemas> = Selector extends string
 
 /** { variable_object: [selectorField, { selectorValue: schema }] } */
 interface VariableObjectType extends RuleType {
+  params: readonly [selectorField: string, schemas: { readonly [value: string]: LIVRSchema }];
   output: BuildVariableObject<this['args'][0], this['args'][1]>;
 }
 

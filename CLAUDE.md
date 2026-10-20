@@ -20,7 +20,7 @@ node --test t/tests-sync/01-test_suite.js
 node --test --test-name-pattern="variable_object" t/tests-async/01-test_suite.js
 
 # Type checks only (TypeScript definitions and type inference): the tests in t/tests-types,
-# then t/tests-types/packages, an application with rule packages
+# then the programs in t/tests-types/packages, t/tests-types/strict and t/tests-types/types-only
 npm run test:types
 ```
 
@@ -71,14 +71,17 @@ function ruleName(arg1, arg2, ruleBuilders) {
   - Alias tests also include `aliases.json`
 - `t/tests-types/` - Compile-time type inference tests (`tsc --noEmit`): every built-in rule, custom rules and aliases, the deprecated registries. Rule types are global, so each file uses rule names of its own
 - `t/tests-types/packages/` - A separate program: an application with rule packages that add types to `livr/types/inference` (through `paths`), like installed ones. `livr-extra-rules.d.ts` is a copy of a published package with the deprecated registries
+- `t/tests-types/strict/` - A separate program with strict mode on (`strictRules: true` in `TypeOptions`, global like rule types): schemas with misspelled rules at every place, `@ts-expect-error` for the validator API
+- `t/tests-types/types-only/` - A separate program that imports only `livr/types/inference`, like a rule package: the built-in rule types must load with it
 
 ### TypeScript Types (types/)
 
 - `types/index.d.ts` - Main type declarations for Validator class and exports
 - `types/inference.d.ts` - Type inference engine for `InferFromSchema<T>` functionality. It has no rule-specific code
-- Each rule in `lib/rules/` has a `.d.ts` file next to it with the whole type of the rule, meta rules included. It adds the type to `BuiltInRuleTypes` (snake_case name only, camelCase is automatic): `As<T>` for rules that check or convert to `T`, a plain type for rules that make a new value, an interface extending `RuleType` (reading `this['args']` and `this['input']`) for the rest, with `present: true` when the field is always present
+- Each rule in `lib/rules/` has a `.d.ts` file next to it with the whole type of the rule, meta rules included. `types/inference.d.ts` loads them with `/// <reference path>`. It adds the type to `BuiltInRuleTypes` (snake_case name only, camelCase is automatic): `As<T>` for rules that check or convert to `T`, a plain type for rules that make a new value, an interface extending `RuleType` (reading `this['args']` and `this['input']`) for the rest, with `present: true` when the field is always present
 - Users and rule packages add types to `RuleTypes`, which overrides `BuiltInRuleTypes`, like registered rules override built-in ones. The deprecated `RuleTypeRegistry` and `ParameterizedRuleRegistry` are still read, before the built-in types
 - Members of the field state (`NextState`) are computed only when they are read, and presence is a flag of a rule type (`present`), never read from `output`: a conditional type on the output of a rule computes nested objects with their parent, and TypeScript stops at a few levels of nesting (`t/tests-types/05-deep-schemas.ts`)
+- Strict mode checks schemas by assignability to `LIVRSchema` (`StrictSchema`), not by the inference engine, which reads any schema (`AnySchema`). Meta rules set `params` (the types of their arguments), so nested rules are checked. TypeScript compares types to about 100 levels and every union on the way costs a level: strict mode checks 16 levels of `nested_object`, avoid new unions in `StrictSchema`. A rule object must not match a string or an array: they have methods named like rules (`trim`, `sort`), hence `length?: never`
 - `skipLibCheck` is off, so the declaration files are type-checked too. They must work with TypeScript 5.0+ (`npm test` uses TypeScript 7; 5.4-5.9 check generic constraints differently, test with them too)
 
 ### Utilities (lib/util.js)
