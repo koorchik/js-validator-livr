@@ -603,7 +603,7 @@ type Item = InferFromSchema<typeof schema>;
 
 ## Strict Mode
 
-A rule without a type gives `unknown`, with no error: a misspelled rule, or a custom rule or an alias whose type was forgotten. Strict mode makes it a compile error. Turn it on once in the application:
+A rule without a type gives `unknown`, with no error: a misspelled rule, or a custom rule or an alias whose type was forgotten. Strict mode makes it a compile error. It is off by default, so existing projects keep compiling. Turn it on in new projects, and in existing ones once every rule has a type. One declaration turns it on for the whole application:
 
 ```typescript
 // livr-options.d.ts, or any .ts file of your project. The file must be a module:
@@ -652,6 +652,8 @@ Strict mode does not change the inferred types. It also checks the arguments of 
 - **A schema from JSON or built at runtime** is not checked: `new LIVR.Validator<Type>(schema as LIVRSchema)`.
 - **Deep schemas.** TypeScript compares types to about 100 levels, so strict mode checks up to 16 levels of nested meta rules, like `nested_object` in `nested_object` (8 levels of `or` with `nested_object` in it). A deeper schema gets `Excessive stack depth comparing types`: pass it `as LIVRSchema`. Inference works deeper.
 - `RuleName` is the union of the names of the rules with a type.
+
+`strictRules: false` turns strict mode off explicitly. It works the same as no option, and the project keeps working the same if a later major version turns strict mode on by default.
 
 ---
 
@@ -776,6 +778,6 @@ import type {
 } from 'livr/types';
 ```
 
-`TypeOptions` turns on [strict mode](#strict-mode), add `strictRules: true` to it in `livr/types/inference`.
+`TypeOptions` of `livr/types/inference` sets [strict mode](#strict-mode): `strictRules: true` turns it on, `strictRules: false` keeps it off.
 
 `livr/types/inference` exports the same types, and it is the module to add rule types to. The deprecated `RuleTypeDef`, `RuleTypeRegistry`, `ParameterizedRuleDef`, `ParameterizedRuleRegistry`, `SimpleRule`, `RequiredRule`, `ParameterizedRule` and `DefaultRule` are still exported, see [Migrating from RuleTypeDef](#migrating-from-ruletypedef).

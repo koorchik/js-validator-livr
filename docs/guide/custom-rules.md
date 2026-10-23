@@ -146,7 +146,7 @@ The type of a rule is one of:
 
 Rules that make the field required, meta rules, replaced built-in rules and rule packages are covered in [Custom rules type inference](../TYPESCRIPT.md#custom-rules-type-inference).
 
-A rule without a type gives `unknown`. To make it a compile error, for misspelled rules and forgotten types, turn on [strict mode](../TYPESCRIPT.md#strict-mode).
+A rule without a type gives `unknown`. To make it a compile error, for misspelled rules and forgotten types, turn on [strict mode](../TYPESCRIPT.md#strict-mode), as new projects should.
 
 ## More rules
 

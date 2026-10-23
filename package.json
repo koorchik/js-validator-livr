@@ -50,7 +50,7 @@
   "scripts": {
     "test": "npm run test:unit && npm run test:types",
     "test:unit": "node --test --experimental-test-coverage --test-coverage-include=\"lib/**\" --test-coverage-lines=95 --test-coverage-branches=90 --test-coverage-functions=95 \"t/tests-sync/*.js\" \"t/tests-async/*.js\"",
-    "test:types": "tsc --noEmit && tsc --noEmit -p t/tests-types/packages && tsc --noEmit -p t/tests-types/strict && tsc --noEmit -p t/tests-types/types-only"
+    "test:types": "tsc --noEmit && tsc --noEmit -p t/tests-types/packages && tsc --noEmit -p t/tests-types/strict && tsc --noEmit -p t/tests-types/strict-off && tsc --noEmit -p t/tests-types/types-only"
   },
   "repository": {
     "type": "git",

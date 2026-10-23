@@ -20,6 +20,7 @@
     "TypeScript: write the schema as const and get the type with InferFromSchema<typeof schema> from 'livr/types'",
     "Prefer an alias (registerAliasedRule(), existing rules under a new name and error code) to a rule function when existing rules can do the check",
     "A rule function (registerRules()) gets the rule arguments and returns (value, allValues, outputArr) => errorCode | undefined. It skips empty values (undefined, null, '') and pushes to outputArr to change the value. registerDefaultRules() and registerAliasedDefaultRule() register rules for all validators",
-    "Registering a rule does not give it a type. Declare the type of every custom rule and alias in RuleTypes with declare module 'livr/types/inference', in a .ts file with an import or an export: As<T>, a plain type, AliasType<typeof rules> or an interface that extends RuleType"
+    "Registering a rule does not give it a type. Declare the type of every custom rule and alias in RuleTypes with declare module 'livr/types/inference', in a .ts file with an import or an export: As<T>, a plain type, AliasType<typeof rules> or an interface that extends RuleType",
+    "Turn on strict mode in a new TypeScript project: interface TypeOptions { strictRules: true } in declare module 'livr/types/inference'. A misspelled rule or a rule without a type is then a compile error, instead of the unknown type. It is off by default: in an existing project, turn it on only once every rule has a type"
   ]
 }

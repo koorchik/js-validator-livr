@@ -75,6 +75,11 @@ type AnySchema = { readonly [field: string]: AnyRuleDefinition };
  * validators, in aliases, in the names of registered rules and aliases, and with
  * `satisfies LIVRSchema`. Rules inside the arguments of meta rules are checked too.
  *
+ * Strict mode is off by default, so existing projects keep compiling. Turn it on in new
+ * projects, and in existing ones once every rule has a type. `strictRules: false` turns it off
+ * explicitly, so the project keeps working the same if a later major version turns it on by
+ * default.
+ *
  * @example
  * ```typescript
  * declare module 'livr/types/inference' {
@@ -85,10 +90,10 @@ type AnySchema = { readonly [field: string]: AnyRuleDefinition };
  * ```
  */
 export interface TypeOptions {
-  // strictRules: true
+  // strictRules: true | false
 }
 
-/** `strictRules: true` in TypeOptions */
+/** `strictRules: true` in TypeOptions, off when it is missing or `false` */
 type IsStrictRules = TypeOptions extends { readonly strictRules: true } ? true : false;
 
 // ============================================================================
