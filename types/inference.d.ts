@@ -77,8 +77,7 @@ type AnySchema = { readonly [field: string]: AnyRuleDefinition };
  *
  * Strict mode is off by default, so existing projects keep compiling. Turn it on in new
  * projects, and in existing ones once every rule has a type. `strictRules: false` turns it off
- * explicitly, so the project keeps working the same if a later major version turns it on by
- * default.
+ * explicitly.
  *
  * @example
  * ```typescript
