@@ -608,9 +608,9 @@ type Item = InferFromSchema<typeof schema>;
 A rule without a type gives `unknown`, with no error: a misspelled rule, or a custom rule or an alias whose type was forgotten. Strict mode makes it a compile error. It is off by default, so existing projects keep compiling. Turn it on in new projects, and in existing ones once every rule has a type. One declaration turns it on for the whole application:
 
 ```typescript
-// livr-options.d.ts, or any .ts file of your project. The file must be a module:
-// with an import or an export, else it declares a new module instead of adding to livr
-export {};
+// livr-options.ts, or any .ts file of your project. The import makes the file a module and
+// loads the types of livr: without an import or an export, the file would declare a new module
+import type {} from 'livr/types/inference';
 
 declare module 'livr/types/inference' {
   interface TypeOptions {

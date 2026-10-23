@@ -87,9 +87,8 @@ const validator = new LIVR.Validator<User>(schema);
 In a new project, turn on [strict mode](https://js.livr-spec.org/typescript#strict-mode): a misspelled rule or a rule without a type is a compile error then, instead of the `unknown` type. It is off by default, so existing projects keep compiling: turn it on there once every custom rule has a type.
 
 ```typescript
-// livr-options.ts. `export {}` makes the file a module: without an import or an export,
-// the declaration would declare a new module instead of adding to livr
-export {};
+// livr-options.ts: the import makes the file a module and loads the types of livr
+import type {} from 'livr/types/inference';
 
 declare module 'livr/types/inference' {
   interface TypeOptions {

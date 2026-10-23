@@ -85,7 +85,8 @@ if (validData) {
 In a new project, also turn on [strict mode](../TYPESCRIPT.md#strict-mode): a misspelled rule or a rule without a type is a compile error then, instead of the `unknown` type. Add this to any `.ts` file of the project:
 
 ```ts
-export {}; // the file must be a module, else it declares a new module instead of adding to livr
+// The import makes the file a module and loads the types of livr
+import type {} from 'livr/types/inference';
 
 declare module 'livr/types/inference' {
   interface TypeOptions {

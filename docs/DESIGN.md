@@ -510,7 +510,7 @@ Absolute numbers depend on hardware; compare the ratios.
 | Ajv               | No        | 4                             | 38 KB                    |
 | Joi               | No        | 7 (six @hapi/\* packages)     | 55 KB                    |
 
-Sizes are of everything a package exports, bundled with esbuild (`--minify`) and gzipped: LIVR 2.11.0, Valibot 1.5, Zod 4.6, fastest-validator 1.19, Ajv 8.20, Joi 18.3. Valibot and Zod are built for tree-shaking, so a typical schema needs only part of them. LIVR can be tree-shaken too: import the core (`livr/lib/Validator`) and only the rules you use.
+Sizes are of everything a package exports, bundled with esbuild (`--minify`) and gzipped: LIVR 2.12.0, Valibot 1.5, Zod 4.6, fastest-validator 1.19, Ajv 8.20, Joi 18.3. Valibot and Zod are built for tree-shaking, so a typical schema needs only part of them. LIVR can be tree-shaken too: import the core (`livr/lib/Validator`) and only the rules you use.
 
 #### Why Zero Dependencies Matters
 
@@ -1312,15 +1312,17 @@ declare module 'livr/types/inference' {
 // Register the rules
 LIVR.Validator.registerDefaultRules({
   toDate: () => (value, _, outputArr) => {
-    if (!value) return;
+    if (LIVR.util.isNoValue(value)) return undefined;
     const date = new Date(value);
     if (isNaN(date.getTime())) return 'INVALID_DATE';
     outputArr.push(date);
+    return undefined;
   },
   uuid: () => (value) => {
-    if (!value) return;
+    if (LIVR.util.isNoValue(value)) return undefined;
     const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
     if (!uuidRegex.test(value)) return 'INVALID_UUID';
+    return undefined;
   },
 });
 

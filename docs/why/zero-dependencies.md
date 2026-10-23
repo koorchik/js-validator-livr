@@ -21,7 +21,7 @@ description: livr has no runtime dependencies. About 2 KB for the core and 5 KB 
 
 | Validator | Version | Runtime dependencies |
 | --- | --- | --- |
-| **LIVR** | 2.11.0 | **0** |
+| **LIVR** | 2.12.0 | **0** |
 | Zod | 4.6.7 | 0 |
 | Valibot | 1.5.0 | 0 |
 | fastest-validator | 1.19.1 | 0 |
@@ -32,7 +32,7 @@ Zero dependencies alone is not unique. LIVR is the one that combines it with sch
 
 ## Size
 
-Measured with esbuild (`--bundle --minify`) and gzip, version 2.11.0:
+Measured with esbuild (`--bundle --minify`) and gzip, version 2.12.0:
 
 | What you import | min+gzip |
 | --- | --- |
