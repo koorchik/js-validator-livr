@@ -1,6 +1,6 @@
 ## CHANGELOG
 
-Unreleased
+v2.12.1
 -   Docs: the strict mode snippet imports `livr/types/inference` instead of `export {}`, so it turns strict mode on in any file: the import also loads the types of livr. Before, the file worked only when another file of the program imported livr
 -   README: the links to the documentation are a list
 
