@@ -8,7 +8,15 @@
 [![Bundle Size](https://img.shields.io/bundlephobia/minzip/livr)](https://bundlephobia.com/package/livr)
 [![Known Vulnerabilities](https://snyk.io/test/github/koorchik/js-validator-livr/badge.svg?targetFile=package.json)](https://snyk.io/test/github/koorchik/js-validator-livr?targetFile=package.json)
 
-**Documentation: [js.livr-spec.org](https://js.livr-spec.org)** · [Getting started](https://js.livr-spec.org/guide/getting-started) · [Custom rules](https://js.livr-spec.org/guide/custom-rules) · [TypeScript](https://js.livr-spec.org/typescript) · [API](https://js.livr-spec.org/api) · [LIVR specification](https://livr-spec.org)
+## Documentation
+
+The full documentation is at **[js.livr-spec.org](https://js.livr-spec.org)**:
+
+- [Getting started](https://js.livr-spec.org/guide/getting-started): install, the first validator, errors and types
+- [Custom rules](https://js.livr-spec.org/guide/custom-rules): aliases, rule functions and their types
+- [TypeScript](https://js.livr-spec.org/typescript): type inference and strict mode
+- [API](https://js.livr-spec.org/api): `Validator` and `AsyncValidator`, their options and methods, registering rules
+- [LIVR specification](https://livr-spec.org): the rules and the test suite shared by all implementations
 
 The guides, the API and the TypeScript guide are also in the package, in `node_modules/livr/docs`. For AI assistants: [llms.txt](https://js.livr-spec.org/llms.txt), and the whole documentation in one file, [llms-full.txt](https://js.livr-spec.org/llms-full.txt).
 

@@ -1,5 +1,9 @@
 ## CHANGELOG
 
+Unreleased
+-   Docs: the strict mode snippet imports `livr/types/inference` instead of `export {}`, so it turns strict mode on in any file: the import also loads the types of livr. Before, the file worked only when another file of the program imported livr
+-   README: the links to the documentation are a list
+
 v2.12.0
 -   The npm package contains only `lib`, `async.js`, `async.d.ts`, `types`, the guides, the API and the TypeScript guide (`docs/`), README, LICENSE and CHANGELOG (98 files instead of 341): tests, editor and CI configs are no longer published
 -   Code examples in README and docs use 2-space indentation, like the code
