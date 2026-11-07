@@ -3,6 +3,7 @@ import type { As } from '../../../types/inference';
 
 declare module '../../../types/inference' {
   interface BuiltInRuleTypes {
-    any_object: As<Record<string, unknown>>;
+    // Arguments are ignored, as in LIVR 2.0
+    any_object: As<Record<string, unknown>, readonly unknown[]>;
   }
 }

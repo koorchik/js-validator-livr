@@ -30,6 +30,7 @@
 /// <reference path="../lib/rules/special/email.d.ts" />
 /// <reference path="../lib/rules/special/url.d.ts" />
 /// <reference path="../lib/rules/special/iso_date.d.ts" />
+/// <reference path="../lib/rules/special/iso_datetime.d.ts" />
 /// <reference path="../lib/rules/special/equal_to_field.d.ts" />
 /// <reference path="../lib/rules/meta/nested_object.d.ts" />
 /// <reference path="../lib/rules/meta/list_of.d.ts" />
@@ -37,6 +38,41 @@
 /// <reference path="../lib/rules/meta/list_of_different_objects.d.ts" />
 /// <reference path="../lib/rules/meta/variable_object.d.ts" />
 /// <reference path="../lib/rules/meta/or.d.ts" />
+// LIVR 2.5: scalar rules
+/// <reference path="../lib/rules/common/boolean.d.ts" />
+/// <reference path="../lib/rules/common/required_if.d.ts" />
+/// <reference path="../lib/rules/string/not_one_of.d.ts" />
+/// <reference path="../lib/rules/string/digits.d.ts" />
+/// <reference path="../lib/rules/string/starts_with.d.ts" />
+/// <reference path="../lib/rules/string/ends_with.d.ts" />
+/// <reference path="../lib/rules/string/contains.d.ts" />
+/// <reference path="../lib/rules/numeric/max_decimals.d.ts" />
+/// <reference path="../lib/rules/special/iso_time.d.ts" />
+/// <reference path="../lib/rules/list/list_length.d.ts" />
+/// <reference path="../lib/rules/list/unique.d.ts" />
+/// <reference path="../lib/rules/modifiers/split.d.ts" />
+// LIVR 2.5: format rules
+/// <reference path="../lib/rules/format/uuid.d.ts" />
+/// <reference path="../lib/rules/format/ip.d.ts" />
+/// <reference path="../lib/rules/format/cidr.d.ts" />
+/// <reference path="../lib/rules/format/hostname.d.ts" />
+/// <reference path="../lib/rules/format/base64.d.ts" />
+/// <reference path="../lib/rules/format/hex.d.ts" />
+/// <reference path="../lib/rules/format/digest.d.ts" />
+/// <reference path="../lib/rules/format/mongo_id.d.ts" />
+/// <reference path="../lib/rules/format/hex_color.d.ts" />
+/// <reference path="../lib/rules/format/mac.d.ts" />
+/// <reference path="../lib/rules/format/e164.d.ts" />
+/// <reference path="../lib/rules/format/semver.d.ts" />
+/// <reference path="../lib/rules/format/jwt.d.ts" />
+/// <reference path="../lib/rules/checksum/luhn.d.ts" />
+/// <reference path="../lib/rules/checksum/credit_card.d.ts" />
+/// <reference path="../lib/rules/checksum/iban.d.ts" />
+// LIVR 2.5: meta rules
+/// <reference path="../lib/rules/meta/when.d.ts" />
+/// <reference path="../lib/rules/meta/values.d.ts" />
+/// <reference path="../lib/rules/meta/keys.d.ts" />
+/// <reference path="../lib/rules/common/any.d.ts" />
 
 // ============================================================================
 // Base Types
@@ -170,9 +206,11 @@ declare const ruleTypeBrand: unique symbol;
  * so deeply nested schemas stay cheap.
  *
  * Set `params` to the types of the arguments, as a tuple like `this['args']`, to check them in
- * strict mode (TypeOptions). Meta rules set it, so that the rules in their arguments are checked
- * too: `params: readonly [schema: LIVRSchema]`. A single argument can also be written without
- * the array, like the validator takes it.
+ * strict mode (TypeOptions). Every built-in rule sets it: meta rules, so that the rules in their
+ * arguments are checked too (`params: readonly [schema: LIVRSchema]`), `readonly []` for a rule
+ * that takes no arguments, `...ignored: unknown[]` at the end for a rule that ignores the arguments
+ * after the ones it takes. A single argument can also be written without the array, like the
+ * validator takes it. Without `params` the arguments are not checked.
  *
  * @example
  * ```typescript
@@ -210,9 +248,13 @@ export interface Present<T> extends RuleType {
  * A rule that checks or converts the value to T. A narrower T from earlier rules is kept:
  * with `max_length: As<string>`, `[{ one_of: ['a', 'b'] }, { max_length: 1 }]` stays 'a' | 'b'.
  * `As<unknown>` keeps any type, for rules that only check the value.
+ *
+ * `Params` are the types of the arguments for strict mode, like `params` of RuleType:
+ * `As<string, readonly [prefix: string]>`. Any arguments by default.
  */
-export interface As<T> extends RuleType {
+export interface As<T, Params extends readonly unknown[] = readonly unknown[]> extends RuleType {
   output: this['input'] extends T ? this['input'] : T;
+  params: Params;
 }
 
 /**
@@ -323,12 +365,17 @@ type RuleArgs<T> = 0 extends 1 & T
     ? Params | SingleArg<Params>
     : unknown;
 
-/** `{ rule: arg }` for `{ rule: [arg] }`, when the rule takes one argument or a list of them */
+/**
+ * `{ rule: arg }` for `{ rule: [arg] }`, when the rule takes one argument: the first parameter
+ * (also an optional one, or one before ignored arguments), or an item of a list of arguments
+ */
 type SingleArg<Params> = Params extends readonly unknown[]
-  ? number extends Params['length']
-    ? Exclude<Params[number], readonly unknown[]>
-    : Params extends readonly [infer Only]
-      ? Exclude<Only, readonly unknown[]>
+  ? Required<Params> extends readonly [infer First, ...unknown[]]
+    ? [First] extends Params
+      ? Exclude<First, readonly unknown[]>
+      : never
+    : number extends Params['length']
+      ? Exclude<Params[number], readonly unknown[]>
       : never
   : never;
 

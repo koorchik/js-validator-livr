@@ -1,6 +1,6 @@
 ---
 title: Zero dependencies
-description: livr has no runtime dependencies. About 2 KB for the core and 5 KB with every built-in rule, min+gzip.
+description: livr has no runtime dependencies. About 2 KB for the core and 13 KB with all 68 built-in rules, min+gzip.
 ---
 
 # Zero dependencies
@@ -32,13 +32,15 @@ Zero dependencies alone is not unique. LIVR is the one that combines it with sch
 
 ## Size
 
-Measured with esbuild (`--bundle --minify`) and gzip, version 2.12.0:
+Measured with esbuild (`--bundle --minify`) and gzip, version 2.13.0:
 
 | What you import | min+gzip |
 | --- | --- |
 | `livr/lib/Validator`, the core without rules | ~2 KB |
-| `livr`, the core and all 35 built-in rules | ~5 KB |
-| `livr/async`, the async validator and all rules | ~5.6 KB |
+| `livr`, the core and all 68 built-in rules (35 of LIVR 2.0, 33 of the LIVR 2.5 draft) | ~13 KB |
+| `livr/async`, the async validator and all rules | ~14 KB |
+
+The 35 rules of LIVR 2.0 with the core are about 5 KB, imported one by one.
 
 The package ships its source as it is, without a build step, so you can read in `node_modules` exactly the code you run. To ship only the rules you use, import them one by one, see [Smaller bundles](/guide/usage#smaller-bundles).
 

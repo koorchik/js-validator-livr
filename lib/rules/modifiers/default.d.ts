@@ -22,6 +22,7 @@ type Widen<T> =
  * rules, it is their type or the type of the default value
  */
 interface DefaultType extends RuleType {
+  params: readonly [value: unknown, ...ignored: unknown[]];
   output: unknown extends this['input']
     ? Widen<this['args'][0]>
     : Exclude<this['input'], null | undefined> | this['args'][0];

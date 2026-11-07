@@ -166,7 +166,7 @@ Before diving into design decisions, here's a comprehensive comparison of LIVR a
 | **Type Coercion**               | ✅ Automatic               | Manual            | ✅ Via options | ✅ Yes            | Manual             |
 | **Unknown Fields**              | Strip (default)            | Strip (default)   | Pass through   | Pass through      | Strip (default)    |
 | **Input Immutability**          | ✅ Always                  | ✅ Always         | ✅ Always      | ⚠️ Mutates        | ✅ Always          |
-| **Whole Package (min+gzip)**    | 5 KB                       | 92 KB             | 55 KB          | 12.4 KB           | 15 KB              |
+| **Whole Package (min+gzip)**    | 13 KB                      | 92 KB             | 55 KB          | 12.4 KB           | 15 KB              |
 | **Zero Dependencies**           | ✅ Yes                     | ✅ Yes            | ❌ No          | ✅ Yes            | ✅ Yes             |
 | **Safe with Untrusted Schemas** | ✅ Yes                     | N/A               | N/A            | ❌ RCE risk       | N/A                |
 
@@ -503,7 +503,7 @@ Absolute numbers depend on hardware; compare the ratios.
 
 | Validator         | Zero Deps | Runtime Deps                  | Whole Package (min+gzip) |
 | ----------------- | --------- | ----------------------------- | ------------------------ |
-| **LIVR**          | Yes       | 0                             | 5 KB (core: 2 KB)        |
+| **LIVR**          | Yes       | 0                             | 13 KB (core: 2 KB)       |
 | Valibot           | Yes       | 0                             | 15 KB                    |
 | Zod               | Yes       | 0                             | 92 KB                    |
 | fastest-validator | Yes       | 0                             | 12.4 KB                  |
@@ -545,7 +545,7 @@ Sizes are of everything a package exports, bundled with esbuild (`--minify`) and
 
 -   Every KB affects page load time
 -   Validation often needed client-side for UX
--   5 KB vs 55 KB is significant for mobile users
+-   13 KB vs 55 KB is significant for mobile users
 
 **Embedded systems:**
 

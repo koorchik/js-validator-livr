@@ -1,11 +1,15 @@
 // Type inference for 'trim' rule
-// A new string: literal types of earlier rules are not kept
+import type { RuleType } from '../../../types/inference';
+
+/** A new string: literal types of earlier rules are not kept */
+interface TrimType extends RuleType {
+  output: string;
+  // Arguments are ignored, as in LIVR 2.0
+  params: readonly unknown[];
+}
 
 declare module '../../../types/inference' {
   interface BuiltInRuleTypes {
-    trim: string;
+    trim: TrimType;
   }
 }
-
-// A module, so that "declare module" above adds to the types instead of replacing them
-export {};

@@ -153,7 +153,9 @@ type _withoutType = [
   // Arguments that do not fit `params` of meta rules
   Expect<Equal<Valid<{ f: { nested_object: 'string' } }>, false>>,
   Expect<Equal<Valid<{ f: { variable_object: 'type' } }>, false>>,
-  Expect<Equal<Valid<{ f: { list_of: [['required'], 'string'] } }>, false>>,
+  Expect<Equal<Valid<{ f: { list_of: ['required', ['string']] } }>, false>>,
+  // Like the validator, the arguments after a list of rules are ignored
+  Expect<Equal<Valid<{ f: { list_of: [['required'], 'string'] } }>, true>>,
 ];
 
 // Schemas nested 16 levels deep (8 levels of `or`) are checked to the bottom. TypeScript stops

@@ -9,7 +9,7 @@ type Rule = Exclude<LIVRRuleDefinition, readonly unknown[]>;
  * { list_of: 'string' }, { list_of: ['required', 'string'] } or { list_of: [['required', 'string']] }
  */
 interface ListOfType extends RuleType {
-  params: readonly Rule[] | readonly [rules: readonly Rule[]];
+  params: readonly Rule[] | readonly [rules: readonly Rule[], ...ignored: unknown[]];
   output: Array<
     this['args'][0] extends infer Rules extends readonly unknown[]
       ? InferRuleType<Rules>

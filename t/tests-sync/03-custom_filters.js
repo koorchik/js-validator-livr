@@ -58,7 +58,9 @@ test('Validate data with registered rules', () => {
   );
 });
 
-test('list_of, or and aliases pass the same arguments to rules as validate()', () => {
+// LIVR 2.5: or and aliases are transparent, their rules see the siblings of the field. Items of
+// list_of have no containing object, their rules get an empty object
+test('list_of, or and aliases pass the containing object to rules like validate()', () => {
   const calls = [];
   const validator = new LIVR.Validator({
     list: { list_of: ['my_spy', 'my_spy'] },
@@ -77,7 +79,8 @@ test('list_of, or and aliases pass the same arguments to rules as validate()', (
   });
   validator.registerAliasedRule({ name: 'my_spied_alias', rules: ['my_spy'] });
 
-  const output = validator.validate({ list: ['a'], any: 'b', aliased: 'c', empty: [1, 2] });
+  const input = { list: ['a'], any: 'b', aliased: 'c', empty: [1, 2] };
+  const output = validator.validate(input);
 
   assert.deepEqual(output, {
     list: ['a!!'],
@@ -86,12 +89,15 @@ test('list_of, or and aliases pass the same arguments to rules as validate()', (
     empty: [undefined, undefined],
   });
   assert.deepEqual(calls, [
-    ['a', { field: 'a' }],
-    ['a!', { field: 'a' }],
-    ['b', { field: 'b' }],
-    ['b', { field: 'b' }],
-    ['c', { value: 'c' }],
+    ['a', {}],
+    ['a!', {}],
+    ['b', input],
+    ['b', input],
+    ['c', input],
   ]);
+  assert.equal(calls[2][1], input);
+  assert.equal(calls[4][1], input);
+  assert.equal(Object.isFrozen(calls[0][1]), true);
 });
 
 test('Rules edge cases keep their results', () => {

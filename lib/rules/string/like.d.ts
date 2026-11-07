@@ -3,6 +3,6 @@ import type { As } from '../../../types/inference';
 
 declare module '../../../types/inference' {
   interface BuiltInRuleTypes {
-    like: As<string>;
+    like: As<string, readonly [pattern: string | number, flags?: string, ...ignored: unknown[]]>;
   }
 }

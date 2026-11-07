@@ -3,6 +3,7 @@ import type { RuleType } from '../../../types/inference';
 
 /** { eq: 'a' } -> 'a': the output is the allowed value itself */
 interface EqType extends RuleType {
+  params: readonly [value: string | number | boolean, ...ignored: unknown[]];
   output: this['args'][0];
 }
 

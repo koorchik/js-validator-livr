@@ -17,7 +17,11 @@ type BuildDiscriminatedUnion<Selector, Schemas> = Selector extends string
 
 /** { list_of_different_objects: [selectorField, { selectorValue: schema }] } */
 interface ListOfDifferentObjectsType extends RuleType {
-  params: readonly [selectorField: string, schemas: { readonly [value: string]: LIVRSchema }];
+  params: readonly [
+    selectorField: string,
+    schemas: { readonly [value: string]: LIVRSchema },
+    ...ignored: unknown[],
+  ];
   output: Array<BuildDiscriminatedUnion<this['args'][0], this['args'][1]>>;
 }
 

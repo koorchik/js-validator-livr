@@ -1,11 +1,14 @@
 // Type inference for 'remove' rule
-// A new string: literal types of earlier rules are not kept
+import type { RuleType } from '../../../types/inference';
+
+/** A new string: literal types of earlier rules are not kept */
+interface RemoveType extends RuleType {
+  output: string;
+  params: readonly [chars: string, ...ignored: unknown[]];
+}
 
 declare module '../../../types/inference' {
   interface BuiltInRuleTypes {
-    remove: string;
+    remove: RemoveType;
   }
 }
-
-// A module, so that "declare module" above adds to the types instead of replacing them
-export {};

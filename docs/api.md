@@ -20,6 +20,19 @@ const validator = new LIVR.Validator(schema, { autoTrim: true });
 | ---------- | ------- | ---------------------------------------- |
 | `autoTrim` | `false` | Trim all string values before validation |
 
+The bounds `today`, `yesterday` and `tomorrow` of `iso_date` and `iso_datetime` are days in UTC of the system clock, never in the time zone of the server. A rule reads `Date.now()` whenever it checks a value with such a bound, so a long-lived validator follows the clock, and tests fix the time with fake timers (`mock.timers` of `node:test`, `vi.useFakeTimers()`, `jest.useFakeTimers()`) or a stub of `Date.now()`:
+
+```js
+import { test } from 'node:test';
+
+test('a birth date is not in the future', t => {
+  t.mock.timers.enable({ apis: ['Date'], now: new Date('2026-10-29T12:00:00Z') });
+  const validator = new LIVR.Validator({ birth_date: ['required', { iso_date: { max: 'today' } }] });
+
+  validator.validate({ birth_date: '2026-10-30' }); // false, { birth_date: 'DATE_TOO_LATE' }
+});
+```
+
 ### `Validator.defaultAutoTrim(boolean)`
 
 Turns auto-trim on or off for all validators created afterwards.

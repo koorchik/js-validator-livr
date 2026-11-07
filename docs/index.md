@@ -36,7 +36,7 @@ features:
     linkText: How it works
   - icon: 📦
     title: Zero dependencies
-    details: Nothing to audit but LIVR itself, no supply-chain risk, no version conflicts. About 2 KB for the core and 5 KB with every built-in rule, min+gzip.
+    details: Nothing to audit but LIVR itself, no supply-chain risk, no version conflicts. About 2 KB for the core and 13 KB with all 68 built-in rules, min+gzip.
     link: /why/zero-dependencies
     linkText: Why it matters
 ---
@@ -180,8 +180,8 @@ const user = validator.validate(input); // User | false
     <div class="stat-tile__label">validator core, min+gzip</div>
   </div>
   <div class="stat-tile">
-    <div class="stat-tile__value">~5 KB</div>
-    <div class="stat-tile__label">with all 35 built-in rules, min+gzip. Import only the rules you use to make it smaller</div>
+    <div class="stat-tile__value">~13 KB</div>
+    <div class="stat-tile__label">with all 68 built-in rules, min+gzip. Import only the rules you use to make it smaller</div>
   </div>
 </div>
 

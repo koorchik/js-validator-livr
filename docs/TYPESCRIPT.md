@@ -495,9 +495,9 @@ declare module 'livr/types/inference' {
 }
 ```
 
-`params` are the types of the arguments, a tuple like `this['args']`: [strict mode](#strict-mode) checks the rules in the arguments with it. A single argument can also be written without the array, like `{ dict_of: 'string' }`. Without `params`, the arguments are not checked.
+`params` are the types of the arguments, a tuple like `this['args']`: [strict mode](#strict-mode) checks the arguments with it, and the rules in them. A single argument can also be written without the array, like `{ dict_of: 'string' }`. `readonly []` is a rule without arguments, `...ignored: unknown[]` at the end allows extra arguments that the rule ignores. Without `params`, the arguments are not checked. `As<T, Params>` sets them for a rule with a fixed type.
 
-The built-in meta rules are written this way, see `lib/rules/meta/*.d.ts` in the package.
+The built-in rules are written this way, see `lib/rules/meta/*.d.ts` and the other `lib/rules/**/*.d.ts` in the package.
 
 ### Aliases
 
@@ -648,7 +648,16 @@ const schema = {
 } as const satisfies LIVRSchema;
 ```
 
-Strict mode does not change the inferred types. It also checks the arguments of meta rules, `{ nested_object: 'string' }` is an error, by `params` of their types (see [Meta Rules](#meta-rules)). The arguments of other rules are not checked.
+Strict mode does not change the inferred types. It also checks the arguments of the rules by `params` of their types (see [Meta Rules](#meta-rules)), like the validator does when it builds the rules:
+
+- the rules in the arguments of meta rules: `{ nested_object: 'string' }` and `{ when: ['type', 'required', []] }` are errors (an empty list of rules in `when`, `values` and `keys` is a schema error, use `'any'`);
+- a LIVR 2.5 rule without arguments takes none: `{ boolean: 1 }`, `{ jwt: 'HS256' }` are errors;
+- a number may be a numeric string and a string may be a number, as the validator reads them: `{ max_decimals: '2' }`, `{ min_length: '5' }`, `{ split: 1 }`, `{ mac: '64' }`; values are checked, `{ uuid: 4 }` and `{ mac: 32 }` are errors;
+- `iso_date`, `iso_datetime` and `iso_time` take nothing or an options object first: `{ iso_date: 'today' }` is an error;
+- the arguments after the ones a rule takes are allowed, the validator ignores them: `{ split: [',', ';'] }` splits at `,`;
+- the LIVR 2.0 rules without arguments (`required`, `email`, `trim`, `integer`...) take any arguments, the validator ignores them as in LIVR 2.0: `{ required: true }` compiles.
+
+A custom rule gets the same checks with `params`, or with the second argument of `As`: `As<string, readonly [prefix: string]>`. Without them its arguments are not checked.
 
 - **A schema without `as const`** has `string` instead of the rule names, every rule is reported. Inference needs `as const` anyway.
 - **A schema from JSON or built at runtime** is not checked: `new LIVR.Validator<Type>(schema as LIVRSchema)`.

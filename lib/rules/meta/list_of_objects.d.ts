@@ -3,7 +3,7 @@ import type { RuleType, InferFromSchema, LIVRSchema } from '../../../types/infer
 
 /** { list_of_objects: schema } -> an array of the schema type */
 interface ListOfObjectsType extends RuleType {
-  params: readonly [schema: LIVRSchema];
+  params: readonly [schema: LIVRSchema, ...ignored: unknown[]];
   output: Array<InferFromSchema<this['args'][0]>>;
 }
 

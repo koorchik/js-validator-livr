@@ -35,7 +35,7 @@ The guides, the API and the TypeScript guide are also in the package, in `node_m
 
 **Type inference.** TypeScript infers the type of the validated data from the schema itself: required and optional fields, literal unions from `one_of`, nested objects, lists and your own rules. No second definition to keep in sync. [How it works →](https://js.livr-spec.org/why/type-inference)
 
-**Zero dependencies.** Nothing to audit but LIVR itself. About 2 KB for the core and 5 KB with every built-in rule, min+gzip, and it runs in Node.js, browsers and edge runtimes. [Why zero dependencies →](https://js.livr-spec.org/why/zero-dependencies)
+**Zero dependencies.** Nothing to audit but LIVR itself. About 2 KB for the core, 5 KB with the 35 rules of LIVR 2.0 and 13 KB with all 68 built-in rules, min+gzip, and it runs in Node.js, browsers and edge runtimes. [Why zero dependencies →](https://js.livr-spec.org/why/zero-dependencies)
 
 **Proven.** Maintained since 2013 and built on the [LIVR specification](https://livr-spec.org), whose shared test suite collects edge cases found in implementations in 11 languages. [More →](https://js.livr-spec.org/why/proven)
 
@@ -168,6 +168,9 @@ More: the [custom rules guide](https://js.livr-spec.org/guide/custom-rules), typ
 | **Special** | [email](http://livr-spec.org/validation-rules/special-rules.html#email) &#183; [url](http://livr-spec.org/validation-rules/special-rules.html#url) &#183; [iso_date](http://livr-spec.org/validation-rules/special-rules.html#iso-date) &#183; [equal_to_field](http://livr-spec.org/validation-rules/special-rules.html#equal-to-field) |
 | **Meta** | [nested_object](http://livr-spec.org/validation-rules/metarules.html#nested-object) &#183; [variable_object](http://livr-spec.org/validation-rules/metarules.html#variable-object) &#183; [list_of](http://livr-spec.org/validation-rules/metarules.html#list-of) &#183; [list_of_objects](http://livr-spec.org/validation-rules/metarules.html#list-of-objects) &#183; [list_of_different_objects](http://livr-spec.org/validation-rules/metarules.html#list-of-different-objects) &#183; [or](http://livr-spec.org/validation-rules/metarules.html#or) |
 | **Modifiers** | [trim](http://livr-spec.org/validation-rules/modifiers.html#trim) &#183; [to_lc](http://livr-spec.org/validation-rules/modifiers.html#to-lc) &#183; [to_uc](http://livr-spec.org/validation-rules/modifiers.html#to-uc) &#183; [remove](http://livr-spec.org/validation-rules/modifiers.html#remove) &#183; [leave_only](http://livr-spec.org/validation-rules/modifiers.html#leave-only) &#183; [default](http://livr-spec.org/validation-rules/modifiers.html#default) |
+| **LIVR 2.5 draft** | boolean &#183; not_one_of &#183; digits &#183; starts_with &#183; ends_with &#183; contains &#183; max_decimals &#183; iso_datetime &#183; iso_time &#183; required_if &#183; when &#183; values &#183; keys &#183; any &#183; list_length &#183; unique &#183; split &#183; uuid &#183; ip &#183; cidr &#183; hostname &#183; base64 &#183; hex &#183; digest &#183; mongo_id &#183; hex_color &#183; mac &#183; e164 &#183; semver &#183; jwt &#183; luhn &#183; credit_card &#183; iban, and `iso_date` with `{ min, max }` |
+
+The **LIVR 2.5 draft** rules follow the draft of the next minor version of the specification: details may still change in a minor release of this package while it is a draft. They are loaded on first use. See [the list with their types](https://js.livr-spec.org/rules#livr-25-draft-rules).
 
 > **Need more rules?** Check out [livr-extra-rules](https://www.npmjs.com/package/livr-extra-rules) for additional validators.
 

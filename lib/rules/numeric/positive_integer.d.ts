@@ -3,6 +3,7 @@ import type { As } from '../../../types/inference';
 
 declare module '../../../types/inference' {
   interface BuiltInRuleTypes {
-    positive_integer: As<number>;
+    // Arguments are ignored, as in LIVR 2.0
+    positive_integer: As<number, readonly unknown[]>;
   }
 }

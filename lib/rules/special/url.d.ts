@@ -3,6 +3,7 @@ import type { As } from '../../../types/inference';
 
 declare module '../../../types/inference' {
   interface BuiltInRuleTypes {
-    url: As<string>;
+    // Arguments are ignored, as in LIVR 2.0
+    url: As<string, readonly unknown[]>;
   }
 }

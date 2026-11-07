@@ -3,7 +3,7 @@ import type { RuleType, InferFromSchema, LIVRSchema } from '../../../types/infer
 
 /** { nested_object: schema } -> the type of the schema */
 interface NestedObjectType extends RuleType {
-  params: readonly [schema: LIVRSchema];
+  params: readonly [schema: LIVRSchema, ...ignored: unknown[]];
   output: InferFromSchema<this['args'][0]>;
 }
 

@@ -17,7 +17,11 @@ type BuildVariableObject<Selector, Schemas> = Selector extends string
 
 /** { variable_object: [selectorField, { selectorValue: schema }] } */
 interface VariableObjectType extends RuleType {
-  params: readonly [selectorField: string, schemas: { readonly [value: string]: LIVRSchema }];
+  params: readonly [
+    selectorField: string,
+    schemas: { readonly [value: string]: LIVRSchema },
+    ...ignored: unknown[],
+  ];
   output: BuildVariableObject<this['args'][0], this['args'][1]>;
 }
 
