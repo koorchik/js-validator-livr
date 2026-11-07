@@ -46,7 +46,7 @@ Rules are organized by category:
 - `special/` - email, url, equal_to_field, iso_date
 - `modifiers/` - trim, to_lc, to_uc, default, remove, leave_only
 - `meta/` - nested_object, variable_object, list_of, list_of_objects, list_of_different_objects, or
-- `list/`, `format/`, `checksum/` - LIVR 2.5 draft rules (list_length, unique; uuid, ip, hostname...; luhn, credit_card, iban). The other 2.5 rules are in the folders above. `LIVR.js` and `async.js` load the 2.5 rules on first use (`lazyRule()`)
+- `list/`, `format/`, `checksum/` - LIVR 2.5 rules (list_length, unique; uuid, ip, hostname...; luhn, credit_card, iban). The other 2.5 rules are in the folders above. `LIVR.js` and `async.js` load the 2.5 rules on first use (`lazyRule()`)
 - `meta-async/` - Async versions of meta rules for AsyncValidator
 
 Every rule file is self-contained: it may use the generic helpers of `lib/util.js` and public validator methods (`validate()`, `getErrors()`, `getFieldRule()`...), but no private methods (`_name`) and no shared rule-specific modules. Repeat code between rules (for example, sync and async versions of a meta rule) instead of extracting it into a separate file.

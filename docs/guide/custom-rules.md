@@ -150,4 +150,4 @@ A rule without a type gives `unknown`. To make it a compile error, for misspelle
 
 ## More rules
 
-[livr-extra-rules](https://www.npmjs.com/package/livr-extra-rules) adds rules such as `ipv4` and `md5`. `boolean`, `credit_card`, `uuid`, `iso_date` with ranges and most of its other rules are built in now, as [LIVR 2.5 draft rules](../rules.md#livr-25-draft-rules).
+[livr-extra-rules](https://www.npmjs.com/package/livr-extra-rules) adds rules such as `ipv4` and `md5`. `boolean`, `credit_card`, `uuid`, `iso_date` with ranges and most of its other rules are built in now, as [LIVR 2.5 rules](../rules.md#livr-25-rules).

@@ -18,7 +18,7 @@ A validator is a dependency you keep for years: your schemas, error codes and UI
 | 2016 | Specification 2.0 and `livr` 2.0.0, on the same day. Version 2 is still the current one |
 | 2023 | 2.7: camelCase rule names, faster validation, 3–5× faster validator construction |
 | 2025 | 2.8 and 2.9: TypeScript declarations, then type inference from the schema |
-| 2026 | 2.11: fixes found by new test suite cases, and the fastest results in the [benchmarks](/why/performance) |
+| 2026 | 2.11: fixes found by new test suite cases, and the fastest results in the [benchmarks](/why/performance). 2.13: the 33 rules added in LIVR 2.5 |
 
 43 releases on npm, all of version 2 since 2016: a schema written for `livr` 2.0 still works with the latest release.
 

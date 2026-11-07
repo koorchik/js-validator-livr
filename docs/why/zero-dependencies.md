@@ -37,7 +37,7 @@ Measured with esbuild (`--bundle --minify`) and gzip, version 2.13.0:
 | What you import | min+gzip |
 | --- | --- |
 | `livr/lib/Validator`, the core without rules | ~2 KB |
-| `livr`, the core and all 68 built-in rules (35 of LIVR 2.0, 33 of the LIVR 2.5 draft) | ~13 KB |
+| `livr`, the core and all 68 built-in rules (35 of LIVR 2.0, 33 added in LIVR 2.5) | ~13 KB |
 | `livr/async`, the async validator and all rules | ~14 KB |
 
 The 35 rules of LIVR 2.0 with the core are about 5 KB, imported one by one.

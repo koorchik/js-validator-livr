@@ -1,5 +1,8 @@
 ## CHANGELOG
 
+v2.13.1
+-   Docs: LIVR 2.5 is released, not a draft. The README and the site say that `livr` implements LIVR 2.0 and LIVR 2.5, link the LIVR 2.5 specification, and the rules of LIVR 2.5 link to their pages on livr-spec.org
+
 v2.13.0
 -   The rules of the LIVR 2.5 draft are built in: `boolean`, `not_one_of`, `digits`, `starts_with`, `ends_with`, `contains`, `max_decimals`, `iso_datetime`, `iso_time`, `required_if`, `when`, `values`, `keys`, `any`, `list_length`, `unique`, `split`, `uuid`, `ip`, `cidr`, `hostname`, `base64`, `hex`, `digest`, `mongo_id`, `hex_color`, `mac`, `e164`, `semver`, `jwt`, `luhn`, `credit_card` and `iban`, in `Validator` and `AsyncValidator`, with their TypeScript types. LIVR 2.5 is a draft of the next minor version of the specification: details of these rules may still change in a minor release. See [Built-in rules](https://js.livr-spec.org/rules#livr-25-draft-rules)
 -   `iso_date` takes bounds: `{ iso_date: { min: '2000-01-01', max: 'today' } }` gives `DATE_TOO_EARLY` and `DATE_TOO_LATE`. `today`, `yesterday` and `tomorrow` are days in UTC of the system clock, read whenever a value is checked, so tests fix the time with fake timers (see the [API](https://js.livr-spec.org/api)). `iso_datetime` takes the same bounds
