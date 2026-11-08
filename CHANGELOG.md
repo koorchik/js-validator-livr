@@ -1,5 +1,8 @@
 ## CHANGELOG
 
+v2.13.2
+-   Docs: the rules tables of the README and the site follow the groups of the specification. The LIVR 2.5 rules are in their groups, marked 2.5, and in the new list, format and checksum groups, instead of a separate list. The rules link to their pages on livr-spec.org, the groups to the pages of the groups
+
 v2.13.1
 -   Docs: LIVR 2.5 is released, not a draft. The README and the site say that `livr` implements LIVR 2.0 and LIVR 2.5, link the LIVR 2.5 specification, and the rules of LIVR 2.5 link to their pages on livr-spec.org
 
