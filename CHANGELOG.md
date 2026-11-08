@@ -1,5 +1,9 @@
 ## CHANGELOG
 
+v2.13.3
+-   Security fix in `url`
+-   Fix: `url` rejects a dot after the host (`https://example.com.`), host labels longer than 63 characters and ports above 65535, and accepts one-digit ports (`https://example.com:8`). Unicode hosts, `localhost` and IPv4 addresses pass as before
+
 v2.13.2
 -   Docs: the rules tables of the README and the site follow the groups of the specification. The LIVR 2.5 rules are in their groups, marked 2.5, and in the new list, format and checksum groups, instead of a separate list. The rules link to their pages on livr-spec.org, the groups to the pages of the groups
 
